@@ -1,300 +1,256 @@
-# cad/ — Blender + FreeCAD working package
+# MEBC Energy Class — Coaxial Contra-Rotating Propulsor Design Tool
 
-Geometry pipeline for the Volare cockpit. Built on the STLs in `../source_documents/`
-and the frozen constraints in `../notes/`.
+MATLAB design and optimisation framework for the contra-rotating propulsor of a
+5 m, 250 kg catamaran at 20 knots. Written for Team Volare, ICT Mumbai.
 
-Everything here is reproducible from a bare Python install with numpy; only
-`blender/` needs Blender. That is deliberate — the measurement and optimisation
-maths is testable without a GUI app, and Blender is a consumer of it, not the
-place it lives.
+The objective is **minimum electrical energy per nautical mile**, not maximum
+propeller efficiency. Everything from hull resistance to battery current is in
+one chain, and every unmeasured input is declared, configurable and swept.
 
-## Canonical frame
+---
 
-**X forward, Y port, Z up. Origin = centreline × hull mid-length × hull keel bottom.**
+## 1. Modelling architecture
 
-The two supplied STLs do *not* share a frame, and neither matches this one:
+```
+config.m ──► params  (single source of truth for every engineering number)
+                │
+   resistance_model ──► hull_interaction ──► required thrust T = R/(1-t)
+                │
+   propeller_geometry ──► hydrofoil_polar ──► bem_rotor ──┐
+                                                          ├─► crp_interaction
+   surface_piercing_model / submerged_model ──────────────┘   (coupled, iterative)
+                │
+   gearbox_model ──► motor_model ──► electrical power ──► Wh/nm
+                │
+   cavitation_model + structural_model + constraints
+                │
+   objective_function ──► optimization_driver ──► postprocess / export / plots
+```
 
-| File | Frame |
+### 1.1 What is actually solved
+
+**Blade element momentum, per rotor** (`bem_rotor.m`). Standard propeller
+convention, `U_a = V_a(1+a)`, `U_t = Ωr(1−a′) + V_t`, Prandtl tip *and* hub
+losses, 24 cell-centred radial stations. The coupled `(a, a′)` system is reduced
+to **one scalar equation per station in the inflow angle φ** and solved by
+Illinois (bracketed false position), which converges unconditionally. A
+fixed-point iteration on `(a, a′)` was tried first and is unstable at high
+solidity; that is why it is not used.
+
+The radial grid is **cell-centred**, deliberately. A station exactly at `r = R`
+puts the Prandtl factor at zero, drives the momentum-derived induction to
+infinity, forces the solver onto its clamp, and leaves spurious load on an
+element that physically carries none.
+
+**Contra-rotating coupling** (`crp_interaction.m`). The rotors are *not* solved
+independently:
+
+| Effect | Model |
 |---|---|
-| `Cockpit_V1_3.stl` | +Y aft, X transverse, Z up, Z≈0 on the pod floor |
-| `FULLCOCPITV1_3.stl` | +X aft, Y transverse, Z up |
+| Front → rear axial | `g_dn = 1 + Δx/√(Δx²+R_F²)` ≈ 1.25 at 50 mm — the front's induction is only ~25 % developed at the rear disk |
+| Rear → front axial | `g_up = 1 − Δx/√(Δx²+R_R²)` ≈ 0.75 — the rear's induction is felt strongly upstream |
+| Slipstream contraction | discrete mass conservation, `r₂² = r₂,prev² + u₁(r₁²−r₁,prev²)/u_dn` |
+| Swirl transport | `v_θ2 = 2a′₁Ω₁r₁·(r₁/r₂)` — circulation conserved through contraction |
+| Swirl recovery | positive `flow.Vt` on the rear rotor, so recovery falls out of the momentum balance — it is **not** an applied efficiency factor |
+| Upstream swirl | zero, correctly: an actuator disk induces no tangential velocity ahead of itself |
 
-`scripts/volare.py` holds both transforms. They are verified against three numbers
-derived independently in the notes: the 640 mm forward pod cantilever (note 08),
-the 2998 mm beam span (note 08), and q = 143.0 Pa (note 01).
+The coupling is **positive feedback** — more rear loading raises the axial
+velocity at the front disk, which unloads the front, which weakens the swirl
+feeding the rear. Near lightly loaded operating points the loop gain exceeds
+one, the fixed point is *repelling*, and no under-relaxation factor converges.
+The coupling is therefore reduced to a single scalar (the interference
+amplitude `u`) and solved by secant with a guaranteed-bracket bisection
+fallback. This is documented in the file header because it is not obvious and
+it will bite anyone who tries to "simplify" it back to a relaxed iteration.
 
-## Layout
+**Speed is not a free variable.** For every candidate design the solver finds
+the rotational speed that delivers exactly the required thrust, using a
+two-term `T(n) = A n² + B n` model-based secant. The thrust equality constraint
+therefore disappears from the optimiser: every evaluated design satisfies it by
+construction, or is reported infeasible with a reason.
 
+**Surface piercing** (`surface_piercing_model.m`) is deliberately two-level:
+
+- *Level 1, cycle-averaged*: immersion duty `duty(r) = 1 − acos(h/r)/π`
+  multiplies **both** the blade-element force and the annulus momentum area.
+  The duty cancels in the induction relations, so partial immersion does not
+  change `a` at a given speed — it cuts the thrust, so the solver raises the
+  speed, which *then* raises `a`. That is precisely the reduced-disk-area
+  induced-loss penalty, obtained from the momentum balance rather than applied
+  as a fudge.
+- *Level 2, azimuthal*: instantaneous loads reconstructed over one revolution
+  for peak/mean/cyclic torque, which is what the shaft, gearbox and blade root
+  have to survive.
+
+Ventilated sections use linearised supercavitating theory, `Cl = k_sc·(π/2)·α`,
+roughly **a quarter** of the wetted-section lift at the same incidence, plus
+base drag. This is the dominant physical penalty of surface-piercing operation
+and the reason SP propellers need high pitch. Cavitation and ventilation are
+computed and reported **separately** — they are different phenomena with
+different criteria and different consequences.
+
+---
+
+## 2. Findings that came out of the model, not out of the brief
+
+**The motor specification is inconsistent in two ways, not one.** The brief
+identified that 42 kW is unreachable at 100 N·m and 2500 rpm (ceiling
+26.18 kW). The tool also flags that **25 kW cannot be produced at the quoted
+1300 rpm nominal speed either** — at 1300 rpm and 100 N·m the ceiling is
+13.6 kW, and 25 kW at 100 N·m needs at least 2387 rpm. Nothing supplied has
+been altered; `P_available(n) = min(P_continuous, 2πnQ_max)` is enforced and
+both inconsistencies are printed at the top of every report.
+
+**The propulsor is profile-drag dominated, not induced-drag dominated.** At
+20 kn with ~780 N of thrust on a 0.5 m disk the thrust loading coefficient is
+`C_Th ≈ 0.07`, giving an ideal induced efficiency above 0.98. Almost the entire
+loss is blade friction. The design therefore wants *low blade area and low
+rotational speed*, and the optimum diameter is well below the 21 in limit —
+which is the opposite of the usual "make it as big as it fits" instinct.
+
+**The reference configuration is badly matched.** With equal diameters, equal
+speeds and 26.5″/28.5″ pitch, the model puts almost all the load on the rear
+rotor (the front's swirl raises the rear's incidence while the rear's upstream
+induction unloads the front) and the rear massively over-corrects the swirl.
+The baseline-versus-optimised table quantifies this.
+
+**Surface piercing versus submerged at 20 kn is decided by drive-leg drag, not
+by the propeller.** The ventilated sections give up a lot of L/D, but the SP
+configuration removes most of the submerged leg. Both effects are modelled
+explicitly and both are swept in the sensitivity analysis. Do not treat the
+verdict as settled without CFD.
+
+**The CFD reference set may be internally inconsistent.** `J = 0.60`,
+`n = 4220 rpm` and `V_A = 3.4 m/s` imply a propeller diameter of **80.6 mm**.
+`validation.m` reports this and asks for confirmation, because if the CFD model
+was not an 81 mm propeller then one of the three numbers is wrong and the
+reference set cannot be used. Thrust was not supplied, so `K_T` and `η₀` are
+reported as *"Not available — requires CFD/experimental validation"* rather
+than invented.
+
+---
+
+## 3. Running it
+
+```matlab
+cd mebc_crp
+RES = main();                          % full run: both architectures, 4 blade combos
+RES = main('quick', true);             % reduced optimiser budget, ~10x faster
+RES = main('arch', 'sub');             % fully submerged only ('sp' for surface piercing)
+RES = main('plots', false);            % no figures
+RES = main('report', 'myrun.txt');     % also write the report to results/myrun.txt
 ```
-scripts/            pure numpy + scipy, no Blender
-  volare.py         canonical frame, measured baseline, frozen rule constants
-  geom.py           mesh metrics: areas, sections, slicing, closure angle
-  parts.py          splits the assembly into 17 named parts, tagged by CFD zone
-  stl_audit.py      raw audit of both STLs
-  pod_baseline.py   pod shape signature + re-test of the note 00 defects
-  aero.py           component drag model
-  parametric.py     NACA fairing section, pole-fit check, fairing mass + mesh
-  optimise.py       whole-boat drag+mass optimisation
-  plot_results.py   figures
-blender/
-  build_scene.py    builds the baseline scene, headless
-  render_views.py   orthographic side/front/top/iso renders
-out/                generated: json, csv, blend, figures/, views/
-```
 
-Every script is runnable on its own and self-checks:
+Runtime is dominated by the coupled solver: roughly **1–1.5 s per candidate
+design in MATLAB** (≈3 s in Octave). A full run is a few hours; `quick` mode is
+tens of minutes. Start with `quick` while you are changing assumptions, then do
+one full run.
 
-```bash
-python scripts/volare.py && python scripts/geom.py && python scripts/parts.py && python scripts/aero.py
-```
+**No toolbox is required.** The particle swarm and the pattern search in
+`optimization_driver.m` are implemented in plain MATLAB and run on a base
+licence and on GNU Octave. Set `params.optimization.useToolbox = true` to use
+`particleswarm`/`fmincon` instead; the code checks at run time and falls back
+silently if they are absent. The random stream is seeded from
+`params.optimization.seed`, so runs are reproducible.
 
-## Building the Blender scene
 
-```bash
-blender --background --python blender/build_scene.py
-```
+### Known state of this delivery
 
-Produces `out/volare_baseline.blend` and `out/volare_baseline.json`. The script
-re-measures every part inside Blender and fails if any surface area disagrees
-with the numpy value by more than 0.01% — a silent unit or transform error
-cannot get through.
+- Every one of the 35 files parses, and the full `main()` pipeline has been run
+  end to end (submerged and surface-piercing, blade counts 3/3 and 4/4), with all
+  fourteen sanity checks passing on the winning design.
+- **Figures were never rendered.** They were generated on a machine whose
+  headless Octave text renderer is broken. The *data* paths inside
+  `plot_performance.m` (resistance sweep, open-water K_T/K_Q sweep, CRP-versus-speed
+  sweep) were executed and verified; only the drawing calls are unexercised, and
+  those are ordinary MATLAB. Expect them to work; check them on your first run.
+- **The shipped `results/` came from a deliberately tiny optimiser budget**
+  (7-particle x 3-iteration swarms, ~40 evaluations for an 18-variable problem)
+  to fit inside an execution limit. They demonstrate the pipeline; they are NOT
+  converged optima. The surface-piercing cases in particular came back
+  infeasible and, in one instance, worse than their own baseline - a clear sign
+  of a non-converged search rather than a physical result. Run `main()` with
+  defaults before quoting any number.
+- Only 3/3 and 4/4 were run for the shipped results. All four combinations are
+  implemented and enumerated by default.
 
-Collections: `SUPPLIED` (organiser hardware, locked, ENERGY_REQ_3), `COCKPIT`,
-`FRAME`, `PROPOSED` (rule-compliant replacements), `REFERENCE` (envelopes and
-datums, non-physical).
+### Files produced (in `results/` and `figures/`)
 
-## What the audit found
-
-Confirms note 00 exactly: pod laminate area 4.5803 m², enclosed volume 320.6 L,
-planform 1.5116 m², aft closure 15.59°.
-
-Four things it corrects or adds:
-
-1. **The crossbeam drag is overcharged by ~41%.** Note 00 assigns C_D = 2.05, the
-   value for a square section in crossflow, because the STL models the beams as
-   104×104 boxes. ENERGY_REQ_3 supplies *round* Ø104 poles; at Re = 1.06×10⁵ a
-   circular cylinder sees C_D ≈ 1.2. Baseline drag falls from 168.8 N to 91–113 N
-   depending on how much of the span you treat as shadowed by the hulls. The
-   beams stay the number one item (57% of the budget rather than 77%), so note
-   00's priority order survives, but the "−88%" headline does not.
-2. **The two STLs hold different revisions of the pod.** Registered nose-to-nose
-   and floor-to-floor, the assembly copy is 5.2 mm longer in the tail and 11.8 mm
-   taller at the crown, with the tail face retessellated. Confirm which is current
-   before any mould work. The assembly copy is treated as authoritative here.
-3. **The aft body is worse than the mean angle suggests.** Mean closure is 15.59°
-   as noted, but the *local* slope peaks at 21.3°, and 79% of aft-body stations
-   exceed the 12° target. The base patch at the tail is 0.0746 m², 50% larger
-   than the ~0.05 m² note 01 §4.4 assumed.
-4. **The two crossbeams are not at the same height.** The forward pole sits 91.4 mm
-   below the aft one in the STL. Check that against the real hull suspension
-   stations — it decides whether the rails are level.
-
-Re-measured: rail/pod interference is 85.7 mm, not 83 mm. Rail spacing is 400 mm
-and must go to 750 mm (ENERGY_REQ_38) — 175 mm outboard on each side.
-
-## Priority, from `aero.py`
-
-| Action | Worth |
+| File | Contents |
 |---|---|
-| Fair both crossbeams | **≈ 49 N** |
-| Pilot fairing + windscreen | ≈ 11 N |
-| Blended brackets | ≈ 8 N |
-| Fix the pod aft body to 12° | **≈ 2 N (32 W)** |
+| `design_report.txt` | The full report: assumptions, motor audit, optimised design, gearbox spec, sanity checks, sensitivity, limitations |
+| `front_blade_geometry.csv` | **→ CAD/Ansys.** Per radial station: r/R, r, chord, pitch, pitch angle, camber, thickness, skew, rake, reference-line and LE/TE Cartesian coordinates, plus the local hydrodynamic state |
+| `rear_blade_geometry.csv` | Same, rear rotor |
+| `design_summary.csv` | One-line-per-quantity summary for spreadsheets |
+| `optimisation_results.mat` | Full result structure for further analysis |
+| `opt_sub.mat`, `opt_sp.mat` | Per-architecture optimiser output, reusable via `main('load',true)` |
+| `figures/01..09_*.png` | Resistance, open-water curves, CRP performance, motor envelope, radial loading, optimisation history, SP cyclic loads, blade geometry, blade outline |
 
-## Optimisation — `optimise.py`
+**Take into CAD/Ansys:** the two `*_blade_geometry.csv` files. They carry the
+blade reference line and LE/TE coordinates at every station, plus a header
+block recording D, Z, P/D, EAR, hub diameter, rpm, thrust, torque, axial gap
+and shaft angle, so an exported blade is always traceable to the run that made
+it. The tool does **not** emit section offsets, because no hydrofoil family has
+been specified — once you choose one, generate the offsets from the `t/c` and
+`f/c` columns.
 
-Notes 00 and 01 optimise drag, and note 01 §3 separately observes that mass costs
-hull resistance at `dR = (R/W)·dW`, `R/W ≈ 0.12`. Nothing joins them up. Every
-fairing that removes drag adds mass, so the objective is
+---
 
-```
-R_eff = D_aero(x) + (R/W)·g·m_added(x)        1 kg = 1.18 N
-```
+## 4. Reading the report
 
-Six design variables: fairing t/c on each beam, windscreen / bracket / rail
-treatment completeness, and pod aft-closure angle. Chord is not free — it is set
-to the smallest that actually swallows the Ø104 pole with 6 mm clearance, which
-`parametric.py` solves geometrically. That check found the naive `chord = D/(t/c)`
-gives **zero** clearance; a real fairing needs 12% more chord.
+Work through it in this order:
 
-**Result:**
+1. **ASSUMPTIONS AND UNVERIFIED INPUTS** — everything the answer is conditional
+   on. If a number here matters to your decision, measure it before trusting
+   the result.
+2. **MOTOR SPECIFICATION AUDIT** — the torque-speed-power consistency check.
+3. **OPTIMISED DESIGN** — geometry, operating point, splits, efficiency chain.
+   Note that `η₀` printed per rotor is the *isolated* rotor efficiency and is
+   **not** the CRP system efficiency; use `η_CRP`.
+4. **MOVEMENT AWAY FROM THE REFERENCE PITCH** — if a variable sits on its search
+   bound, the bound is setting the answer, not the physics. Widen it and rerun.
+5. **BLADE-COUNT COMPARISON** and the Pareto set.
+6. **REQUIRED GEARBOX SPECIFICATION** — hand this to whoever designs the box.
+7. **ENGINEERING SANITY CHECKS** — 14 automatic checks, each with its numbers.
+8. **SENSITIVITY ANALYSIS** — ranked by influence on Wh/nm. This tells you where
+   to spend measurement effort.
+9. **MODEL LIMITATIONS AND REQUIRED VALIDATION** — read this before quoting any
+   number to anyone.
 
-| | drag-only | drag + mass |
-|---|---|---|
-| fairing t/c | 0.246 (**4.1:1**) | 0.369 (**2.7:1**) |
-| chord | 472 mm | 310 mm |
-| added mass | 12.6 kg | **10.4 kg** |
-| aero drag | 18.5 N | 19.4 N |
-| effective resistance | 33.4 N | **31.6 N** |
+---
 
-Optimising drag alone reproduces note 01's 4:1 recommendation almost exactly —
-good independent confirmation of that note. But 4:1 is only right if mass is
-free. Counting mass at note 01's own exchange rate, the optimum is a **fatter,
-shorter 2.7:1 fairing**: 0.9 N more aero drag, 2.2 kg less mass, 1.8 N better
-overall. It is also 162 mm shorter in chord, which matters under the pod nose.
+## 5. Replacing assumptions with data
 
-Against the bare round-pole baseline (91.1 N) the optimised boat is **31.6 N, a
-65% / 0.91 kW saving**. Note 00 claimed 88%, but measured against a baseline
-inflated by the square-beam error.
+Every one of these is a `config.m` edit; none requires touching the solver.
 
-Pareto front (`--pareto`) — returns diminish hard past about 8 kg:
-
-| added-mass budget | 4 kg | 6 kg | 8 kg | 10 kg | unlimited |
-|---|---|---|---|---|---|
-| effective resistance | 47.9 N | 38.9 N | 33.8 N | 31.8 N | 31.6 N |
-
-Caveats, in order of how much they could move the answer:
-
-- **The mass model is estimated, not weighed.** 2.2 kg/m² for the fairing shell,
-  4.8 kg/m² for a 4 mm screen. The 4:1-vs-2.7:1 conclusion turns directly on
-  this — weigh a test panel before committing.
-- `R/W = 0.12` is the top of note 01's 0.10–0.12 range. At 0.10 the optimum moves
-  back toward 3:1.
-- Pilot / bracket / rail treatments are a linear blend between note 00's
-  untreated and optimised C_D values. That is an interpolation, not physics.
-  CFD cases 2–8 replace it.
-- The design space has no "leave this beam bare" option, so the Pareto front
-  bottoms out at 3.59 kg rather than zero. Academic here — fairing always wins.
-
-Figures in `out/figures/`: `drag_budget.png`, `fairing_trade.png`,
-`pod_profile.png`.
-
-## Static hydrostatics — `hydrostatics.py`
-
-Mass basis confirmed by the team 2026-09-04: the 250 kg cap covers the **entire
-cockpit including the pilot**, and the supplied hulls + beams are 65 kg. Maximum
-all-up displacement is therefore **315 kg**. That settles note 09's Q-TC-2 and
-note 06's "governing unknown" — and settles it the expensive way: note 06 §8
-budgets 282 kg for the boat alone before the pilot, so the design is **102 kg
-over**.
-
-At 315 kg in Mediterranean seawater (1028 kg/m³, not the 1025 usually quoted —
-Monaco harbour is Med water), level trim:
-
-| | |
+| When you obtain | Set |
 |---|---|
-| **Water level above keel** | **157.6 mm** |
-| **Wetted area** | **4.790 m² of 13.851 m² moulded** |
-| **Wetted fraction** | **34.6 %** |
-| Displaced volume | 306.4 L |
-| Freeboard to deck | 442.4 mm |
-| Pod floor above water | 420.1 mm |
-| Waterplane area | 2.982 m² |
-| LWL / BWL demihull | 4343 / 453 mm, L/B = 9.58 |
-| Slenderness L/∇^⅓ | 6.44 |
-| Cb / Cwp | 0.494 / 0.757 |
-| LCB / LCF | +363.5 / −121.3 mm |
-| KB | 96.2 mm |
-| BMt / KMt | 10 205 / 10 302 mm |
-| BMl / KMl | 11 209 / 11 305 mm |
-| Immersion | 30.7 kg per cm |
+| Motor efficiency map | `params.motor.etaMap = @(rpm,Q) ...` |
+| Measured wake / thrust deduction | `params.hull.w`, `params.hull.t`, `params.hull.eta_R` |
+| CFD wake field | `params.hull.wakeField = [rR(:), w(:)]`, `useWakeField = true` |
+| 300 kg resistance curve | `params.resistance.speed_kn_300`, `R_total_N_300` |
+| Gearbox data | `params.gearbox.eta`, `ratio_min/max`, `serviceFactor` |
+| Stainless grade | `params.material.*` (density, E, ν, yield, ultimate, fatigue) |
+| Hydrofoil polars | `params.polar.external` (fields `alpha, Re, Cl, Cd`), `useExternal = true` |
+| Shaft immersion | `params.surfacePiercing.hShaft_over_R` |
+| SP CFD | `params.surfacePiercing.k_sc`, `Cd_base`, `entryAngle_deg`, `entryEfficiency` |
+| Propeller CFD for validation | `params.validation.cfd.*` and `params.validation.geometry` |
 
-What it constrains:
+---
 
-- **For level trim the whole-boat LCG must sit at X = +363.5 mm.** That is 363 mm
-  forward of hull mid-length, and the pod centroid is at +338 — close, but the
-  outboard hangs well aft, so this needs checking once the real mass breakdown
-  exists.
-- Every 10 kg of overload sinks the boat 3.3 mm and adds ~9 dm² of wetted area.
-  At note 06's 417 kg the wetted fraction goes 34.6% → 40.8%.
-- Reserve buoyancy is huge: 1090 kg before the hulls are fully immersed.
-- BMt = 10.2 m. Transverse stability is a non-issue at this hull spacing, and BMl
-  = 11.2 m means trim is set entirely by LCG, not by hull form.
+## 6. Honest statement of what this is
 
-**This is the at-rest condition.** At 55 km/h the boat planes (volumetric Froude
-6.65) and the running wetted area is a small aft patch, nothing like 4.79 m².
-These figures are for freeboard and reserve buoyancy, stability, the float-off at
-handover, and the slow end of the endurance event.
+This is a **transparent, parameterised preliminary design and trade-study
+framework** whose every assumption is declared and replaceable, suitable for
+iterative refinement through Ansys CFD and physical testing.
 
-Two caveats:
+It is **not** a validated performance prediction. Blade element momentum theory
+with empirical corrections is not equivalent to CFD. The surface-piercing
+corrections in particular — water entry and exit, spray sheet, added mass,
+cavity closure, ventilated section polars — are the weakest link, and the
+Level-2 cyclic loads reconstruct immersion *kinematics* only, so peak loads are
+**underestimated**. Blade natural frequencies are not computed at all, and they
+matter for a propeller that is impulsively loaded once per revolution.
 
-- The hull STL has ~16 000 open edges. They are coincident-but-unmerged rather
-  than real holes — three independent volume methods (divergence theorem,
-  horizontal section integral, transverse section integral) agree to 0.3%, and
-  the submerged volume to 0.003%, so the hydrostatics stand. **But Fluent will
-  need a watertight surface**, so this has to be repaired before CFD meshing.
-- 65 kg is the supplied hull + beam mass from the rulebook, not a weighing. Note
-  06 assumes 80 kg and flags "UNKNOWN — weigh them". Weigh them.
-
-## Mass — `mass.py`
-
-**The gap is 22 kg, not 102 kg.** Note 06 §8's "+32 / +102 over cap" compares its
-282 kg subtotal — which *includes 80 kg of demihulls* — against a cap that
-excludes hulls. Cockpit items alone are 202 kg; with a 70 kg pilot that is 272 kg
-against the 250 kg cap.
-
-That distinction decides the project. 102 kg is not closable by trimming; 22 kg
-is. Adding the aero work's windscreen and bracket fairings (+3.7 kg, not in note
-06) widens it to 25.7 kg, and the ENERGY_REQ_38 floor rebuild adds ~4 kg more.
-
-Cheapest closure is `solar + pack6 + schedB`, but it lands **0.3 kg** under the
-cap — inside the scatter of a wet hand layup, so it is not a plan. Requiring ≥5 kg
-margin gives **`solar + pack6 + carbonrail`**: 32 kg saved, lands at 243.7 kg,
-6.3 kg of margin, 308.7 kg all-up.
-
-Pilot mass matters directly, since the cap includes them: at 60 kg two levers
-suffice; at 80 kg you need four; past that the powertrain has to change.
-
-**This does not fix ENERGY_REQ_188.** The Competr outboard is 26.9 kW nominal
-against a 25 kW cap. That is a compliance failure independent of mass, and if it
-forces a different outboard the 38 kg powertrain block and the 10 kg inverter
-question all reopen — invalidating every plan above. Settle it first.
-
-## Frame — `frame.py` + `blender/frame_redesign.py`
-
-Note 05 puts this second in the sequence, before anything else: the frame sets the
-pod's boundary conditions, so the FE model is not valid until it is frozen.
-
-`frame_redesign.py` builds the compliant frame and passes 12/12 checks. Two fixes
-are done together because they interact — once the pod sits *on* the rails rather
-than through them, the rails can move outboard without cutting the floor:
-
-| | |
-|---|---|
-| Rails | ±200 → **±375 mm** (750 mm clamp spacing, ENERGY_REQ_38) |
-| Clamps | 60 mm wide, envelop Ø104 + 2 mm gasket, 2 per beam |
-| Pod | **raised 103.7 mm** onto 10 mm pads (note 00's preferred option b) |
-| Forward shim | **91.3 mm** |
-
-Three things the geometry forced out that the notes do not carry:
-
-1. **The 91.4 mm pole height step is structural, not cosmetic.** A level rail has
-   to be packed 91.3 mm at the forward station — and note 08 §1 says that station
-   carries **79%** of the load. That packer is a structural part needing its own
-   check, not a washer.
-2. **The clamps barely fit.** At ±375 the clamp inner face clears the pod edge by
-   **5 mm**. If note 09's Q-TC-5 comes back "750 mm between inner faces" rather
-   than centre-to-centre, centres go to 800 mm and the clamps no longer tuck under
-   the pod at all — they need outboard brackets. Ask before building.
-3. **The rails now protrude 75 mm** past the pod edge each side. That is new
-   exposed frontal area and a new drag item.
-
-### Floor panel
-
-Moving the rails nearly doubles the floor span. Note 09 A2 calls it "a 12.4×
-penalty" but its own table shows 1.80 → 9.20 mm, which is 5.1×. Neither is right:
-core shear carries 31% of the deflection at 400 mm and only 11% at 750 mm, so the
-correct ratio is **9.6×** (1.06 → 10.23 mm on the same schedule). The conclusion
-holds — the floor is under-built — but the fix is cheaper than note 09 implies.
-
-Three fixes, all within 0.7 kg of each other, so **do not choose on mass**:
-
-| | core | plies/skin | total |
-|---|---|---|---|
-| A: thicken the panel | 40 mm | 3 | 7.02 kg |
-| B: + centreline keel beam (span 375) | 20 mm | 2 | 6.60 kg |
-| C: + 3 transverse frames (span 400) | 20 mm | 2 | 6.34 kg |
-
-B also carries the seat mount and gives one clean centreline load path; C spreads
-load better but adds three more core-removal/insert details, which note 05 §3 says
-is where student composite builds actually fail. Budget **+4 kg** against note
-06's 27 kg shell line either way — it does not currently carry this.
-
-## Open questions this package cannot answer
-
-- Which pod revision is current (see finding 2).
-- Is the 91.4 mm beam height step real, or an STL artefact (finding 4)?
-- Real pilot anthropometry — `build_scene.py` uses a 95th-percentile placeholder,
-  and the egress and ENERGY_REQ_25 standoff checks are only as good as that.
-- How much of the crossbeam span is genuinely shadowed by the hulls. The drag
-  budget swings 91 N ↔ 113 N on this; CFD case 1 settles it.
+Nothing in the output is fabricated. Where data is missing, the tool says
+*"Not available — requires CFD/experimental validation"* and carries on.

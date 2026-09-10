@@ -1,0 +1,660 @@
+
+#########################################################################
+ MEBC ENERGY CLASS - COAXIAL CONTRA-ROTATING PROPULSOR DESIGN TOOL
+ v1.0
+ run started 2026-08-24 11:21:09
+#########################################################################
+
+[EXTERNAL INPUTS]
+   No external inputs supplied: running entirely on config.m defaults and declared assumptions.
+
+[STAGE 1] Hull resistance and effective power
+     0.0 kn ->     0.0 N  [supplied]
+     5.0 kn ->    89.0 N  [supplied]
+    10.0 kn ->   212.0 N  [supplied]
+    15.0 kn ->   381.0 N  [supplied]
+    20.0 kn ->   624.0 N  [supplied]
+   design point: R_T = 624.0 N, P_E = 6.420 kW  (check against the brief: 624 N, 6.42 kW)
+
+[STAGE 2] Motor torque-speed-power envelope
+   ceiling at n_max and Q_max = 26.18 kW
+   !! SPEC INCONSISTENCY: max power 42.0 kW is UNREACHABLE. With Q_max = 100 N.m and n_max = 2500 rpm the ceiling is 26.18 kW. Reaching 42.0 kW would need 4011 rpm at 100 N.m.
+   !! SPEC INCONSISTENCY: nominal power 25.0 kW CANNOT be produced at the quoted nominal speed 1300 rpm. At 1300 rpm and 100 N.m the ceiling is 13.61 kW. 25.0 kW at 100 N.m requires at least 2387 rpm.
+
+[STAGES 3-7] Single rotor, front rotor, interaction, rear rotor, coupling
+   baseline (submerged, 3/3, D = 0.450 m, P = 26.5/28.5 in, equal speeds):
+      836 rpm, 12.47 kW shaft, eta_CRP = 0.6142, 704.9 Wh/nm
+      coupling converged 1 (7 evaluations), BEM 1/1, thrust residual 4.1e-04
+      swirl recovered by the rear rotor: -954.4%; slipstream contraction 1.0195
+   baseline (surfacepiercing, 3/3, D = 0.450 m, P = 26.5/28.5 in, equal speeds):
+      960 rpm, 16.94 kW shaft, eta_CRP = 0.4150, 957.4 Wh/nm
+      coupling converged 1 (4 evaluations), BEM 1/1, thrust residual 3.3e-04
+      swirl recovered by the rear rotor: -12.2%; slipstream contraction 1.0228
+
+[STAGES 8-11] Global optimisation (energy per nautical mile)
+   optimising architecture: submerged
+   loaded cached result for submerged from results/opt_sub.mat
+   optimising architecture: surfacepiercing
+   loaded cached result for surfacepiercing from results/opt_sp.mat
+
+=========================================================================
+ ASSUMPTIONS AND UNVERIFIED INPUTS
+=========================================================================
+ The following values were NOT supplied and had to be assumed. Every one
+ of them is a configurable entry in config.m. Results are conditional on
+ them. Replace them as soon as measured or CFD data become available.
+
+ PARAMETER                                     VALUE  UNIT          
+ ----------------------------------------------------------------------
+ Water temperature                                20  degC          
+     -> Not supplied; sets rho, mu, p_v.
+ Seawater density                               1025  kg/m^3        
+     -> Standard seawater at 20 C. Scales all forces linearly.
+ Dynamic viscosity                           0.00107  Pa.s          
+     -> Sets blade Reynolds number and hence section drag.
+ Vapour pressure                                2339  Pa            
+     -> Sets cavitation number.
+ Wake fraction w                                0.05  -             
+     -> NO measurement supplied. Directly scales V_A and hence J and efficiency.
+ Thrust deduction t                              0.1  -             
+     -> NO measurement supplied. Directly scales required thrust: T=R/(1-t).
+ Relative rotative efficiency                      1  -             
+     -> NO measurement supplied. Multiplies delivered power.
+ Gearbox efficiency                             0.96  -             
+     -> Gearbox NOT designed. Sensitivity swept in sensitivity_analysis.m.
+ Controller efficiency                          0.97  -             
+     -> Not supplied. Multiplies electrical power directly.
+ Gear ratio plausibility bounds                    4  -             
+     -> No gearbox architecture selected; bounds constrain the search only.
+ Hull curve is bare-hull                           1  bool          
+     -> Unknown whether the 624 N includes the drive leg. Appendage drag is ADDED. This dominates the SP-vs-submerged comparison.
+ Appendage drag model                           0.15  m (strut chord)
+     -> Flat-plate friction + form factor. NOT validated. See resistance_model.m.
+ Stainless steel properties                      250  MPa yield     
+     -> Grade NOT specified. Generic austenitic values.
+ Section modulus coefficient                     0.1  -             
+     -> Z ~ k*c*t^2 for aerofoil sections. Screening only; FEA required.
+ Hydrofoil polars                                  0  -             
+     -> NO section data supplied. Provisional analytical Cl/Cd model. Largest single uncertainty after the SP model.
+ Ventilated-section lift factor                    1  -             
+     -> Linearised supercavitating flat-plate theory (Cl=(pi/2)*alpha). Real SC sections differ.
+ Base/cavity drag coefficient                   0.03  -             
+     -> Sets surface-piercing L/D and therefore the whole SP efficiency.
+ Blade entry/exit sectors                         25  deg           
+     -> Cyclic force build-up model. Requires CFD or experiment.
+ Shaft immersion h/R                            0.05  -             
+     -> Optimisation variable; baseline value assumed.
+ Ventilation Froude threshold                      4  -             
+     -> Empirical fully-ventilated transition criterion.
+ Burrill limit-line fit                         0.28  -             
+     -> Empirical fit to a published cavitation limit chart, not a first-principles result.
+ Cp_min peak factor                                2  -             
+     -> Thin-section suction-peak estimate. Panel method or CFD required.
+ Propeller speed bounds                           60  rev/s         
+     -> Constrains the search space only.
+ Skew and rake                                    15  deg           
+     -> Geometric output only - hydrodynamic effect NOT modelled.
+ ----------------------------------------------------------------------
+ Assumptions registered: 24
+=========================================================================
+
+
+=========================================================================
+ MOTOR SPECIFICATION AUDIT
+=========================================================================
+  Supplied: 25 kW nominal, 42 kW maximum, 100 N.m, 1300 rpm nominal, 2500 rpm maximum.
+  P = 2*pi*n*Q gives:
+    at 2500 rpm and 100 N.m : 26.18 kW
+    at 1300 rpm and 100 N.m : 13.61 kW
+    25 kW at 100 N.m needs 2387 rpm
+    42 kW at 100 N.m needs 4011 rpm
+  !! SPEC INCONSISTENCY: max power 42.0 kW is UNREACHABLE. With Q_max = 100 N.m and n_max = 2500 rpm the ceiling is 26.18 kW. Reaching 42.0 kW would need 4011 rpm at 100 N.m.
+  !! SPEC INCONSISTENCY: nominal power 25.0 kW CANNOT be produced at the quoted nominal speed 1300 rpm. At 1300 rpm and 100 N.m the ceiling is 13.61 kW. 25.0 kW at 100 N.m requires at least 2387 rpm.
+  NO SUPPLIED SPECIFICATION HAS BEEN ALTERED. The optimiser enforces
+  P_available(n) = min(P_continuous, 2*pi*n*Q_max) and never violates the
+  torque-speed-power relationship. The 42 kW figure is retained as a
+  specification and flagged as unreachable within the stated limits.
+
+=========================================================================
+ VESSEL AND RESISTANCE
+=========================================================================
+  Hull type                       catamaran, 5.0 m, spacing 2.5 m
+  Design speed                    20.0 kn  (10.2889 m/s)
+  Design displacement             250 kg   (LCG 1.80 m)
+  Bare-hull resistance at 20 kn   624.0 N   [supplied]
+  Effective hull power P_E        6.42 kW
+  Resistance data source          SUPPLIED - MEBC Energy Class resistance curve (250 kg, LCG 1.8 m)
+  Interpolation                   pchip, no extrapolation beyond 20 kn
+  300 kg case                     RESISTANCE DATA UNAVAILABLE - sensitivity analysis
+                                  for 300 kg CANNOT be considered validated.
+
+=========================================================================
+ OPTIMISED DESIGN - SUBMERGED (blades 3/3)
+=========================================================================
+  MOTOR
+    Speed                         1300 rpm   (limit 2500)
+    Torque                        75.8 N.m   (limit 100)
+    Mechanical power              10.31 kW    (continuous limit 25.0 kW)
+    Efficiency                    0.950
+    Electrical power              11.19 kW
+    Current at 96 V              116.6 A
+    Feasible speed window         985 - 2396 rpm
+
+  FRONT ROTOR
+    Diameter                      0.3803 m  (14.97 in)
+    Blade count                   3
+    Pitch at 0.7R                 0.7587 m  (29.87 in)   P/D = 1.995
+    Expanded area ratio           0.489
+    Hub diameter                  0.0968 m  (hub ratio 0.255)
+    Speed                         808.5 rpm
+    Thrust                        513.7 N
+    Torque                        75.90 N.m
+    Power                         6.43 kW
+    Advance coefficient J         1.939   (on the LOCAL inflow)
+    K_T / K_Q                     0.1319 / 0.0513
+    Open-water efficiency         0.7942   (rotor alone - NOT the CRP efficiency)
+    Mean angle of attack          -1.61 deg
+    Reynolds number 0.7R          2.11e+06
+
+  REAR ROTOR
+    Diameter                      0.3609 m  (14.21 in)
+    Blade count                   3
+    Pitch at 0.7R                 0.7672 m  (30.20 in)   P/D = 2.126
+    Expanded area ratio           0.573
+    Hub diameter                  0.0968 m  (hub ratio 0.268)
+    Speed                         718.7 rpm
+    Thrust                        270.4 N
+    Torque                        46.16 N.m
+    Power                         3.47 kW
+    Advance coefficient J         2.361   (on the LOCAL inflow)
+    K_T / K_Q                     0.1084 / 0.0513
+    Open-water efficiency         0.7942   (rotor alone - NOT the CRP efficiency)
+    Mean angle of attack          -1.93 deg
+    Reynolds number 0.7R          2.33e+06
+
+  COMPLETE CONTRA-ROTATING SYSTEM
+    Total thrust                  784.1 N   (required 784.0 N)
+    Total torque (magnitudes)     122.06 N.m
+    Net roll reaction torque      29.74 N.m  (front minus rear)
+    Total shaft power             9.90 kW
+    Total electrical power        11.19 kW
+    Thrust split  front/rear      65.5% / 34.5%
+    Torque split  front/rear      62.2% / 37.8%
+    Power split   front/rear      64.9% / 35.1%
+    Speed ratio front/rear        1.1250
+    Swirl recovered by rear rotor 49.3%
+    Slipstream contraction        1.0010 (rear/front tip streamtube radius)
+    Axial gap                     0.050 m  (development factors g_dn = 1.254, g_up = 0.733)
+    CRP system efficiency         0.7737
+    Energy per nautical mile      559.6 Wh/nm  (0.5596 kWh/nm)
+    Range on 10.0 kWh stored       17.9 nm
+
+  EFFICIENCY CHAIN
+    Propeller (CRP system)  eta_0 = 0.7737
+    Hull                    eta_H = 0.9474   (w = 0.050, t = 0.100, both ASSUMED)
+    Relative rotative       eta_R = 1.0000   (ASSUMED)
+    Quasi-propulsive        eta_D = 0.7330
+    Gearbox                       = 0.9600   (ASSUMED - not designed)
+    Motor                         = 0.9500
+    Controller                    = 0.9700   (ASSUMED)
+    OVERALL P_E/P_elec            = 0.6487
+
+  REQUIRED GEARBOX SPECIFICATION
+    Input speed                   1300 rpm
+    Input torque                  75.8 N.m
+    Front output                  809 rpm, 75.90 N.m, 6.43 kW
+    Rear output                   719 rpm, 46.16 N.m, 3.47 kW
+    Front ratio                   1.6079 : 1
+    Rear ratio                    1.8088 : 1
+    Front/rear speed ratio        1.1250
+    Front/rear torque ratio       1.6444
+    Required torque capacity      94.7 N.m input (service factor 1.25)
+                                  94.9 N.m front, 57.7 N.m rear
+    Required power capacity       12.89 kW
+    Efficiency requirement        96.0% (assumption on which the above depends)
+    Counter-rotation required     YES
+    Coaxial shaft required        YES
+    Specification only. Architecture, bearing arrangement, thrust path and lubrication are NOT designed here.
+
+  CAVITATION AND VENTILATION
+    front: sigma_0.7 = 0.88, min margin = 1.67, tau_c = 0.1335 (limit 0.2557)
+      No cavitation predicted by the analytical screen.
+    rear: sigma_0.7 = 1.06, min margin = 1.66, tau_c = 0.0838 (limit 0.2844)
+      No cavitation predicted by the analytical screen.
+    Ventilation: not applicable (fully submerged, tip depth 0.494 m).
+    ANALYTICAL SCREENING ONLY - cavitation tunnel testing or CFD required for validation.
+
+  PRELIMINARY STRUCTURE
+    front: centrifugal 0.9 MPa + bending 9.0 MPa = 9.9 MPa (allowable 83.3 MPa, SF 25.23) OK
+    rear: centrifugal 0.6 MPa + bending 2.6 MPa = 3.3 MPa (allowable 83.3 MPa, SF 76.75) OK
+    PRELIMINARY ANALYTICAL STRUCTURAL SCREENING - FEA REQUIRED FOR FINAL VALIDATION.
+
+  OPTIMISATION AND SOLVER STATUS
+    Objective (weighted)          562.99
+    Energy component              559.6 Wh/nm, secondary multiplier 1.0061, penalty 0.00
+    Constraints feasible          1
+    Thrust solve                  converged 1, 5 iterations, residual 4.17e-04
+    CRP coupling                  converged 1, 4 evaluations, residual 8.02e-06
+    Front/rear BEM                converged 1 / 1
+    Reduced-fidelity global search NOT used - every evaluation was full fidelity.
+
+  MOVEMENT AWAY FROM THE REFERENCE PITCH
+    Front  29.87 in  vs reference 26.50 in   (+12.7%)
+    Rear   30.20 in  vs reference 28.50 in   (+6.0%)
+    !! Front pitch sits ON its search bound. The bound, not physics, is
+       setting the answer - widen params.propeller.front.P07_min_m/max_m.
+
+  BLADE-COUNT COMPARISON (SUBMERGED)
+    Z f/r           Wh/nm    eta_CRP    D_f [m]    D_r [m]  n_f [rpm]   feas
+    ------------------------------------------------------------------------
+    3/3             559.6     0.7737      0.380      0.361        809      1
+    4/4             663.1     0.6535      0.371      0.476        767      1
+    Non-dominated cases (energy / cavitation / gearbox complexity / peak stress): 1 2 
+
+=========================================================================
+ OPTIMISED DESIGN - SURFACEPIERCING (blades 4/4)
+=========================================================================
+  MOTOR
+    Speed                         2358 rpm   (limit 2500)
+    Torque                        100.0 N.m   (limit 100)
+    Mechanical power              24.70 kW    (continuous limit 25.0 kW)
+    Efficiency                    0.950
+    Electrical power              26.80 kW
+    Current at 96 V              279.2 A
+    Feasible speed window         2358 - 2500 rpm
+
+  FRONT ROTOR
+    Diameter                      0.5093 m  (20.05 in)
+    Blade count                   4
+    Pitch at 0.7R                 0.5588 m  (22.00 in)   P/D = 1.097
+    Expanded area ratio           0.512
+    Hub diameter                  0.1449 m  (hub ratio 0.284)
+    Speed                         1140.8 rpm
+    Thrust                        -61.3 N
+    Torque                        49.42 N.m
+    Power                         5.90 kW
+    Advance coefficient J         1.087   (on the LOCAL inflow)
+    K_T / K_Q                     -0.0025 / 0.0039
+    Open-water efficiency         -0.1092   (rotor alone - NOT the CRP efficiency)
+    Mean angle of attack          -0.26 deg
+    Reynolds number 0.7R          3.74e+06
+
+  REAR ROTOR
+    Diameter                      0.4794 m  (18.87 in)
+    Blade count                   4
+    Pitch at 0.7R                 0.7539 m  (29.68 in)   P/D = 1.573
+    Expanded area ratio           0.968
+    Hub diameter                  0.1449 m  (hub ratio 0.302)
+    Speed                         1056.3 rpm
+    Thrust                        781.1 N
+    Torque                        160.94 N.m
+    Power                         17.80 kW
+    Advance coefficient J         1.139   (on the LOCAL inflow)
+    K_T / K_Q                     0.0465 / 0.0200
+    Open-water efficiency         0.4217   (rotor alone - NOT the CRP efficiency)
+    Mean angle of attack          4.12 deg
+    Reynolds number 0.7R          6.03e+06
+
+  COMPLETE CONTRA-ROTATING SYSTEM
+    Total thrust                  719.8 N   (required 719.4 N)
+    Total torque (magnitudes)     210.37 N.m
+    Net roll reaction torque      -111.52 N.m  (front minus rear)
+    Total shaft power             23.71 kW
+    Total electrical power        26.80 kW
+    Thrust split  front/rear      -8.5% / 108.5%
+    Torque split  front/rear      23.5% / 76.5%
+    Power split   front/rear      24.9% / 75.1%
+    Speed ratio front/rear        1.0799
+    Swirl recovered by rear rotor -360.5%
+    Slipstream contraction        1.0351 (rear/front tip streamtube radius)
+    Axial gap                     0.050 m  (development factors g_dn = 1.193, g_up = 0.796)
+    CRP system efficiency         0.2965
+    Energy per nautical mile      1340.0 Wh/nm  (1.3400 kWh/nm)
+    Range on 10.0 kWh stored       7.5 nm
+
+  EFFICIENCY CHAIN
+    Propeller (CRP system)  eta_0 = 0.2965
+    Hull                    eta_H = 0.9474   (w = 0.050, t = 0.100, both ASSUMED)
+    Relative rotative       eta_R = 1.0000   (ASSUMED)
+    Quasi-propulsive        eta_D = 0.2809
+    Gearbox                       = 0.9600   (ASSUMED - not designed)
+    Motor                         = 0.9500
+    Controller                    = 0.9700   (ASSUMED)
+    OVERALL P_E/P_elec            = 0.2486
+
+  REQUIRED GEARBOX SPECIFICATION
+    Input speed                   2358 rpm
+    Input torque                  100.0 N.m
+    Front output                  1141 rpm, 49.42 N.m, 5.90 kW
+    Rear output                   1056 rpm, 160.94 N.m, 17.80 kW
+    Front ratio                   2.0672 : 1
+    Rear ratio                    2.2325 : 1
+    Front/rear speed ratio        1.0799
+    Front/rear torque ratio       0.3071
+    Required torque capacity      125.0 N.m input (service factor 1.25)
+                                  61.8 N.m front, 201.2 N.m rear
+    Required power capacity       30.87 kW
+    Efficiency requirement        96.0% (assumption on which the above depends)
+    Counter-rotation required     YES
+    Coaxial shaft required        YES
+    Specification only. Architecture, bearing arrangement, thrust path and lubrication are NOT designed here.
+
+  CAVITATION AND VENTILATION
+    front: sigma_0.7 = 0.35, min margin = 1.70, tau_c = -0.0026 (limit 0.1467)
+      No cavitation predicted by the analytical screen.
+    rear: sigma_0.7 = 0.44, min margin = 1.05, tau_c = 0.0283 (limit 0.1682)
+      CAVITATION PREDICTED near r/R = 0.75  [tip 1, mid 1, root 0]
+    VENTILATION (a DIFFERENT phenomenon from cavitation):
+      Immersion ratio I_T           0.350  (shaft depth -0.0764 m)
+      Fn_D front / rear             4.33 / 3.89  (fully ventilated above 4.0)
+      Weber number                  7321902 (threshold 260)
+      Regime                        FULLY VENTILATED
+    ANALYTICAL SCREENING ONLY - cavitation tunnel testing or CFD required for validation.
+
+  PRELIMINARY STRUCTURE
+    front: centrifugal 3.9 MPa + bending 6.8 MPa = 10.6 MPa (allowable 83.3 MPa, SF 23.52) OK
+    rear: centrifugal 2.9 MPa + bending 4.2 MPa = 7.1 MPa (allowable 83.3 MPa, SF 35.09) OK
+    PRELIMINARY ANALYTICAL STRUCTURAL SCREENING - FEA REQUIRED FOR FINAL VALIDATION.
+
+  OPTIMISATION AND SOLVER STATUS
+    Objective (weighted)          2398.71
+    Energy component              1340.0 Wh/nm, secondary multiplier 1.0075, penalty 1048.66
+    Constraints feasible          0
+      VIOLATION: hub ratio rear  <= max (violated by 0.7%)
+      VIOLATION: rear  Fn_D >= vent threshold (violated by 2.7%)
+    Thrust solve                  converged 1, 1 iterations, residual 1.47e-04
+    CRP coupling                  converged 1, 4 evaluations, residual 4.94e-05
+    Front/rear BEM                converged 1 / 1
+    Reduced-fidelity global search NOT used - every evaluation was full fidelity.
+
+  MOVEMENT AWAY FROM THE REFERENCE PITCH
+    Front  22.00 in  vs reference 26.50 in   (-17.0%)
+    Rear   29.68 in  vs reference 28.50 in   (+4.1%)
+    !! Front pitch sits ON its search bound. The bound, not physics, is
+       setting the answer - widen params.propeller.front.P07_min_m/max_m.
+
+  BLADE-COUNT COMPARISON (SURFACEPIERCING)
+    Z f/r           Wh/nm    eta_CRP    D_f [m]    D_r [m]  n_f [rpm]   feas
+    ------------------------------------------------------------------------
+    4/4            1340.0     0.2965      0.509      0.479       1141      0
+    3/3             812.4     0.4890      0.349      0.350       1250      0
+    Non-dominated cases (energy / cavitation / gearbox complexity / peak stress): 1 2 
+
+=========================================================================
+ BASELINE VERSUS OPTIMISED
+=========================================================================
+  QUANTITY                         BASELINE      OPTIMISED     CHANGE
+  --------------------------------------------------------------------
+  --- SUBMERGED ---
+  Electrical power [W]             1.41e+04      1.119e+04    -20.62%
+  Energy [Wh/nm]                      704.9          559.6    -20.62%
+  Shaft power [W]                 1.247e+04           9900    -20.62%
+  CRP efficiency [-]                 0.6142         0.7737     25.97%
+  Overall efficiency [-]             0.5149         0.6487     25.97%
+  Total thrust [N]                    783.6          784.1      0.06%
+  Range on stored E [nm]              14.19          17.87     25.97%
+  --- SURFACEPIERCING ---
+  Electrical power [W]            1.915e+04       2.68e+04     39.96%
+  Energy [Wh/nm]                      957.4           1340     39.96%
+  Shaft power [W]                 1.694e+04      2.371e+04     39.96%
+  CRP efficiency [-]                  0.415         0.2965    -28.54%
+  Overall efficiency [-]             0.3479         0.2486    -28.55%
+  Total thrust [N]                    719.1          719.8      0.09%
+  Range on stored E [nm]              10.45          7.463    -28.55%
+
+=========================================================================
+ SURFACE PIERCING VERSUS FULLY SUBMERGED AT 20 KN
+=========================================================================
+  QUANTITY                            SUBMERGED SURFACE-PIERCING
+  --------------------------------------------------------------
+  Hull + appendage resistance [N]          705.6          647.4
+    of which drive-leg drag [N]           81.56          23.42
+  Required thrust [N]                       784          719.4
+  CRP efficiency [-]                     0.7737         0.2965
+  Shaft power [W]                          9900      2.371e+04
+  Electrical power [W]                1.119e+04       2.68e+04
+  Energy [Wh/nm]                          559.6           1340
+  --------------------------------------------------------------
+  VERDICT: fully submerged is better by 58.2% at 20 kn.
+  CAUTION: this verdict is dominated by two assumptions - the ventilated
+  section lift factor (k_sc) and base drag, and the drive-leg drag model.
+  Both are configurable in config.m and both are swept in the sensitivity
+  analysis. Do NOT treat this comparison as settled without CFD.
+
+=========================================================================
+ MODEL LIMITATIONS AND REQUIRED VALIDATION
+=========================================================================
+  HIGHER-FIDELITY CFD REQUIRED FOR:
+    - the surface-piercing model in its entirety: water entry and exit, spray
+      sheet, added mass, cavity closure and the ventilated section polars. The
+      Level-2 cyclic loads reconstruct immersion KINEMATICS only and therefore
+      UNDERESTIMATE peak loads.
+    - rotor-rotor interaction at 50 mm spacing, which is strongly unsteady.
+      Sliding-mesh (or overset) transient CFD is needed; the steady actuator
+      superposition used here cannot capture blade-passing effects.
+    - the section Cl/Cd polars, which are currently a provisional analytical
+      model, not data. This is the single largest source of uncertainty in the
+      absolute efficiency numbers.
+    - the minimum pressure coefficient used for cavitation inception.
+    - free-surface interaction of the propulsor with the hulls.
+  STRUCTURAL FEA REQUIRED FOR:
+    - blade root stress, fillet stress concentration, and skew-induced moments.
+    - blade natural frequencies against blade-rate and shaft-rate excitation,
+      which are NOT computed here at all and which matter for a surface-piercing
+      propeller that is impulsively loaded once per revolution.
+    - shaft, bearing and hub design under the cyclic loads reported above.
+  GEARBOX MECHANICAL DESIGN REQUIRED FOR:
+    - everything beyond the ratings specified here: architecture, bearings,
+      thrust path, lubrication, seals, and the coaxial shaft arrangement.
+  CAVITATION TUNNEL TESTING REQUIRED FOR:
+    - cavitation inception and extent on the submerged variant.
+  TOWING TANK / FREE-SURFACE TESTING REQUIRED FOR:
+    - the resistance curve itself beyond the five supplied points, the 300 kg
+      case, wake fraction and thrust deduction.
+    - ventilation inception and the thrust-breakdown boundary.
+  FULL-SCALE WATER TESTING REQUIRED FOR:
+    - the motor efficiency map, gearbox efficiency, and the achieved Wh/nm.
+  
+  WHAT THIS TOOL IS: a transparent, parameterised preliminary design and
+  trade-study framework whose every assumption is declared and replaceable.
+  WHAT IT IS NOT: a validated performance prediction. Blade element momentum
+  theory with empirical corrections is not equivalent to CFD, and the
+  surface-piercing corrections in particular are the weakest part of the chain.
+=========================================================================
+
+=========================================================================
+ ENGINEERING SANITY CHECKS
+=========================================================================
+  [ OK ] 1  required thrust achieved          784.1 N produced vs 784.0 N required
+  [ OK ] 2  motor torque within limit         75.8 of 100 N.m (76% used)
+  [ OK ] 3  power within continuous rating    10.31 of 25.0 kW
+  [ OK ] 4  motor speed within limit          1300 of 2500 rpm
+  [ OK ] 5  diameters within 21 in            front 14.97 in, rear 14.21 in
+  [ OK ] 6  blade loading physically reasonable max tau_c = 0.1334
+  [ OK ] 7  efficiency between 0 and 1        eta_D = 0.7329, eta_CRP = 0.7736
+  [ OK ] 8  power positive                    shaft 9.90 kW, electrical 11.19 kW
+  [ OK ] 9  cavitation acceptable             min margin front 1.67, rear 1.66
+  [ OK ] 10 structural safety factor          min SF = 23.17, required 3.0
+  [ OK ] 11 gearbox mechanically plausible    ratios 1.608 / 1.809 (bounds 0.30-4.00)
+  [ OK ] 12 beats the baseline                559.6 vs 704.9 Wh/nm (-20.6%)
+  [ OK ] 13 solvers converged                 CRP 1 (res 8.2e-06), BEM 1/1, thrust 1
+  [ OK ] 14 assumption dominance reviewed     gearbox+motor+controller efficiency chain removes 11.5% of the electrical power; assumed w=0.05, t=0.10 set eta_H=0.947 and the required thrust; drive-leg drag is 82 N, 11.6% of total resistance - an ASSUMED model
+
+-------------------------------------------------------------------------
+ VALIDATION AGAINST SUPPLIED REFERENCE DATA
+-------------------------------------------------------------------------
+ Reference (MODEL SCALE - not a design input):
+   J        = 0.600
+   n        = 4220 rpm
+   V_A      = 3.40 m/s
+   Q        = 1.060 N.m
+   P        = 460 W
+   T        = NOT SUPPLIED
+ Derived:
+   D implied by J,n,V_A = 80.6 mm
+   D used for coefficients = 80.6 mm (implied by J, n and V_A)
+   2*pi*n*Q             = 468 W  (1.8% vs supplied P)
+   K_Q                  = 0.0616
+   K_T                  = Not available - requires CFD/experimental validation
+   eta_0                = Not available - requires CFD/experimental validation
+ Model comparison NOT RUN: To run the analytical model against this point, populate params.validation.geometry with the CFD propeller geometry (D, Z, P/D, EAR, chord/thickness/camber distributions). Without that geometry the comparison cannot be made and is NOT faked.
+ !! Propeller diameter was NOT supplied. J, n and V_A imply D = 80.6 mm. CONFIRM THIS. If the CFD model was not a 81 mm propeller then J, n or V_A is inconsistent and this reference set cannot be used for validation.
+ !! CFD thrust NOT supplied: K_T, eta_0 and the thrust error cannot be computed. Not available - requires CFD/experimental validation.
+-------------------------------------------------------------------------
+
+[STAGE 13] Exporting geometry for CAD and Ansys
+   wrote results/front_blade_geometry.csv
+   wrote results/rear_blade_geometry.csv
+   wrote results/design_summary.csv
+
+==============================
+OPTIMIZED MEBC CRP DESIGN
+==============================
+Architecture:            SUBMERGED
+Design speed:            20.0 knots
+Displacement:            250 kg
+Hull resistance:         624 N (bare hull) + 82 N drive leg
+Effective hull power:    7.26 kW
+
+Front rotor:
+  Diameter:              0.3803 m (14.97 in)
+  Blade count:           3
+  Pitch (0.7R):          0.7587 m (29.87 in), P/D = 1.995
+  EAR:                   0.489
+  Speed:                 809 rpm
+  Torque:                75.87 N.m
+  Power:                 6.42 kW
+  Thrust:                513.5 N
+
+Rear rotor:
+  Diameter:              0.3609 m (14.21 in)
+  Blade count:           3
+  Pitch (0.7R):          0.7672 m (30.20 in), P/D = 2.126
+  EAR:                   0.573
+  Speed:                 719 rpm
+  Torque:                46.19 N.m
+  Power:                 3.48 kW
+  Thrust:                270.6 N
+
+CRP:
+  Total thrust:          784.1 N (required 784.0 N)
+  Total shaft power:     9.90 kW
+  Electrical power:      11.19 kW
+  Overall efficiency:    0.6486
+  Energy per n.mile:     559.6 Wh/nm  (0.5596 kWh/nm)
+  Range on 10 kWh:      17.9 nm
+
+Motor:
+  Speed:                 1300 rpm
+  Torque:                75.8 N.m
+  Power:                 10.31 kW
+  Current at 96 V:       116.6 A
+
+Gearbox:
+  Front ratio:           1.6077 : 1
+  Rear ratio:            1.8086 : 1
+  Speed ratio F/R:       1.1250
+  Torque ratio F/R:      1.6425
+  Torque capacity:       94.7 N.m input
+  Power capacity:        12.89 kW
+  Efficiency requirement:96.0 %
+  Counter-rotation:      REQUIRED
+
+Cavitation:
+  Status:                none predicted (min margin 1.67)
+
+Ventilation:
+  Status:                not applicable (fully submerged)
+
+Structural:
+  Maximum stress:        10.8 MPa
+  Safety factor:         23.17
+  Status:                OK
+
+Optimization:
+  Objective:             559.6 Wh/nm (weighted 563.0)
+  Converged:             1
+  Blade counts:          3/3
+  Seed:                  20260823
+==============================
+
+ Total runtime: 7.8 s
+ Full result structure saved to results/optimisation_results.mat
+
+=========================================================================
+ SENSITIVITY ANALYSIS (one factor at a time, about the optimised design)
+=========================================================================
+  baseline: 559.6 Wh/nm, 11.19 kW electrical, eta_D = 0.7330
+
+  PARAMETER                       VALUE        Wh/nm       dE %      eta_D
+  ------------------------------------------------------------------------
+  wake fraction w                     0        594.9     +6.32%     0.6895
+  wake fraction w                  0.03        573.5     +2.50%     0.7151
+  wake fraction w                  0.05        559.6     +0.00%     0.7330
+  wake fraction w                  0.08        539.4     -3.60%     0.7609
+  wake fraction w                  0.12        512.9     -8.34%     0.8004
+  thrust deduction t               0.04        528.4     -5.57%     0.7763
+  thrust deduction t               0.07        543.4     -2.88%     0.7547
+  thrust deduction t                0.1        559.6     +0.00%     0.7330
+  thrust deduction t               0.14        582.9     +4.17%     0.7035
+  thrust deduction t               0.18        609.1     +8.86%     0.6738
+  gearbox efficiency                0.9        596.9     +6.67%     0.7330
+  gearbox efficiency               0.93        577.6     +3.23%     0.7330
+  gearbox efficiency               0.96        559.6     +0.00%     0.7330
+  gearbox efficiency               0.98        548.1     -2.04%     0.7330
+  motor efficiency                  0.9        590.6     +5.56%     0.7330
+  motor efficiency                 0.93        571.6     +2.15%     0.7330
+  motor efficiency                 0.95        559.6     +0.00%     0.7330
+  motor efficiency                 0.97        548.0     -2.06%     0.7330
+  controller efficiency            0.94        577.4     +3.19%     0.7330
+  controller efficiency            0.96        565.4     +1.04%     0.7330
+  controller efficiency            0.97        559.6     +0.00%     0.7330
+  controller efficiency            0.99        548.3     -2.02%     0.7330
+  seawater density                 1000        557.5     -0.38%     0.7340
+  seawater density                 1015        558.7     -0.15%     0.7334
+  seawater density                 1025        559.6     +0.00%     0.7330
+  seawater density                 1035        560.4     +0.15%     0.7325
+  axial gap [m]                    0.03        559.2     -0.07%     0.7335
+  axial gap [m]                    0.05        559.6     +0.00%     0.7330
+  axial gap [m]                   0.075        560.5     +0.18%     0.7322
+  axial gap [m]                     0.1        561.2     +0.30%     0.7313
+  ventilated lift factor            0.8        559.6     +0.00%     0.7330
+  ventilated lift factor              1        559.6     +0.00%     0.7330
+  ventilated lift factor            1.2        559.6     +0.00%     0.7330
+  ventilated lift factor            1.5        559.6     +0.00%     0.7330
+  ventilated base drag            0.015        559.6     +0.00%     0.7330
+  ventilated base drag             0.03        559.6     +0.00%     0.7330
+  ventilated base drag             0.05        559.6     +0.00%     0.7330
+  ventilated base drag             0.08        559.6     +0.00%     0.7330
+  appendage strut span              0.2        548.4     -2.00%     0.7312
+  appendage strut span             0.35        559.6     +0.00%     0.7330
+  appendage strut span              0.5        570.8     +2.01%     0.7346
+
+  RANKING BY INFLUENCE ON ENERGY PER NAUTICAL MILE
+     14.7% spread   wake fraction w
+     14.4% spread   thrust deduction t
+      8.7% spread   gearbox efficiency
+      7.6% spread   motor efficiency
+      5.2% spread   controller efficiency
+      4.0% spread   appendage strut span
+      0.5% spread   seawater density
+      0.4% spread   axial gap [m]
+      0.0% spread   ventilated lift factor
+      0.0% spread   ventilated base drag
+
+  DISPLACEMENT 250 kg VERSUS 300 kg
+    300 kg RESISTANCE DATA UNAVAILABLE; SENSITIVITY ANALYSIS CANNOT BE
+    CONSIDERED VALIDATED. The optimisation is for the 250 kg condition,
+    which is the only displacement with a supplied resistance curve.
+    Set params.resistance.scaling300.enable = true for a clearly labelled
+    theoretical estimate, kept separate from the validated 250 kg data.
+
+  DESIGN-VARIABLE SENSITIVITY (+/- 5% of the range, about the optimum)
+     1.25%   D_rear_m
+     0.88%   EAR_front
+     0.86%   D_front_m
+     0.72%   EAR_rear
+     0.69%   rpmRatio_F_over_R
+     0.52%   P07_rear_m
+     0.38%   d_hub_m
+     0.29%   pitchSlope_rear
