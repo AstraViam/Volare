@@ -4,7 +4,7 @@
 stands. Anyone, human or AI, should be able to read this page and start work
 without reading the rest of the repository.
 
-Last updated: 2026-09-10 (third session) · Branch: `claude/epic-lovelace-36k14r`
+Last updated: 2026-09-10 (fourth session) · Branch: `claude/epic-lovelace-36k14r`
 
 ---
 
@@ -21,7 +21,7 @@ through one file and are otherwise separate.
 |---|---|---|
 | `powertrain/` — 26S21P battery pack, drivetrain, mission, compliance | MATLAB | Structured; blocked on 2 measured data files |
 | `cad/` — geometry, frame, aero, optimisation, Blender scenes | Python | 14 of 16 modules self-test green |
-| `propulsor/` — contra-rotating propulsor optimiser | MATLAB | Incomplete but **planned**. Solver core is sound and kept; see `propulsor/DESIGN.md` |
+| `propulsor/` — contra-rotating propulsor optimiser | MATLAB | **Stages 0-2 built and gated, 45 checks green.** Stages 3-12 remain; see `propulsor/DESIGN.md` |
 | `notes/`, `docs/` — design record and competition rules | Markdown | Complete |
 
 ---
@@ -124,7 +124,10 @@ CI uses it. Every `propulsor/*.m` file parses in Octave today.
 ```bash
 sudo apt-get install -y --no-install-recommends octave
 octave --no-gui --quiet tools/octave_check.m     # parse + portability gate
+cd propulsor && octave --no-gui --quiet tests/ci.m   # build-stage gates
 ```
+
+In MATLAB the same suite runs as `cd propulsor/tests; run_tests`.
 
 Write to the MATLAB/Octave intersection: no `arguments` blocks, no `string()`,
 no `classdef`, no `dictionary()`, and guard every toolbox call. The check above
@@ -239,11 +242,12 @@ code on first run.
 
 ## 7. Suggested next actions, in order
 
-1. **Build `propulsor/` per `DESIGN.md`, starting with `units.m`.** The
-   decision to salvage rather than restart is recorded there with evidence:
-   the BEM solver, CRP coupling and surface-piercing kinematics already
-   present are the hard parts, and they are sound. Work section 6's staged
-   order; stage 0 is about 30 lines and unblocks `config()`.
+1. **Stage 3 of `propulsor/DESIGN.md`: `hydrofoil_polar.m` and
+   `propeller_geometry.m`.** Stages 0 to 2 are done and gated. These two are
+   the hard ones and everything downstream depends on their quality.
+   Stage 4 is the honesty checkpoint: if the single-rotor BEM does not give
+   sane K_T and K_Q against published open-water data, nothing after it means
+   anything.
 2. **Resolve the cockpit STL path.** Pick one canonical location and make
    `volare_params.json` agree, then remove the fallback in `boat.py`.
 3. **Run `TEST_ALL.m` and `RUN_EVERYTHING.m` in MATLAB** and record the result
@@ -259,6 +263,31 @@ code on first run.
 
 Append one entry per working session. Newest first. Keep entries short: what
 changed, what broke, what is next.
+
+### 2026-09-10 (fourth session) — propulsor stages 0-2 built and gated
+Team decision applied: **the motor is capped at 25 kW at all times, peak equal
+to continuous.** `params.motor.P_cap_W` is the enforced ceiling; the supplied
+42 kW datasheet peak stays recorded with `usePeakSpec = false` so nothing
+supplied is silently altered. Envelope: torque limited at 100 N·m up to
+2387.3 rpm, power limited above it, so 2500 rpm yields only 95.5 N·m.
+
+Built and gated:
+- `units.m`, which unblocked `config()`. It could not run at all before.
+- `resistance_model.m`, pchip over the 5 supplied points, refusing to
+  extrapolate unless asked and refusing outright to fabricate the 300 kg curve.
+- `motor_model.m` plus `motor_consistency_report.m`.
+- `tests/` harness: `run_tests.m` for MATLAB, `tests/ci.m` for headless CI.
+
+45 checks green. Verified the gates are not vacuous by injecting two
+regressions: raising the cap to 42 kW failed 8 checks, and swapping pchip for
+linear initially passed, which exposed a real gap. Added a slope-continuity
+discriminator (pchip leaves 0.001 N/kn of jump at a knot, linear leaves 14.8)
+and the swap now fails.
+
+MATLAB CI is now worth setting up, since a Campus-Wide Licence is confirmed.
+Keep both jobs: Octave as the fast gate, MATLAB as the fidelity gate.
+
+Next: stage 3, `hydrofoil_polar.m` and `propeller_geometry.m`.
 
 ### 2026-09-10 (third session) — propulsor planned, Octave adopted
 Assessed whether to delete `propulsor/` and restart. **Salvage, not restart.**

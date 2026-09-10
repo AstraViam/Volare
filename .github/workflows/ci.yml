@@ -52,7 +52,7 @@ jobs:
         run: python verify.py
 
   matlab-portability:
-    name: MATLAB sources parse under Octave
+    name: MATLAB sources - portability and stage gates
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -62,3 +62,6 @@ jobs:
           sudo apt-get install -y -qq --no-install-recommends octave
       - name: Parse and portability check
         run: octave --no-gui --quiet tools/octave_check.m
+      - name: Propulsor build-stage gates
+        working-directory: propulsor
+        run: octave --no-gui --quiet tests/ci.m

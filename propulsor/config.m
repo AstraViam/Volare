@@ -86,10 +86,29 @@ params.water.sigma_surf  = 0.0728;      % N/m surface tension, for Weber-number 
 % =========================================================================
 params.motor.type          = 'axial-flux PMSM';
 params.motor.P_nominal_W   = 25.0e3;    % SUPPLIED continuous
-params.motor.P_max_spec_W  = 42.0e3;    % SUPPLIED peak SPEC (see consistency check)
 params.motor.Q_max_Nm      = 100.0;     % SUPPLIED hard torque limit
 params.motor.n_nominal_rpm = 1300;      % SUPPLIED
 params.motor.n_max_rpm     = 2500;      % SUPPLIED hard speed limit
+
+% -------------------------------------------------------------------------
+% ABSOLUTE POWER CEILING - TEAM DECISION, 2026-09-10
+%
+% The motor is capped at 25 kW at all times. Peak equals continuous; there is
+% no short-duration overload mode. Every operating point the optimiser
+% proposes must satisfy P <= P_cap_W, and nothing in this project may exceed
+% it for any duration.
+%
+% The supplied datasheet peak of 42 kW is recorded below but NOT USED. It was
+% never reachable inside the other two hard limits in any case:
+%   42 kW at 2500 rpm needs 160.4 Nm  -> 60% over the 100 Nm limit
+%   42 kW at 100 Nm    needs 4010.7 rpm -> 60% over the 2500 rpm limit
+% The supplied number is kept, unaltered, so the contradiction stays visible
+% and can be put to the supplier. See print_assumptions.m.
+% -------------------------------------------------------------------------
+params.motor.P_cap_W       = 25.0e3;    % ENFORCED absolute ceiling, all durations
+params.motor.P_cap_source  = 'team decision 2026-09-10: 25 kW hard cap, peak = continuous';
+params.motor.P_max_spec_W  = 42.0e3;    % SUPPLIED datasheet peak - RECORDED, NOT USED
+params.motor.usePeakSpec   = false;     % must stay false unless the cap is lifted
 params.motor.eta           = 0.95;      % SUPPLIED (constant, first version)
 params.motor.etaMap        = [];        % placeholder: function handle eta = f(rpm, Q)
 params.motor.V_system_V    = 96.0;      % SUPPLIED nominal DC bus

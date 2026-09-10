@@ -88,10 +88,28 @@ but older versions do not. Prefer `'name', value` pairs for portability.
   from spec section 49, the full toolbox-free optimisation path.
 - **On your machine:** MATLAB. Toolbox optimisers for the final production runs,
   plotting for report figures, and anything touching Simulink.
-- **Optionally, later:** MATLAB in GitHub Actions via `matlab-actions/setup-matlab`.
-  This needs a licence that permits CI use; ICT Mumbai's Campus-Wide Licence
-  probably does. Worth checking with your IT department, but not a blocker,
-  because Octave already covers the numerical core.
+- **MATLAB in CI, now worth doing.** You have confirmed MATLAB access for
+  anyone with an institute email, which means a Campus-Wide Licence. Those
+  normally permit CI through `matlab-actions/setup-matlab` with a batch
+  licensing token. The steps:
+
+  1. Ask IT for a MATLAB batch licensing token for CI, or check whether the
+     Campus-Wide Licence already covers `matlab-actions`.
+  2. Store it as a repository secret named `MATLAB_BATCH_TOKEN`.
+  3. Add a job mirroring the Octave one, running `tests/ci.m` under MATLAB.
+
+  Keep **both** jobs. Octave is the fast gate that runs on every push in
+  seconds; MATLAB is the fidelity gate that proves the code behaves
+  identically on the runtime the team actually uses, and is the only way to
+  exercise the toolbox optimiser path. If the two ever disagree, that
+  disagreement is itself the bug worth finding.
+
+### MATLAB Online
+
+Also available to anyone with the institute email, at matlab.mathworks.com.
+Useful for a teammate without a local install to open a `.slx` model or run a
+one-off script. Not useful for development here, because it has no access to
+this repository's working tree.
 
 ### The rule this imposes on new code
 
@@ -260,9 +278,9 @@ Each stage ends with a runnable check. Nothing proceeds on an unverified stage.
 
 | Stage | Deliverable | Gate |
 |---:|---|---|
-| 0 | `units.m`, then `config()` runs | `config()` returns a struct in Octave |
-| 1 | `resistance_model.m` | Reproduces all 5 supplied points exactly; `P_E(20 kn) = 6.42 kW` |
-| 2 | `motor_model.m` | Reproduces the envelope numbers in section 7 below |
+| 0 | `units.m`, then `config()` runs | **DONE.** 11 checks green |
+| 1 | `resistance_model.m` | **DONE.** 16 checks green, including a discriminator that fails if pchip is swapped for linear |
+| 2 | `motor_model.m` | **DONE.** 18 checks green, including the 25 kW cap held across 5001 speeds |
 | 3 | `hydrofoil_polar.m`, `propeller_geometry.m` | Smooth geometry, no negative chord, monotonic radius |
 | 4 | `bem_rotor.m` on a single submerged rotor | Converges; `eta_0` in (0,1); `K_T`, `K_Q` physically ordered |
 | 5 | `crp_interaction.m` coupled | Rear-rotor inflow strictly exceeds `V_A`; swirl recovery positive |
@@ -343,12 +361,37 @@ solver being touched.
 
 ---
 
-## 9. Immediate next steps
+## 9. The 25 kW cap
 
-1. Write `units.m`. It is 30 lines and unblocks `config()`, which currently
-   cannot run at all.
-2. Add an Octave CI job so every push runs the suite.
-3. Work stages 1 and 2, which are quick and give real numbers.
-4. Ask the motor supplier about the 42 kW contradiction.
-5. Decide whether to chase a MATLAB CI licence, or stay on Octave. Octave is
-   sufficient for everything except Simulink.
+**Team decision, 2026-09-10: the motor is capped at 25 kW at all times.** Peak
+equals continuous. There is no overload mode and no operating point of any
+duration may exceed it.
+
+`params.motor.P_cap_W = 25e3` is the enforced ceiling. The supplied 42 kW
+datasheet peak stays recorded in `params.motor.P_max_spec_W` with
+`usePeakSpec = false`, so the supplied specification is never silently
+altered and the contradiction stays visible for the supplier conversation.
+
+The resulting envelope:
+
+| Region | Speed | Limit |
+|---|---|---|
+| Torque limited | up to 2387.3 rpm | 100 N·m, power rising with speed |
+| Power limited | 2387.3 to 2500 rpm | 25 kW, torque falling as `P_cap/omega` |
+
+**At 2500 rpm only 95.5 N·m is available, not 100.** That constraint is live in
+`motor_model.m` and gated by `tests/test_stage2_motor.m`, which sweeps 5001
+speeds and fails if any point exceeds the cap.
+
+---
+
+## 10. Immediate next steps
+
+1. **Stage 3: `hydrofoil_polar.m` and `propeller_geometry.m`.** These are the
+   two hard ones, and everything downstream depends on their quality.
+2. Ask the motor supplier about the 42 kW figure. The cap makes it moot for
+   design, but the answer tells you whether the 100 N·m is truly absolute.
+3. Set up the MATLAB CI job, per section 2, now that the licence is confirmed.
+4. Stage 4 is the honesty checkpoint: if the single-rotor BEM does not produce
+   sane `K_T`/`K_Q` against published open-water data, nothing downstream
+   means anything.
