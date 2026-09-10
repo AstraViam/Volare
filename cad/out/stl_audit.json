@@ -1,0 +1,427 @@
+{
+  "pod": {
+    "name": "Cockpit_V1_3 (pod shell)",
+    "triangles": 22082,
+    "welded_vertices": 11043,
+    "degenerate_triangles": 0,
+    "bbox_min_mm": [
+      -350.0,
+      -1332.5,
+      -1.8
+    ],
+    "bbox_max_mm": [
+      350.0,
+      1200.0,
+      483.8
+    ],
+    "bbox_size_mm": [
+      700.0,
+      2532.5,
+      485.6
+    ],
+    "surface_area_m2": 4.5803,
+    "signed_volume_L": 320.58,
+    "surface_centroid_mm": [
+      -0.3,
+      -20.5,
+      156.6
+    ],
+    "mesh": {
+      "edges": 33123,
+      "boundary_edges_used_1x": 0,
+      "manifold_edges_used_2x": 33123,
+      "non_manifold_used_3x_plus": 0,
+      "watertight": true
+    },
+    "projected_area_m2": {
+      "frontal_X": 0.7518,
+      "profile_Y": 0.2702,
+      "planform_Z": 1.5114
+    }
+  },
+  "full_assembly": {
+    "name": "FULLCOCPITV1_3 (full assembly)",
+    "triangles": 105174,
+    "welded_vertices": 60311,
+    "degenerate_triangles": 2,
+    "bbox_min_mm": [
+      -2540.6,
+      -2192.7,
+      -897.1
+    ],
+    "bbox_max_mm": [
+      2451.4,
+      296.4,
+      178.0
+    ],
+    "bbox_size_mm": [
+      4992.0,
+      2489.0,
+      1075.1
+    ],
+    "surface_area_m2": 23.4971,
+    "signed_volume_L": 1720.35,
+    "surface_centroid_mm": [
+      141.3,
+      -950.2,
+      -476.9
+    ],
+    "mesh": {
+      "edges": 166927,
+      "boundary_edges_used_1x": 18368,
+      "manifold_edges_used_2x": 148541,
+      "non_manifold_used_3x_plus": 18,
+      "watertight": false
+    },
+    "projected_area_m2": {
+      "frontal_X": 1.0757,
+      "profile_Y": 3.02,
+      "planform_Z": 5.6151
+    }
+  },
+  "assembly_components": {
+    "count": 17,
+    "parts": [
+      {
+        "triangles": 37557,
+        "bbox_min_mm": [
+          -2540.6,
+          -2192.7,
+          -897.1
+        ],
+        "bbox_size_mm": [
+          4992.0,
+          454.0,
+          600.0
+        ],
+        "centroid_mm": [
+          204.6,
+          -1965.7,
+          -632.0
+        ],
+        "surface_area_m2": 6.9051,
+        "volume_L": 685.54
+      },
+      {
+        "triangles": 37557,
+        "bbox_min_mm": [
+          -2540.6,
+          -157.6,
+          -897.1
+        ],
+        "bbox_size_mm": [
+          4992.0,
+          454.0,
+          600.0
+        ],
+        "centroid_mm": [
+          204.6,
+          69.4,
+          -632.0
+        ],
+        "surface_area_m2": 6.9051,
+        "volume_L": 685.53
+      },
+      {
+        "triangles": 21894,
+        "bbox_min_mm": [
+          -1695.9,
+          -1298.5,
+          -319.4
+        ],
+        "bbox_size_mm": [
+          2537.7,
+          700.0,
+          497.3
+        ],
+        "centroid_mm": [
+          -382.9,
+          -948.2,
+          -149.7
+        ],
+        "surface_area_m2": 4.5803,
+        "volume_L": 320.58
+      },
+      {
+        "triangles": 1096,
+        "bbox_min_mm": [
+          1890.3,
+          -2098.2,
+          -389.7
+        ],
+        "bbox_size_mm": [
+          104.0,
+          2300.0,
+          104.0
+        ],
+        "centroid_mm": [
+          1942.3,
+          -948.2,
+          -338.7
+        ],
+        "surface_area_m2": 1.4242,
+        "volume_L": 1.42
+      },
+      {
+        "triangles": 1094,
+        "bbox_min_mm": [
+          -1108.3,
+          -2077.7,
+          -481.0
+        ],
+        "bbox_size_mm": [
+          104.0,
+          2190.0,
+          104.0
+        ],
+        "centroid_mm": [
+          -1056.3,
+          -982.7,
+          -430.1
+        ],
+        "surface_area_m2": 1.3537,
+        "volume_L": 1.35
+      },
+      {
+        "triangles": 1044,
+        "bbox_min_mm": [
+          -1113.3,
+          -1202.7,
+          -483.5
+        ],
+        "bbox_size_mm": [
+          3112.6,
+          109.0,
+          249.8
+        ],
+        "centroid_mm": [
+          440.7,
+          -1148.2,
+          -309.2
+        ],
+        "surface_area_m2": 1.1139,
+        "volume_L": 14.76
+      },
+      {
+        "triangles": 1044,
+        "bbox_min_mm": [
+          -1113.3,
+          -802.7,
+          -483.5
+        ],
+        "bbox_size_mm": [
+          3112.6,
+          109.0,
+          249.8
+        ],
+        "centroid_mm": [
+          440.7,
+          -748.2,
+          -309.2
+        ],
+        "surface_area_m2": 1.1139,
+        "volume_L": 14.76
+      },
+      {
+        "triangles": 576,
+        "bbox_min_mm": [
+          -775.4,
+          -2055.8,
+          -420.5
+        ],
+        "bbox_size_mm": [
+          81.8,
+          180.1,
+          29.2
+        ],
+        "centroid_mm": [
+          -734.6,
+          -1965.7,
+          -401.0
+        ],
+        "surface_area_m2": 0.0152,
+        "volume_L": 1.4
+      },
+      {
+        "triangles": 576,
+        "bbox_min_mm": [
+          -775.4,
+          -20.7,
+          -420.5
+        ],
+        "bbox_size_mm": [
+          81.8,
+          180.1,
+          29.2
+        ],
+        "centroid_mm": [
+          -734.6,
+          69.4,
+          -401.0
+        ],
+        "surface_area_m2": 0.0152,
+        "volume_L": 1.4
+      },
+      {
+        "triangles": 216,
+        "bbox_min_mm": [
+          -867.0,
+          -1205.7,
+          -371.2
+        ],
+        "bbox_size_mm": [
+          16.5,
+          139.0,
+          50.4
+        ],
+        "centroid_mm": [
+          -858.4,
+          -1148.8,
+          -358.7
+        ],
+        "surface_area_m2": 0.0101,
+        "volume_L": 0.02
+      },
+      {
+        "triangles": 216,
+        "bbox_min_mm": [
+          -867.0,
+          -805.7,
+          -371.2
+        ],
+        "bbox_size_mm": [
+          16.5,
+          139.0,
+          50.4
+        ],
+        "centroid_mm": [
+          -858.4,
+          -748.8,
+          -358.7
+        ],
+        "surface_area_m2": 0.0101,
+        "volume_L": 0.02
+      },
+      {
+        "triangles": 216,
+        "bbox_min_mm": [
+          -667.1,
+          -1205.7,
+          -365.1
+        ],
+        "bbox_size_mm": [
+          16.5,
+          139.0,
+          50.4
+        ],
+        "centroid_mm": [
+          -658.5,
+          -1148.8,
+          -352.6
+        ],
+        "surface_area_m2": 0.0101,
+        "volume_L": 0.02
+      },
+      {
+        "triangles": 216,
+        "bbox_min_mm": [
+          -667.1,
+          -805.7,
+          -365.1
+        ],
+        "bbox_size_mm": [
+          16.5,
+          139.0,
+          50.4
+        ],
+        "centroid_mm": [
+          -658.5,
+          -748.8,
+          -352.6
+        ],
+        "surface_area_m2": 0.0101,
+        "volume_L": 0.02
+      },
+      {
+        "triangles": 216,
+        "bbox_min_mm": [
+          -467.2,
+          -1205.7,
+          -359.0
+        ],
+        "bbox_size_mm": [
+          16.5,
+          139.0,
+          50.4
+        ],
+        "centroid_mm": [
+          -458.6,
+          -1148.8,
+          -346.5
+        ],
+        "surface_area_m2": 0.0101,
+        "volume_L": 0.02
+      },
+      {
+        "triangles": 216,
+        "bbox_min_mm": [
+          -467.2,
+          -805.7,
+          -359.0
+        ],
+        "bbox_size_mm": [
+          16.5,
+          139.0,
+          50.4
+        ],
+        "centroid_mm": [
+          -458.6,
+          -748.8,
+          -346.5
+        ],
+        "surface_area_m2": 0.0101,
+        "volume_L": 0.02
+      },
+      {
+        "triangles": 582,
+        "bbox_min_mm": [
+          -802.2,
+          -2053.5,
+          -423.8
+        ],
+        "bbox_size_mm": [
+          28.1,
+          175.5,
+          22.8
+        ],
+        "centroid_mm": [
+          -788.4,
+          -1965.7,
+          -407.6
+        ],
+        "surface_area_m2": 0.005,
+        "volume_L": 0.45
+      },
+      {
+        "triangles": 582,
+        "bbox_min_mm": [
+          -802.2,
+          -18.4,
+          -423.8
+        ],
+        "bbox_size_mm": [
+          28.1,
+          175.5,
+          22.8
+        ],
+        "centroid_mm": [
+          -788.4,
+          69.4,
+          -407.6
+        ],
+        "surface_area_m2": 0.005,
+        "volume_L": 0.45
+      }
+    ]
+  }
+}

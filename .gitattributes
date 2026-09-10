@@ -1,0 +1,38 @@
+# =============================================================================
+# Volare
+#
+# Line-ending normalisation and diff hints. Git LFS is NOT enabled yet; see
+# docs/data-management.md for how and when to turn it on. Enabling LFS rules
+# before every teammate has run `git lfs install` hands them pointer files
+# instead of real CAD, so it is a deliberate, coordinated switch.
+# =============================================================================
+
+* text=auto eol=lf
+
+*.m      text eol=lf diff=matlab
+*.py     text eol=lf diff=python
+*.md     text eol=lf
+*.csv    text eol=lf
+*.json   text eol=lf
+*.txt    text eol=lf
+*.bat    text eol=crlf
+*.ps1    text eol=crlf
+
+# --- Binary: never line-ending-munge, never try to merge ---------------------
+*.mat    binary
+*.slx    binary
+*.mdl    binary
+*.blend  binary
+*.stl    binary
+*.step   binary
+*.stp    binary
+*.FCStd  binary
+*.pdf    binary
+*.png    binary
+*.jpg    binary
+
+# --- Diff and language hints -------------------------------------------------
+docs/**             linguist-documentation
+cad/out/**          linguist-generated
+powertrain/output/** linguist-generated
+source_documents/** linguist-vendored

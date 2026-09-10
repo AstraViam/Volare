@@ -1,4 +1,75 @@
+# =============================================================================
+# Volare
+#
+# Rule: Git stores what a human wrote. It does not store what a tool can
+# regenerate. If you are about to add an exception for a large binary, read
+# docs/data-management.md first.
+# =============================================================================
+
+# --- Editor and OS noise -----------------------------------------------------
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*~
+*.swp
+
+# --- Python ------------------------------------------------------------------
 __pycache__/
-*.pyc
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+.coverage
+htmlcov/
+
+# --- MATLAB ------------------------------------------------------------------
+# Editor autosaves and Simulink build scratch. The .slx models themselves are
+# source and stay tracked.
+*.asv
+*.m~
+*.autosave
+slprj/
+sccprj/
+codegen/
+*.slxc
+*.mexa64
+*.mexw64
+*.mexmaci64
+
+# --- Blender -----------------------------------------------------------------
+# .blend1 (and .blend2) are Blender's automatic previous-version backups. They
+# are byte-for-byte redundant with the .blend beside them and cost ~11 MB.
 *.blend1
+*.blend2
+*.blend@
+
+# --- FreeCAD -----------------------------------------------------------------
 *.FCBak
+*.FCStd1
+
+# --- Build and run logs ------------------------------------------------------
+*_build.log
+powertrain_step_build.log
+
+# --- Secrets -----------------------------------------------------------------
+# Never commit telemetry endpoints, API keys or radio credentials.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+
+# --- Deliberately NOT ignored ------------------------------------------------
+# powertrain/output/ and cad/out/ hold generated artefacts that ARE tracked,
+# because teammates without MATLAB or Blender still need them. That means a
+# rerun shows them as modified. Commit a regenerated artefact only when the
+# input actually changed; otherwise `git checkout -- <path>` to discard it.
