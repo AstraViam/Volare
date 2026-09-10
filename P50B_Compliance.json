@@ -1,0 +1,918 @@
+{
+  "rulesDocument": "Monaco Energy Class Technical Rules 2026.1",
+  "rulesIssued": "08/09/2025",
+  "rulesFile": "04_data/Monaco Energy Class Technical Rules 2026 V3 (1).pdf",
+  "generatedBy": "P50B_ExportCompliance",
+  "summary": {
+    "total": 94,
+    "pass": 55,
+    "fail": 1,
+    "action": 13,
+    "partial": 0,
+    "checklist": 24,
+    "compliant": false
+  },
+  "checks": [
+    {
+      "req": "ENERGY_REQ_7",
+      "title": "Maximum stored energy under 10 kWh",
+      "status": "PASS",
+      "finding": "546 cells x 3.6 V x 5.0 Ah x f=1.0 = 9828 Wh. Margin 172 Wh (1.72%).",
+      "action": "Margin is thin. The rule caps the pack at 555 cells of this type; you have 546."
+    },
+    {
+      "req": "ENERGY_REQ_188",
+      "title": "Motor nominal power at or below 25 kW",
+      "status": "ACTION",
+      "finding": "Competr hardware is rated 26.9 kW nominal (42 kW peak), which is 1.9 kW over the rule limit. The drivetrain is configured to 25.0 kW, which complies, and every model in this project enforces that limit.",
+      "action": "Compliance depends entirely on the derate. Get a written statement from Competr confirming the unit can be limited to 25 kW nominal, and be able to show the setting in the inverter configuration at scrutineering."
+    },
+    {
+      "req": "ENERGY_REQ_187",
+      "title": "Approval required for voltage above 100 V",
+      "status": "ACTION",
+      "finding": "Pack reaches 109.2 V at 100% SOC (26S x 4.2 V), above the 100 V threshold.",
+      "action": "Obtain Technical Committee approval during registration. This is a paperwork gate, not a design fault -- but without it the boat cannot race."
+    },
+    {
+      "req": "ENERGY_REQ_191",
+      "title": "High voltage training certification",
+      "status": "ACTION",
+      "finding": "System reaches 109.2 V, so the 100 V threshold applies.",
+      "action": "Everyone who works on the pack needs a high voltage training certificate. Checked at technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_59",
+      "title": "Fuse rating below weakest protected component",
+      "status": "PASS",
+      "finding": "400 A fuse protects Series busbar (90 mm2) rated 450 A continuous.",
+      "action": ""
+    },
+    {
+      "req": "ENERGY_REQ_58",
+      "title": "Fuse immediately after the energy storage",
+      "status": "MODELLED",
+      "finding": "A 400 A fuse is modelled in the HV path.",
+      "action": "Confirm the physical fuse sits immediately after the pack terminals, before any other component. Also required on the telemetry battery."
+    },
+    {
+      "req": "ENERGY_REQ_57",
+      "title": "Adequately sized wire gauge",
+      "status": "PASS",
+      "finding": "150 mm2 cable, 459 A derated, against 375 A maximum continuous draw.",
+      "action": ""
+    },
+    {
+      "req": "ENERGY_REQ_23",
+      "title": "Batteries used within datasheet ratings",
+      "status": "PASS",
+      "finding": "17.86 A per cell at the 375 A bus maximum, against a 60 A datasheet continuous rating (30% utilisation).",
+      "action": ""
+    },
+    {
+      "req": "ENERGY_REQ_93",
+      "title": "Exposed parts below 60 degC",
+      "status": "PASS",
+      "finding": "Highest modelled steady cell temperature 35.1 degC.",
+      "action": ""
+    },
+    {
+      "req": "ENERGY_REQ_67",
+      "title": "Battery temperature monitored and shown to pilot",
+      "status": "ACTION",
+      "finding": "Not a model property. The BMS must display cell temperature to the pilot, and the telemetry battery needs monitoring too.",
+      "action": "Confirm the BMS temperature channel reaches the pilot display."
+    },
+    {
+      "req": "ENERGY_REQ_68",
+      "title": "Pilot warned at 90% of maximum temperature",
+      "status": "ACTION",
+      "finding": "With a 70 degC cell maximum, the warning must trigger at 63 degC.",
+      "action": "Set the BMS warning threshold to 63 degC."
+    },
+    {
+      "req": "ENERGY_REQ_154",
+      "title": "Steering rotates at least 40 degrees each side",
+      "status": "PASS",
+      "finding": "Competr steering range -40 to +40 degrees.",
+      "action": "Exactly at the limit, with no margin. Verify the installed range on the boat."
+    },
+    {
+      "req": "ENERGY_REQ_5",
+      "title": "No ammonia, fossil fuel or nuclear energy",
+      "status": "PASS",
+      "finding": "Battery electric. The only stored energy aboard is the 9.83 kWh lithium pack and the secondary telemetry battery, both of which the rule permits.",
+      "action": "Note that ENERGY_REQ_7 note 3 exempts the telemetry battery from the energy calculation but not from the fusing and monitoring rules."
+    },
+    {
+      "req": "ENERGY_REQ_6",
+      "title": "No direct CO2 emissions",
+      "status": "PASS",
+      "finding": "Battery electric, no combustion of any kind aboard.",
+      "action": ""
+    },
+    {
+      "req": "ENERGY_REQ_31",
+      "title": "No human powered mechanical energy",
+      "status": "PASS",
+      "finding": "No human-powered propulsion or actuation.",
+      "action": "Declared in the parameter file. Confirm on the build at inspection."
+    },
+    {
+      "req": "ENERGY_REQ_48",
+      "title": "Overall weight excluding hulls under 250 kg",
+      "status": "FAIL",
+      "finding": "259.2 kg excluding hulls, over the 250 kg limit by 9.2 kg.",
+      "action": "An overweight boat is not permitted in the water. See P50B_MassBudget for where the mass is."
+    },
+    {
+      "req": "ENERGY_REQ_135",
+      "title": "Pilot at least 60 kg ready to sail",
+      "status": "PASS",
+      "finding": "Pilot 80 kg ready to sail against a 60 kg minimum, so no ballast is needed.",
+      "action": "Ready to sail means with overalls, helmet, lifejacket, shoes and the communication system. Weigh the pilot dressed, not undressed."
+    },
+    {
+      "req": "ENERGY_REQ_37",
+      "title": "Boat reaches at least 3 knots",
+      "status": "PASS",
+      "finding": "Three knots needs 402 W at the shaft, 1.8% of the 22.8 kW the rules allow. Top speed is 22.2 knots.",
+      "action": "Computed against the supplied MEBC resistance curve. The sea trial is still the proof."
+    },
+    {
+      "req": "ENERGY_REQ_32",
+      "title": "Boat moves and manoeuvres forward and reverse",
+      "status": "PASS",
+      "finding": "At quarter power and 2 knots the propulsor makes 612 N astern against 33 N of resistance, a margin of 18.5x.",
+      "action": "Astern thrust is estimated as a fraction of ahead thrust and is an assumption, but the margin is wide enough that the assumption is not load bearing. Manoeuvrability is judged by the Technical Committee at the sea certification test."
+    },
+    {
+      "req": "DRIVETRAIN",
+      "title": "Motor can deliver the permitted power",
+      "status": "ACTION",
+      "finding": "At top speed the propulsor asks the motor for 1712 rpm and 131.3 Nm against limits of 4000 rpm and 100 Nm.",
+      "action": "Not a rule breach -- the boat is simply unable to use the power it is allowed. Run P50B_GearboxStudy; the gearbox ratio is the free variable."
+    },
+    {
+      "req": "ENERGY_REQ_63",
+      "title": "Circuits above 15 V DC at least IP2X",
+      "status": "ACTION",
+      "finding": "The pack reaches 109.2 V, far above the 15 V DC threshold, so IP2X applies to the whole HV system. Intended rating is IP2X.",
+      "action": "The rule names busbars specifically. Every exposed conductor inside the pack needs a cover, not just the terminals. ENERGY_REQ_60 then tests it with a 100 mm long, 6 mm probe."
+    },
+    {
+      "req": "ENERGY_REQ_71",
+      "title": "Kill cord cuts engine power in under 1 second",
+      "status": "PASS",
+      "finding": "0.07 s intended, 1 s permitted (margin +0.93 s).",
+      "action": "Detection 20 ms, inverter inhibit 15 ms, contactor 35 ms. The contactor dominates and is the one figure worth taking from a real datasheet. ENERGY_REQ_74 then requires a second deliberate action before the motor can restart -- waiting does not count."
+    },
+    {
+      "req": "ENERGY_REQ_77",
+      "title": "Emergency stop button at least 30 mm across",
+      "status": "PASS",
+      "finding": "40 mm intended, 30 mm required (margin +10 mm).",
+      "action": ""
+    },
+    {
+      "req": "ENERGY_REQ_76",
+      "title": "Red button over a 90 mm yellow circle",
+      "status": "PASS",
+      "finding": "90 mm intended, 90 mm specified.",
+      "action": "The rule gives 90 mm as the specification, not as a minimum."
+    },
+    {
+      "req": "ENERGY_REQ_78",
+      "title": "Emergency stop symbol at least 100 mm high",
+      "status": "PASS",
+      "finding": "100 mm intended, 100 mm specified.",
+      "action": "Red spark on a white-edged blue triangle, close to the button."
+    },
+    {
+      "req": "ENERGY_REQ_85",
+      "title": "Emergency stop within one metre of starboard",
+      "status": "PASS",
+      "finding": "0.35 m intended, 1 m permitted (margin +0.65 m).",
+      "action": "ENERGY_REQ_81 also requires it in front of the pilot, and ENERGY_REQ_86 requires it to face outboard -- a button pointing up is explicitly not compliant."
+    },
+    {
+      "req": "ENERGY_REQ_79",
+      "title": "Emergency stop isolates every power source",
+      "status": "PASS",
+      "finding": "Isolates the telemetry supply as well as the traction pack, by relay rather than in software.",
+      "action": "Declared in the parameter file. Confirm on the build at inspection."
+    },
+    {
+      "req": "ENERGY_REQ_174",
+      "title": "Bulkhead hole at least 30 mm",
+      "status": "PASS",
+      "finding": "40 mm intended, 30 mm required (margin +10 mm).",
+      "action": ""
+    },
+    {
+      "req": "ENERGY_REQ_175",
+      "title": "Bulkhead hole at most 50 mm, with a cap",
+      "status": "PASS",
+      "finding": "40 mm intended, 50 mm permitted (margin +10 mm).",
+      "action": "ENERGY_REQ_176 also requires it to point to the pilot's side rather than at the pilot."
+    },
+    {
+      "req": "ENERGY_REQ_51",
+      "title": "Bulkhead at least A1 fire resistant",
+      "status": "PASS",
+      "finding": "Intended class A1.",
+      "action": "Changed from the French classification to Euroclass for 2026. Have the material certificate at inspection."
+    },
+    {
+      "req": "ENERGY_REQ_25",
+      "title": "Energy container at least 500 mm from the pilot",
+      "status": "PASS",
+      "finding": "620 mm intended, 500 mm required (margin +120 mm).",
+      "action": "Relaxed from 1 m for 2026. Applies to the secondary telemetry battery too."
+    },
+    {
+      "req": "ENERGY_REQ_38",
+      "title": "At least two clamps per beam",
+      "status": "PASS",
+      "finding": "2 per beam intended, 2 per beam specified.",
+      "action": "Each must envelop the full circumference of the beam."
+    },
+    {
+      "req": "ENERGY_REQ_38",
+      "title": "Clamp width at least 50 mm",
+      "status": "PASS",
+      "finding": "60 mm intended, 50 mm required (margin +10 mm).",
+      "action": ""
+    },
+    {
+      "req": "ENERGY_REQ_38",
+      "title": "Clamp spacing at least 750 mm",
+      "status": "PASS",
+      "finding": "800 mm intended, 750 mm required (margin +50 mm).",
+      "action": "New for 2026. Symmetric about the centreline. The beams are 3000 mm apart, so there is room."
+    },
+    {
+      "req": "ENERGY_REQ_38",
+      "title": "Clamp gasket at least 1 mm",
+      "status": "PASS",
+      "finding": "1.5 mm intended, 1 mm required (margin +0.5 mm).",
+      "action": "Rubber, between the beam and the clamp. ENERGY_REQ_3 forbids modifying the beams, so the gasket is what protects them."
+    },
+    {
+      "req": "ENERGY_REQ_182",
+      "title": "Pass-through for the organiser temperature sensor",
+      "status": "PASS",
+      "finding": "4 mm intended, 3.2 mm required (margin +0.8 mm).",
+      "action": "The sensor must reach cells at the CORE of the pack, not just the wall. The three empty slots in the 4x4 grid give a natural route to the centre -- design the route now, not after the pack is potted."
+    },
+    {
+      "req": "ENERGY_REQ_185",
+      "title": "Free volume for the organiser monitoring device",
+      "status": "PASS",
+      "finding": "200 x 160 x 130 mm allocated against a 190 x 150 x 122 mm requirement.",
+      "action": "It must be open to the sky, outside every closed compartment, and its long-by-wide plane as parallel to the trim as possible. The organiser also fits a camera."
+    },
+    {
+      "req": "ENERGY_REQ_185",
+      "title": "Monitoring cables 100 mm clear of power cables",
+      "status": "PASS",
+      "finding": "150 mm intended, 100 mm required (margin +50 mm).",
+      "action": "Crossing a power cable is permitted only at a right angle. The organiser installs the sensor cabling, but the team has to leave them a route."
+    },
+    {
+      "req": "ENERGY_REQ_184",
+      "title": "Organiser power interface, 10-28 V, 30 W",
+      "status": "PASS",
+      "finding": "12 V from the DC-DC rail, inside the 10-28 V window, with a 30 W budget. Connector BD-02BFFA-LL7001, positive on pin 1.",
+      "action": "The connector part number CHANGED for 2026 -- check it against Annex IV before ordering. Amphenol LTW BD-02BFFA-LL7001 or ABD-02AFFM-LL7A03."
+    },
+    {
+      "req": "ENERGY_REQ_171",
+      "title": "W026 lithium battery symbol at least 10 cm",
+      "status": "PASS",
+      "finding": "12 cm intended, 10 cm required (margin +2 cm).",
+      "action": "The pack holds 9828 Wh, well over the 100 Wh threshold, so the symbol is required on the battery AND on its container. ISO 7010:2019."
+    },
+    {
+      "req": "ENERGY_REQ_172",
+      "title": "Battery capacity marked, letters at least 2 cm",
+      "status": "PASS",
+      "finding": "3 cm intended, 2 cm required (margin +1 cm).",
+      "action": "Mark it as 9828 Wh / 93.6 V / 105 Ah."
+    },
+    {
+      "req": "ENERGY_REQ_173",
+      "title": "Battery composition marked, letters at least 2 cm",
+      "status": "PASS",
+      "finding": "3 cm intended, 2 cm required (margin +1 cm).",
+      "action": "Composition is NMC -- lithium-ion, INR-21700-P50B cells."
+    },
+    {
+      "req": "ENERGY_REQ_49",
+      "title": "High visibility tape, starboard",
+      "status": "ACTION",
+      "finding": "520 cm2 intended, 500 cm2 required (margin +20 cm2).",
+      "action": "Margin is under 5%. "
+    },
+    {
+      "req": "ENERGY_REQ_49",
+      "title": "High visibility tape, port",
+      "status": "ACTION",
+      "finding": "520 cm2 intended, 500 cm2 required (margin +20 cm2).",
+      "action": "Margin is under 5%. "
+    },
+    {
+      "req": "ENERGY_REQ_49",
+      "title": "High visibility tape, forward",
+      "status": "ACTION",
+      "finding": "260 cm2 intended, 250 cm2 required (margin +10 cm2).",
+      "action": "Margin is under 5%. "
+    },
+    {
+      "req": "ENERGY_REQ_49",
+      "title": "High visibility tape, aft",
+      "status": "ACTION",
+      "finding": "260 cm2 intended, 250 cm2 required (margin +10 cm2).",
+      "action": "Margin is under 5%. "
+    },
+    {
+      "req": "ENERGY_REQ_106",
+      "title": "Fire extinguisher at least 1 kg",
+      "status": "ACTION",
+      "finding": "1 kg intended, 1 kg required (margin +0 kg).",
+      "action": "Margin is under 5%. ENERGY_REQ_107 requires ABC type; 108 and 109 require a valid approval showing the last and next test dates; 110 requires it reachable from the seat and NOT behind it; 111 requires it not to fall in the water when taken out."
+    },
+    {
+      "req": "ENERGY_REQ_101",
+      "title": "Paddle overall length",
+      "status": "PASS",
+      "finding": "110 cm intended, 100 cm required (margin +10 cm).",
+      "action": ""
+    },
+    {
+      "req": "ENERGY_REQ_101",
+      "title": "Paddle blade length",
+      "status": "PASS",
+      "finding": "32 cm intended, 30 cm required (margin +2 cm).",
+      "action": ""
+    },
+    {
+      "req": "ENERGY_REQ_101",
+      "title": "Paddle blade width",
+      "status": "PASS",
+      "finding": "14 cm intended, 13 cm required (margin +1 cm).",
+      "action": ""
+    },
+    {
+      "req": "ENERGY_REQ_102",
+      "title": "Boat hook at least 100 cm",
+      "status": "PASS",
+      "finding": "110 cm intended, 100 cm required (margin +10 cm).",
+      "action": "It may be combined with the paddle, but a plain paddle handle is not a hook -- it has to be able to catch."
+    },
+    {
+      "req": "ENERGY_REQ_103",
+      "title": "Warning flag at least 30 x 30 cm",
+      "status": "PASS",
+      "finding": "35 cm intended, 30 cm required (margin +5 cm).",
+      "action": "Uniformly orange or red. ENERGY_REQ_104 forbids securing it to the paddle or the boat hook, so it needs its own handle."
+    },
+    {
+      "req": "ENERGY_REQ_103",
+      "title": "Warning flag handle at least 100 cm",
+      "status": "PASS",
+      "finding": "110 cm intended, 100 cm required (margin +10 cm).",
+      "action": ""
+    },
+    {
+      "req": "ENERGY_REQ_99",
+      "title": "Floating towline at least 10 m",
+      "status": "PASS",
+      "finding": "12 m intended, 10 m required (margin +2 m).",
+      "action": ""
+    },
+    {
+      "req": "ENERGY_REQ_99",
+      "title": "Towline diameter at least 10 mm",
+      "status": "PASS",
+      "finding": "12 mm intended, 10 mm required (margin +2 mm).",
+      "action": ""
+    },
+    {
+      "req": "ENERGY_REQ_96",
+      "title": "Towing bridle diameter at least 10 mm",
+      "status": "PASS",
+      "finding": "12 mm intended, 10 mm required (margin +2 mm).",
+      "action": "Floating, fitted to the boat, with the towline secured to it per ENERGY_REQ_100."
+    },
+    {
+      "req": "ENERGY_REQ_137",
+      "title": "Lifejacket at least 100 N buoyancy",
+      "status": "PASS",
+      "finding": "150 N intended, 100 N required (margin +50 N).",
+      "action": "If not rigid it must inflate automatically on contact with water, and its service date must fall after the event."
+    },
+    {
+      "req": "ENERGY_REQ_150",
+      "title": "National flag at least 2 m above the water",
+      "status": "PASS",
+      "finding": "2.2 m intended, 2 m required (margin +0.2 m).",
+      "action": ""
+    },
+    {
+      "req": "ENERGY_REQ_151",
+      "title": "National flag at least 30 cm wide",
+      "status": "PASS",
+      "finding": "35 cm intended, 30 cm required (margin +5 cm).",
+      "action": ""
+    },
+    {
+      "req": "ENERGY_REQ_141",
+      "title": "Pilot can reach the shore team; VHF forbidden",
+      "status": "PASS",
+      "finding": "Intended system is 4G/LTE helmet intercom, which is not VHF.",
+      "action": "This changed for 2026 -- VHF used to be the obvious choice and is now banned. ENERGY_REQ_143 requires it built into the helmet, 144 waterproof, 145 good for a whole race on one charge."
+    },
+    {
+      "req": "ENERGY_REQ_142",
+      "title": "Communication range at least 2 nautical miles",
+      "status": "PASS",
+      "finding": "5 nmi intended, 2 nmi required (margin +3 nmi).",
+      "action": ""
+    },
+    {
+      "req": "ENERGY_REQ_44",
+      "title": "Pilot evacuates within 5 seconds unaided",
+      "status": "PASS",
+      "finding": "3.5 s intended, 5 s permitted (margin +1.5 s).",
+      "action": "Demonstrated by an evacuation test at inspection. Rehearse it in full kit, in the water, before the event."
+    },
+    {
+      "req": "ENERGY_REQ_45",
+      "title": "Pilot not fully enclosed",
+      "status": "PASS",
+      "finding": "No hatch stands between the pilot and the water.",
+      "action": "Declared in the parameter file. Confirm on the build at inspection."
+    },
+    {
+      "req": "ENERGY_REQ_46",
+      "title": "Pilot not restrained to the boat",
+      "status": "PASS",
+      "finding": "No restraint of any kind; safety belts are not allowed.",
+      "action": "Declared in the parameter file. Confirm on the build at inspection."
+    },
+    {
+      "req": "ENERGY_REQ_47",
+      "title": "Cockpit is self-draining",
+      "status": "PASS",
+      "finding": "Self-draining cockpit.",
+      "action": "Declared in the parameter file. Confirm on the build at inspection."
+    },
+    {
+      "req": "ENERGY_REQ_186",
+      "title": "No cockpit appendix touches the water",
+      "status": "PASS",
+      "finding": "Only the motor and the water pump reach the water.",
+      "action": "Declared in the parameter file. Confirm on the build at inspection."
+    },
+    {
+      "req": "ENERGY_REQ_28",
+      "title": "Solar panels at most 4 m2",
+      "status": "PASS",
+      "finding": "0 m2 intended, 4 m2 permitted (margin +4 m2).",
+      "action": "Including the mounting frame. None fitted."
+    },
+    {
+      "req": "ENERGY_REQ_29",
+      "title": "Sail at most 20 m2",
+      "status": "PASS",
+      "finding": "0 m2 intended, 20 m2 permitted (margin +20 m2).",
+      "action": "None fitted."
+    },
+    {
+      "req": "ENERGY_REQ_115-169",
+      "title": "Hydrogen safety chapter",
+      "status": "PASS",
+      "finding": "Not applicable. The boat carries no hydrogen and no pressurised gas, so requirements 8, 19, 21, 22, 64, 94, 115 to 134 and 156 to 169 do not apply.",
+      "action": "Recorded rather than omitted: a compliance report that is simply silent about a quarter of the rule book is indistinguishable from one that forgot."
+    },
+    {
+      "req": "ANNEX_III",
+      "title": "Temperature monitoring API",
+      "status": "ACTION",
+      "finding": "A POST application/json endpoint at /monitoringdata/ carrying 3 temperature channels, voltage, current, latitude, longitude and the team token, posted every 1 s.",
+      "action": "The Annex says the API 'will be confirmed in February 2026'. The payload built by Mission Control follows the published example exactly, so confirming it should be a one-line change. Test against the organiser's endpoint before the event, not in the paddock."
+    },
+    {
+      "req": "ENERGY_REQ_26",
+      "title": "Energy container not in the pilot's seating area",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_27",
+      "title": "Container ventilation blows away from the pilot",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_24",
+      "title": "Energy source securely fixed onboard",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_155",
+      "title": "Container overpressure valve, certified and sized, facing aft",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_56",
+      "title": "Fire extinguisher port on the port side of the container",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_189",
+      "title": "External charging interface, no need to open the container",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_50",
+      "title": "Bulkhead isolating propulsion and energy from the pilot",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_52",
+      "title": "Bulkhead protects the pilot from an energy storage explosion",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_55",
+      "title": "Cable pass-throughs fitted with grommets",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_60",
+      "title": "No live part touchable with a 100 mm long, 6 mm probe",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_61",
+      "title": "All wiring outside the enclosure is orange",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_62",
+      "title": "Electronics in an IP56 watertight, cooled compartment",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_70",
+      "title": "Kill cord fitted, visible at 3 m, secured to the pilot",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_75",
+      "title": "Emergency stop mushroom button fitted and accessible",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_181",
+      "title": "ESC input power wired to accept the organiser sensing device",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_190",
+      "title": "Pilot wears tear resistant gloves, EN 388:2016",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_170",
+      "title": "Cockpit built to professional standard, approved by the Design Jury",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_39",
+      "title": "Every component of and in the cockpit is fixed",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_41",
+      "title": "Pilot's feet forward of the body and clear of hazards",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_42",
+      "title": "Seat includes a headrest",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_90",
+      "title": "No sharp edges",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_92",
+      "title": "Rotating components shielded; propellers protected off the water",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_105",
+      "title": "Audible warning system aboard",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    },
+    {
+      "req": "ENERGY_REQ_148",
+      "title": "ISO 7010:2019 symbols on a visible part of the cockpit",
+      "status": "CHECKLIST",
+      "finding": "Physical or procedural. Not derivable from the model.",
+      "action": "Verify on the build before technical inspection."
+    }
+  ],
+  "mass": {
+    "items": [
+      {
+        "item": "Battery pack",
+        "kg": 51.597000000000008,
+        "percent": 19.906480399078696,
+        "source": "model"
+      },
+      {
+        "item": "Outboard",
+        "kg": 25,
+        "percent": 9.6451733623460143,
+        "source": "datasheet"
+      },
+      {
+        "item": "Trim assembly",
+        "kg": 10,
+        "percent": 3.8580693449384058,
+        "source": "datasheet"
+      },
+      {
+        "item": "Inverter / ESC",
+        "kg": 6.5,
+        "percent": 2.5077450742099638,
+        "source": "allowance"
+      },
+      {
+        "item": "HV harness (cable)",
+        "kg": 4,
+        "percent": 1.5432277379753623,
+        "source": "allowance"
+      },
+      {
+        "item": "Energy container",
+        "kg": 6,
+        "percent": 2.3148416069630433,
+        "source": "allowance"
+      },
+      {
+        "item": "HV switchgear",
+        "kg": 5.6,
+        "percent": 2.1605188331655074,
+        "source": "allowance"
+      },
+      {
+        "item": "Cooling system",
+        "kg": 7,
+        "percent": 2.7006485414568839,
+        "source": "allowance"
+      },
+      {
+        "item": "LV system",
+        "kg": 3.5,
+        "percent": 1.350324270728442,
+        "source": "allowance"
+      },
+      {
+        "item": "Cockpit structure",
+        "kg": 32,
+        "percent": 12.345821903802898,
+        "source": "allowance"
+      },
+      {
+        "item": "Seat",
+        "kg": 4.5,
+        "percent": 1.7361312052222826,
+        "source": "allowance"
+      },
+      {
+        "item": "Steering and controls",
+        "kg": 6,
+        "percent": 2.3148416069630433,
+        "source": "allowance"
+      },
+      {
+        "item": "Beam clamps and fasteners",
+        "kg": 3,
+        "percent": 1.1574208034815217,
+        "source": "allowance"
+      },
+      {
+        "item": "Safety equipment",
+        "kg": 6,
+        "percent": 2.3148416069630433,
+        "source": "allowance"
+      },
+      {
+        "item": "Organiser equipment",
+        "kg": 2.5,
+        "percent": 0.96451733623460145,
+        "source": "allowance"
+      },
+      {
+        "item": "Pilot, ready to sail",
+        "kg": 80,
+        "percent": 30.864554759507246,
+        "source": "assumption"
+      },
+      {
+        "item": "Ballast",
+        "kg": 0,
+        "percent": 0,
+        "source": "ENERGY_REQ_135"
+      },
+      {
+        "item": "Contingency",
+        "kg": 6,
+        "percent": 2.3148416069630433,
+        "source": "reserve"
+      }
+    ],
+    "excludingHulls_kg": 259.197,
+    "limit_kg": 250,
+    "margin_kg": -9.1970000000000027,
+    "marginPercent": -3.6788000000000012,
+    "hull_kg": 65,
+    "weighIn_kg": 324.197,
+    "allowanceFraction": 0.33410880527166592,
+    "pass": false,
+    "pilotMass_kg": 80,
+    "pilotMin_kg": 60,
+    "ballast_kg": 0
+  },
+  "performance": {
+    "topSpeed_kmh": 41.11164483866348,
+    "topSpeed_knots": 22.198512418219277,
+    "shaftCeiling_W": 22825.08951246064,
+    "electricalLimit_W": 25000,
+    "motorRPM": 1711.6299977031392,
+    "motorTorque_Nm": 131.28111235975271,
+    "motorSpeedLimit_rpm": 4000,
+    "motorTorqueLimit_Nm": 100,
+    "drivetrainFeasible": false,
+    "propEfficiency": 0.76435088608196033,
+    "targetSpeed_kmh": 55,
+    "targetReachable": false,
+    "minSpeedPower_W": 402.29804664243449,
+    "minSpeedOK": true,
+    "reverseThrust_N": 611.72229054171214,
+    "reverseOK": true,
+    "bestRange_km": 64.788344678132148,
+    "bestRangeSpeed_kmh": 9,
+    "bestRangeWhPerKm": 128.93985857335289,
+    "curve": [
+      {
+        "kmh": 3,
+        "packW": 523.6216771769607,
+        "WhPerKm": 174.5405590589869,
+        "range_km": 47.861654878604973,
+        "chainEff": 0.36848185739198214
+      },
+      {
+        "kmh": 6.5,
+        "packW": 863.85382514623291,
+        "WhPerKm": 132.90058848403584,
+        "range_km": 62.857509475990518,
+        "chainEff": 0.56781831482455081
+      },
+      {
+        "kmh": 10,
+        "packW": 1293.1831474270311,
+        "WhPerKm": 129.31831474270311,
+        "range_km": 64.598738520688684,
+        "chainEff": 0.67419484284504738
+      },
+      {
+        "kmh": 13.5,
+        "packW": 1840.634886084242,
+        "WhPerKm": 136.34332489512903,
+        "range_km": 61.270326262216926,
+        "chainEff": 0.73880829036137452
+      },
+      {
+        "kmh": 17,
+        "packW": 2536.4035412669368,
+        "WhPerKm": 149.2002083098198,
+        "range_km": 55.990538449202575,
+        "chainEff": 0.7804521203958471
+      },
+      {
+        "kmh": 20.5,
+        "packW": 3413.2005380899104,
+        "WhPerKm": 166.49758722389808,
+        "range_km": 50.173700047473986,
+        "chainEff": 0.80794088206684633
+      },
+      {
+        "kmh": 23.5,
+        "packW": 4352.4594695462629,
+        "WhPerKm": 185.21104125728777,
+        "range_km": 45.104222422653706,
+        "chainEff": 0.82413632284620775
+      },
+      {
+        "kmh": 27,
+        "packW": 5732.3440049815563,
+        "WhPerKm": 212.30903722153911,
+        "range_km": 39.34735944039452,
+        "chainEff": 0.83686321629767746
+      },
+      {
+        "kmh": 30.5,
+        "packW": 7526.42761240099,
+        "WhPerKm": 246.76811843937674,
+        "range_km": 33.852833392058578,
+        "chainEff": 0.8445047541631181
+      },
+      {
+        "kmh": 34,
+        "packW": 9884.2517525042585,
+        "WhPerKm": 290.71328683836055,
+        "range_km": 28.735528708891778,
+        "chainEff": 0.847909022251433
+      },
+      {
+        "kmh": 37.5,
+        "packW": 15230.431449561949,
+        "WhPerKm": 406.14483865498534,
+        "range_km": 20.568524341377735,
+        "chainEff": 0.84557320662880964
+      },
+      {
+        "kmh": 41,
+        "packW": 18009.476884709715,
+        "WhPerKm": 439.25553377340771,
+        "range_km": 19.018087098953547,
+        "chainEff": 0.8422384547224202
+      }
+    ]
+  },
+  "telemetry": {
+    "protocol": "REST/JSON over HTTP",
+    "method": "POST",
+    "path": "/monitoringdata/",
+    "contentType": "application/json",
+    "periodSeconds": 1,
+    "tempChannels": 3,
+    "supplyV": 12,
+    "supplyBudgetW": 30,
+    "connector": "BD-02BFFA-LL7001",
+    "pin1": "positive",
+    "pin2": "ground"
+  }
+}

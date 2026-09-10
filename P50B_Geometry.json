@@ -1,0 +1,48 @@
+{
+  "generatedBy": "P50B_ExportGeometry",
+  "generated": "2026-09-07 17:07",
+  "units": "mm, kg",
+  "pack": {
+    "nSeries": 26,
+    "nParallel": 21,
+    "nCells": 546,
+    "nLayers": 2,
+    "groupsPerLayer": 13,
+    "storedEnergy_Wh": 9828
+  },
+  "packCellEnvelope_mm": [
+    512.55,
+    391.25,
+    165.3
+  ],
+  "packEnvelope_mm": [
+    534.55,
+    413.25,
+    180.3
+  ],
+  "group": {
+    "rows": 3,
+    "cols": 7,
+    "cells": 21,
+    "width_mm": 162.85,
+    "depth_mm": 68.65,
+    "pitchX_mm": 174.85,
+    "pitchY_mm": 80.65
+  },
+  "grid": {
+    "rows": 5,
+    "cols": 3,
+    "slots": 15
+  },
+  "cell": {
+    "diameter_mm": 21.55,
+    "height_mm": 70.15,
+    "mass_kg": 0.07,
+    "clearance_mm": 2
+  },
+  "mass": {
+    "cells_kg": 38.220000000000006,
+    "nonCell_kg": 13.377,
+    "pack_kg": 51.597000000000008
+  }
+}
