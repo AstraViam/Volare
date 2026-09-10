@@ -583,9 +583,9 @@
     ],
 
     "bulkhead_fire_class":        { "v": "A1", "u": "-", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_51, Euroclass. Changed from the French classification for 2026." },
-    "bulkhead_hole_diameter_mm":  { "v": 40.0, "u": "mm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_174 at least 30 mm, ENERGY_REQ_175 at most 50 mm with a removable cap." },
-    "bulkhead_hole_capped":       { "v": true, "u": "-", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_175." },
-    "bulkhead_hole_offset_deg":   { "v": 35.0, "u": "deg", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_176 requires the hole to point to the pilot's side, not at the pilot." },
+    "bulkhead_hole_diameter_mm":  { "v": 40.0, "u": "mm", "s": "DESIGN_CHOICE", "n": "WITHDRAWN 2027: ENERGY_REQ_174/175 no longer exist. Retained as a design choice; 40 mm still satisfies the withdrawn 30-50 mm band. See docs/reference/RULES_CHANGES_2026_to_2027.md." },
+    "bulkhead_hole_capped":       { "v": true, "u": "-", "s": "DESIGN_CHOICE", "n": "WITHDRAWN 2027: ENERGY_REQ_175 no longer exists. Retained as a design choice." },
+    "bulkhead_hole_offset_deg":   { "v": 35.0, "u": "deg", "s": "DESIGN_CHOICE", "n": "WITHDRAWN 2027: ENERGY_REQ_176 no longer exists. Retained as sound practice; the hole still points to the pilot's side." },
     "grommets_fitted":            { "v": true, "u": "-", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_55." },
 
     "energy_container_to_pilot_mm": { "v": 620.0, "u": "mm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_25 requires at least 500 mm. Relaxed from 1 m for 2026." },
@@ -927,8 +927,8 @@
     "hull_mass_tol_kg":            { "v": 1.0,  "u": "kg", "s": "DATASHEET", "n": "ENERGY_REQ_48 note: the hulls are supposed to be 65 +/- 1 kg." },
     "pilot_min_mass_kg":           { "v": 60.0, "u": "kg", "s": "DATASHEET", "n": "ENERGY_REQ_135, ready to sail with overalls, helmet, lifejacket, shoes and comms. Below this the boat is ballasted." },
 
-    "bulkhead_hole_min_mm":        { "v": 30.0, "u": "mm", "s": "DATASHEET", "n": "ENERGY_REQ_174." },
-    "bulkhead_hole_max_mm":        { "v": 50.0, "u": "mm", "s": "DATASHEET", "n": "ENERGY_REQ_175, with a removable cap." },
+    "bulkhead_hole_min_mm":        { "v": 30.0, "u": "mm", "s": "DATASHEET", "n": "WITHDRAWN 2027: ENERGY_REQ_174 no longer exists. Kept so the historical check still has a limit to report against." },
+    "bulkhead_hole_max_mm":        { "v": 50.0, "u": "mm", "s": "DATASHEET", "n": "WITHDRAWN 2027: ENERGY_REQ_175 no longer exists. Kept so the historical check still has a limit to report against." },
     "container_min_from_pilot_mm": { "v": 500.0, "u": "mm", "s": "DATASHEET", "n": "ENERGY_REQ_25. Relaxed from 1 m for 2026." },
 
     "estop_min_diameter_mm":       { "v": 30.0, "u": "mm", "s": "DATASHEET", "n": "ENERGY_REQ_77." },

@@ -4,7 +4,7 @@
 stands. Anyone, human or AI, should be able to read this page and start work
 without reading the rest of the repository.
 
-Last updated: 2026-09-10 (fourth session) · Branch: `claude/epic-lovelace-36k14r`
+Last updated: 2026-09-10 (fifth session) · Branch: `claude/epic-lovelace-36k14r`
 
 ---
 
@@ -21,7 +21,7 @@ through one file and are otherwise separate.
 |---|---|---|
 | `powertrain/` — 26S21P battery pack, drivetrain, mission, compliance | MATLAB | Structured; blocked on 2 measured data files |
 | `cad/` — geometry, frame, aero, optimisation, Blender scenes | Python | 14 of 16 modules self-test green |
-| `propulsor/` — contra-rotating propulsor optimiser | MATLAB | **Stages 0-2 built and gated, 45 checks green.** Stages 3-12 remain; see `propulsor/DESIGN.md` |
+| `propulsor/` — contra-rotating propulsor optimiser | MATLAB | **Stages 0-2 built and gated, 69 checks green.** Stages 3-12 remain; see `propulsor/DESIGN.md` |
 | `notes/`, `docs/` — design record and competition rules | Markdown | Complete |
 
 ---
@@ -242,7 +242,13 @@ code on first run.
 
 ## 7. Suggested next actions, in order
 
-1. **Stage 3 of `propulsor/DESIGN.md`: `hydrofoil_polar.m` and
+1. **Act on the 2027 rule changes.** Reserve the 220 x 111 x 80 mm waterproof
+   sensor volume (ENERGY_REQ_195), design the motor seat to 200 N·m
+   (ENERGY_REQ_194), check the ordered monitoring connector part number against
+   the revised ENERGY_REQ_184 list, and decide the post-August-2028 cell
+   chemistry (ENERGY_REQ_193). All listed in
+   `docs/reference/RULES_CHANGES_2026_to_2027.md` section 7.
+2. **Stage 3 of `propulsor/DESIGN.md`: `hydrofoil_polar.m` and
    `propeller_geometry.m`.** Stages 0 to 2 are done and gated. These two are
    the hard ones and everything downstream depends on their quality.
    Stage 4 is the honesty checkpoint: if the single-rotor BEM does not give
@@ -263,6 +269,43 @@ code on first run.
 
 Append one entry per working session. Newest first. Keep entries short: what
 changed, what broke, what is next.
+
+### 2026-09-10 (fifth session) — 2027 rules adopted
+Replaced the 2026 Technical Rules and Notice of Challenge with the 2027
+editions (2027.1, issued 07/09/2026). The 2026 documents moved to
+`docs/reference/archive-2026/` rather than being deleted, because decisions
+already recorded in `notes/` were made against them.
+
+Compared both documents requirement by requirement: 174 in each year, with
+**4 new, 4 withdrawn and 11 revised**. Full record in
+`docs/reference/RULES_CHANGES_2026_to_2027.md`.
+
+The important one: **ENERGY_REQ_188 went from v1.0 to v1.1**, changing "total
+nominal power" to "sum of instantaneous power consumption of all motors" with
+an explicit note that no peak may exceed 25 kW. Our cap was already correct,
+but it had been attributed to a team decision. It is a competition rule, and
+`config.m` now says so.
+
+New and relevant: **ENERGY_REQ_194** requires the motor seat to withstand 200%
+of maximum motor torque, so 200 N·m. **ENERGY_REQ_195** requires a waterproof
+220 x 111 x 80 mm volume per traction chain. **ENERGY_REQ_186** now bans
+hydrofoils outright. **ENERGY_REQ_193** requires LFP or solid-state cells from
+August 2028, and the Molicel P50B is NMC, so the pack is fine for 2027 and not
+beyond it without Technical Committee approval.
+
+Withdrawn: ENERGY_REQ_174, 175 and 176, the bulkhead hole specification. Our
+compliance code checked two of them; they are now marked WITHDRAWN rather than
+deleted, which downstream FAIL counters ignore, so the audit trail survives.
+
+Unchanged and load-bearing: the 250 kg mass limit, the 10 kWh energy cap and
+every energy factor, the 4 m2 solar limit.
+
+Added `tests/test_stage2b_rules.m`, 22 checks pinning every rules-derived
+constant to its requirement id. One of them caught a bug in my own test rather
+than the code: 25 kW at 2000 rpm would need 119.4 Nm against a 100 Nm limit,
+because below the 2387.3 rpm corner the motor is torque limited.
+
+69 checks green. Event dates: racing 1-3 July 2027.
 
 ### 2026-09-10 (fourth session) — propulsor stages 0-2 built and gated
 Team decision applied: **the motor is capped at 25 kW at all times, peak equal

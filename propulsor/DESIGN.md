@@ -361,11 +361,19 @@ solver being touched.
 
 ---
 
-## 9. The 25 kW cap
+## 9. The 25 kW cap — a rule, not a preference
 
-**Team decision, 2026-09-10: the motor is capped at 25 kW at all times.** Peak
-equals continuous. There is no overload mode and no operating point of any
-duration may exceed it.
+**ENERGY_REQ_188 v1.1, Technical Rules 2027.1:** "The sum of instantaneous
+power consumption of all motors shall not exceed 25 kW." Note: "No power
+exceeding 25 kW will be allowed, even during a peak."
+
+The 2027 rules tightened this. The 2026 wording capped *nominal* power, which
+left room to argue a brief peak was permissible. The 2027 wording caps
+*instantaneous* power, summed over all motors, and rules out peaks explicitly.
+
+So `P <= P_cap_W` is a hard feasibility constraint at every operating point,
+never a soft penalty. A design that breaches it is not a worse design, it is
+an illegal one.
 
 `params.motor.P_cap_W = 25e3` is the enforced ceiling. The supplied 42 kW
 datasheet peak stays recorded in `params.motor.P_max_spec_W` with
@@ -382,6 +390,18 @@ The resulting envelope:
 **At 2500 rpm only 95.5 N·m is available, not 100.** That constraint is live in
 `motor_model.m` and gated by `tests/test_stage2_motor.m`, which sweeps 5001
 speeds and fails if any point exceeds the cap.
+
+---
+
+## 9b. New 2027 constraints on this subsystem
+
+| Requirement | Constraint | Where it lands |
+|---|---|---|
+| ENERGY_REQ_194 v1.0 **(new)** | Motor seat must withstand **200% of maximum motor torque**, so **200 N·m** | `structural_model.m` when written, and the frame design |
+| ENERGY_REQ_186 v1.1 **(revised)** | **Hydrofoils are not permitted** | Does *not* affect `hydrofoil_polar.m`, which concerns propeller blade sections, not lifting foils. The name collision is unfortunate |
+| ENERGY_REQ_195 v1.0 **(new)** | Waterproof 220 × 111 × 80 mm per traction chain for the Organiser's power sensor | Cockpit layout, not this subsystem |
+
+Full change record: `docs/reference/RULES_CHANGES_2026_to_2027.md`.
 
 ---
 

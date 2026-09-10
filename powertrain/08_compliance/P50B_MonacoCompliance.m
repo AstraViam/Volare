@@ -902,20 +902,41 @@ function Compliance = P50B_MonacoCompliance(varargin)
         "telemetry power sources.");
 
     %% =========================================================
-    % BULKHEAD -- 174, 175, 51
+    % BULKHEAD -- 51
     %
-    % The hole has both a floor and a ceiling, which is easy to
-    % miss: 30 mm minimum from ENERGY_REQ_174 and 50 mm maximum
-    % from ENERGY_REQ_175.
+    % ENERGY_REQ_174, 175 and 176 specified a bulkhead hole with a
+    % 30 mm floor, a 50 mm ceiling and a removable cap, oriented to
+    % the pilot's side rather than at the pilot.
+    %
+    % ALL THREE WERE WITHDRAWN in the 2027 Technical Rules, with no
+    % replacement. ENERGY_REQ_55, requiring grommets on wire holes
+    % through the bulkhead, survives unchanged and is checked
+    % elsewhere.
+    %
+    % They are recorded as WITHDRAWN rather than deleted. Downstream
+    % code counts Status == "FAIL" and lists Status == "PASS", so a
+    % withdrawn row neither fails the run nor claims a pass; it just
+    % keeps the audit trail of what was once required. Delete these
+    % three lines only when the 2026 rules stop being relevant to any
+    % decision recorded in notes/.
+    %
+    % See docs/reference/RULES_CHANGES_2026_to_2027.md.
     %% =========================================================
 
-    addMin("ENERGY_REQ_174","Bulkhead hole at least 30 mm", ...
-        CK.bulkhead_hole_diameter_mm,RL.bulkhead_hole_min_mm,"mm");
+    add("ENERGY_REQ_174","Bulkhead hole at least 30 mm","WITHDRAWN", ...
+        "Withdrawn in Technical Rules 2027.1. Was: hole diameter " + ...
+        "no less than 30 mm.", ...
+        "No action. Requirement no longer exists.");
 
-    addMax("ENERGY_REQ_175","Bulkhead hole at most 50 mm, with a cap", ...
-        CK.bulkhead_hole_diameter_mm,RL.bulkhead_hole_max_mm,"mm", ...
-        "ENERGY_REQ_176 also requires it to point to the pilot's " + ...
-        "side rather than at the pilot.");
+    add("ENERGY_REQ_175","Bulkhead hole at most 50 mm, with a cap","WITHDRAWN", ...
+        "Withdrawn in Technical Rules 2027.1. Was: no more than 50 mm, " + ...
+        "covered with a removable cap.", ...
+        "No action. Requirement no longer exists.");
+
+    add("ENERGY_REQ_176","Bulkhead hole not aimed at the pilot","WITHDRAWN", ...
+        "Withdrawn in Technical Rules 2027.1. Was: hole oriented to the " + ...
+        "pilot's side rather than at the pilot.", ...
+        "No action. Requirement no longer exists.");
 
     add("ENERGY_REQ_51","Bulkhead at least A1 fire resistant","PASS", ...
         sprintf("Intended class %s.",CK.bulkhead_fire_class), ...

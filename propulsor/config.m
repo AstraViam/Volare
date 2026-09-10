@@ -91,24 +91,36 @@ params.motor.n_nominal_rpm = 1300;      % SUPPLIED
 params.motor.n_max_rpm     = 2500;      % SUPPLIED hard speed limit
 
 % -------------------------------------------------------------------------
-% ABSOLUTE POWER CEILING - TEAM DECISION, 2026-09-10
+% ABSOLUTE POWER CEILING - COMPETITION RULE, NOT A PREFERENCE
 %
-% The motor is capped at 25 kW at all times. Peak equals continuous; there is
-% no short-duration overload mode. Every operating point the optimiser
-% proposes must satisfy P <= P_cap_W, and nothing in this project may exceed
-% it for any duration.
+% ENERGY_REQ_188 v1.1 (Technical Rules 2027.1):
+%   "The sum of instantaneous power consumption of all motors shall not
+%    exceed 25 kW."
+%   Note: "No power exceeding 25 kW will be allowed, even during a peak."
 %
-% The supplied datasheet peak of 42 kW is recorded below but NOT USED. It was
-% never reachable inside the other two hard limits in any case:
-%   42 kW at 2500 rpm needs 160.4 Nm  -> 60% over the 100 Nm limit
+% The 2027 rules tightened this. The 2026 wording (v1.0) capped "total
+% NOMINAL power", which left room to argue a brief peak was allowed. The 2027
+% wording caps INSTANTANEOUS power, over the SUM of all motors, and rules out
+% peaks explicitly. There is no overload mode and no averaging window.
+%
+% Consequence for the optimiser: P <= P_cap_W is a hard feasibility
+% constraint at every operating point, not a soft penalty. A design that
+% breaches it is not a worse design, it is an illegal one.
+%
+% The supplied datasheet peak of 42 kW is recorded below but NOT USED. Beyond
+% being forbidden by the rule, it was never reachable inside the motor's own
+% two hard limits:
+%   42 kW at 2500 rpm needs 160.4 Nm    -> 60% over the 100 Nm limit
 %   42 kW at 100 Nm    needs 4010.7 rpm -> 60% over the 2500 rpm limit
-% The supplied number is kept, unaltered, so the contradiction stays visible
-% and can be put to the supplier. See print_assumptions.m.
+% The supplied number is kept unaltered so the contradiction stays visible and
+% can be put to the supplier. See motor_consistency_report.m.
 % -------------------------------------------------------------------------
-params.motor.P_cap_W       = 25.0e3;    % ENFORCED absolute ceiling, all durations
-params.motor.P_cap_source  = 'team decision 2026-09-10: 25 kW hard cap, peak = continuous';
+params.motor.P_cap_W       = 25.0e3;    % ENFORCED ceiling, all durations
+params.motor.P_cap_rule    = 'ENERGY_REQ_188 v1.1';
+params.motor.P_cap_source  = ['Technical Rules 2027.1, ENERGY_REQ_188 v1.1: sum of ' ...
+                              'INSTANTANEOUS power of all motors <= 25 kW, no peak allowed'];
 params.motor.P_max_spec_W  = 42.0e3;    % SUPPLIED datasheet peak - RECORDED, NOT USED
-params.motor.usePeakSpec   = false;     % must stay false unless the cap is lifted
+params.motor.usePeakSpec   = false;     % forbidden by ENERGY_REQ_188; do not set true
 params.motor.eta           = 0.95;      % SUPPLIED (constant, first version)
 params.motor.etaMap        = [];        % placeholder: function handle eta = f(rpm, Q)
 params.motor.V_system_V    = 96.0;      % SUPPLIED nominal DC bus
@@ -242,6 +254,31 @@ params.cavitation.burrill.c         = 0.03;
 % =========================================================================
 % 13. COMPETITION CONSTRAINTS  (MEBC Energy Class)
 % =========================================================================
+% Rules edition this configuration is written against. Bump BOTH when the
+% Organiser issues new rules, and re-read docs/reference/RULES_CHANGES_*.md.
+params.rules.edition        = '2027.1';
+params.rules.issued         = '2026-09-07';
+params.rules.document       = 'docs/reference/Technical_Rules_Energy_Class_2027_V1.pdf';
+params.rules.changeLog      = 'docs/reference/RULES_CHANGES_2026_to_2027.md';
+
+% Limits taken directly from the 2027 rules. Each carries its requirement id so
+% a reviewer can check the number against the source without searching.
+params.rules.P_motor_max_W       = 25.0e3;   % ENERGY_REQ_188 v1.1, instantaneous, all motors
+params.rules.E_stored_max_Wh     = 10.0e3;   % ENERGY_REQ_7   v1.3
+params.rules.mass_max_kg         = 250.0;    % ENERGY_REQ_48  v3.1, excluding hulls
+params.rules.hull_mass_kg        = 65.0;     % ENERGY_REQ_48  v3.1, hulls are 65 +/- 1 kg
+params.rules.solar_area_max_m2   = 4.0;      % ENERGY_REQ_28  v2.0, including frame
+params.rules.speed_min_kn        = 3.0;      % ENERGY_REQ_37  v1.0
+params.rules.steering_min_deg    = 40.0;     % ENERGY_REQ_154 v1.0, each side
+params.rules.surface_temp_max_C  = 60.0;     % ENERGY_REQ_93  v1.1, any REACHABLE surface
+params.rules.hydrofoilsAllowed   = false;    % ENERGY_REQ_186 v1.1, NEW in 2027
+params.rules.motorSeatTorqueFactor = 2.0;    % ENERGY_REQ_194 v1.0, NEW: seat takes 200% of max torque
+params.rules.powerSensorVolume_mm  = [220 111 80];  % ENERGY_REQ_195 v1.0, NEW, per traction chain, waterproof
+params.rules.monitorVolume_mm      = [190 150 122]; % ENERGY_REQ_185 v1.1, open to sky, >=40 cm above beams
+params.rules.monitorHeightMin_m    = 0.40;   % ENERGY_REQ_185 v1.1, NEW placement constraint
+params.rules.monitorInterface_W    = 35.0;   % ENERGY_REQ_184 v1.1, raised from 30 W
+params.rules.lfpRequiredFrom       = '2028-08-01';  % ENERGY_REQ_193 v1.0, NEW; the P50B is NMC
+
 params.competition.E_stored_kWh   = 10.0;   % SUPPLIED - configurable
 params.competition.P_motor_cap_W  = 25.0e3; % Energy Class nominal motor cap
 params.competition.mission_nm     = [];     % optional: mission length for range check

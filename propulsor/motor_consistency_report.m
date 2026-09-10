@@ -7,6 +7,11 @@ function txt = motor_consistency_report(params, fid)
 %   Spec section 1 requires that the supplied numbers are never silently
 %   altered and that any inconsistency is reported in the output. This does
 %   that, and is called from print_assumptions.m and postprocess.m.
+%
+%   The 25 kW ceiling is not a team preference. It is ENERGY_REQ_188 v1.1 of
+%   the 2027 Technical Rules, which caps the sum of instantaneous power over
+%   all motors and forbids peaks. A design that breaches it is not a worse
+%   design, it is an illegal one.
 
     U  = units();
     mo = params.motor;
@@ -28,7 +33,10 @@ function txt = motor_consistency_report(params, fid)
     L{end+1} = sprintf('  supplied : %.0f kW nominal, %.0f kW peak spec, %.0f Nm, %.0f rpm', ...
                        mo.P_nominal_W/1e3, spec/1e3, Q, nM);
     L{end+1} = sprintf('  enforced : %.0f kW absolute cap, all durations', cap/1e3);
-    L{end+1} = sprintf('             source: %s', mo.P_cap_source);
+    L{end+1} = sprintf('             rule  : %s', mo.P_cap_rule);
+    L{end+1} =         '             The 2027 rules cap INSTANTANEOUS power summed over';
+    L{end+1} =         '             all motors, and forbid peaks explicitly. The 2026';
+    L{end+1} =         '             wording capped nominal power, which was looser.';
     L{end+1} = '';
     L{end+1} = sprintf('  Power available at the two hard limits together:');
     L{end+1} = sprintf('    %.0f rpm x %.0f Nm = %.2f kW', nM, Q, P_at_corner/1e3);
