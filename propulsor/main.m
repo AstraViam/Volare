@@ -9,7 +9,6 @@ function RES = main(varargin)
 %   RES = MAIN('budget', [nPop1 nIt1 nPop2 nIt2 nIt3])   explicit optimiser budget
 %   RES = MAIN('zcombos', [3 3; 4 4])   restrict the blade-count enumeration
 %   RES = MAIN('load', true)     reuse results/opt_<arch>.mat if it exists
-%   RES = MAIN('inputs', S)      supply external data files; see load_inputs.m
 %
 %   The run is organised in the fourteen stages set out in the design brief,
 %   each with its own sanity check, so that a failure can be isolated.
@@ -18,9 +17,6 @@ function RES = main(varargin)
 
 opt = parse_args(varargin);
 params = config();
-% Externally supplied data (measured resistance, CFD wake, polars, motor map,
-% material, CFD reference) enters ONLY here, so the solver never needs editing.
-[params, inputReport] = load_inputs(params, opt.inputs);
 if ~isempty(opt.plots), params.plots.enable = opt.plots; end
 if ~exist(params.io.resultsDir,'dir'), mkdir(params.io.resultsDir); end
 if ~exist(params.io.figuresDir,'dir'), mkdir(params.io.figuresDir); end
@@ -37,8 +33,6 @@ end
 t0 = tic;
 out('\n%s\n MEBC ENERGY CLASS - COAXIAL CONTRA-ROTATING PROPULSOR DESIGN TOOL\n', repmat('#',1,73));
 out(' %s\n run started %s\n%s\n', params.meta.version, datestr(now,31), repmat('#',1,73));
-out('\n[EXTERNAL INPUTS]\n');
-for k = 1:numel(inputReport), out('   %s\n', inputReport{k}); end
 
 % =====================================================================
 % STAGE 1: hull resistance and effective power
@@ -292,7 +286,6 @@ end
 function o = parse_args(v)
 o.quick = false;  o.arch = '';  o.plots = [];  o.report = 'design_report.txt';
 o.skipSensitivity = false;  o.budget = [];  o.Zcombos = [];  o.load = '';
-o.inputs = struct();
 for k = 1:2:numel(v)
     switch lower(v{k})
         case 'quick',  o.quick = v{k+1};
@@ -303,7 +296,6 @@ for k = 1:2:numel(v)
         case 'budget', o.budget = v{k+1};      % [nPop1 nIt1 nPop2 nIt2 nIt3]
         case 'zcombos', o.Zcombos = v{k+1};    % e.g. [3 3; 4 4]
         case 'load',   o.load = v{k+1};        % reuse a saved architecture result
-        case 'inputs', o.inputs = v{k+1};      % struct of external data files, see load_inputs.m
     end
 end
 end

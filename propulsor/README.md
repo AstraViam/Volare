@@ -1,17 +1,3 @@
-> **STATUS: INCOMPLETE — this tool cannot run.**
->
-> The document below describes the propulsor design tool as designed. Most of
-> the core solver files it refers to (`config.m`, `bem_rotor.m`,
-> `crp_interaction.m`, `resistance_model.m`, `motor_model.m`,
-> `propeller_geometry.m`, `postprocess.m` and others) were **not part of the
-> upload** and are not in this repository. What is present is `main.m` and eight
-> supporting files, which reference those missing functions.
->
-> Either upload the missing files or delete this folder. See `HANDOFF.md`
-> section 5.
-
----
-
 # MEBC Energy Class — Coaxial Contra-Rotating Propulsor Design Tool
 
 MATLAB design and optimisation framework for the contra-rotating propulsor of a
@@ -167,27 +153,6 @@ licence and on GNU Octave. Set `params.optimization.useToolbox = true` to use
 silently if they are absent. The random stream is seeded from
 `params.optimization.seed`, so runs are reproducible.
 
-
-### Known state of this delivery
-
-- Every one of the 35 files parses, and the full `main()` pipeline has been run
-  end to end (submerged and surface-piercing, blade counts 3/3 and 4/4), with all
-  fourteen sanity checks passing on the winning design.
-- **Figures were never rendered.** They were generated on a machine whose
-  headless Octave text renderer is broken. The *data* paths inside
-  `plot_performance.m` (resistance sweep, open-water K_T/K_Q sweep, CRP-versus-speed
-  sweep) were executed and verified; only the drawing calls are unexercised, and
-  those are ordinary MATLAB. Expect them to work; check them on your first run.
-- **The shipped `results/` came from a deliberately tiny optimiser budget**
-  (7-particle x 3-iteration swarms, ~40 evaluations for an 18-variable problem)
-  to fit inside an execution limit. They demonstrate the pipeline; they are NOT
-  converged optima. The surface-piercing cases in particular came back
-  infeasible and, in one instance, worse than their own baseline - a clear sign
-  of a non-converged search rather than a physical result. Run `main()` with
-  defaults before quoting any number.
-- Only 3/3 and 4/4 were run for the shipped results. All four combinations are
-  implemented and enumerated by default.
-
 ### Files produced (in `results/` and `figures/`)
 
 | File | Contents |
@@ -197,7 +162,6 @@ silently if they are absent. The random stream is seeded from
 | `rear_blade_geometry.csv` | Same, rear rotor |
 | `design_summary.csv` | One-line-per-quantity summary for spreadsheets |
 | `optimisation_results.mat` | Full result structure for further analysis |
-| `opt_sub.mat`, `opt_sp.mat` | Per-architecture optimiser output, reusable via `main('load',true)` |
 | `figures/01..09_*.png` | Resistance, open-water curves, CRP performance, motor envelope, radial loading, optimisation history, SP cyclic loads, blade geometry, blade outline |
 
 **Take into CAD/Ansys:** the two `*_blade_geometry.csv` files. They carry the

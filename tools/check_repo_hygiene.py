@@ -36,6 +36,16 @@ LOAD_BEARING = [
      "geom.py reads the supplied STLs from source_documents/"),
     ("HANDOFF.md",
      "the entry point every session is required to update"),
+    ("powertrain/params/volare_params.json",
+     "the single parameter file MATLAB, the volare package and the CAD "
+     "scripts all read; everything downstream fails without it"),
+    ("powertrain/python/volare/params.py",
+     "params.py resolves project_root() two levels up, so the package must "
+     "stay at powertrain/python/volare"),
+    ("powertrain/tools/crosscheck.py",
+     "P50B_ArchitectureAudit.m looks for it at <project root>/tools/"),
+    ("powertrain/web/mission_control.html",
+     "build_mission_control.py reads the shell from _ROOT/web/"),
 ]
 
 # 3. The MATLAB manifest that TEST_ALL.m asserts. Kept in sync by hand; if

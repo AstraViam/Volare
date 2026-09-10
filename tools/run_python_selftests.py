@@ -21,9 +21,9 @@ SCRIPTS = ROOT / "cad" / "scripts"
 # Known non-zero exits that are not regressions. Remove an entry the moment its
 # cause is fixed, so the failure starts being reported again.
 EXPECTED_FAILURES = {
-    "powertrain.py": "3 of 15 design checks fail (real open issues), and it is "
-                     "blocked earlier on the missing params/volare_params.json",
-    "pack_fit.py": "blocked on the missing powertrain/params/volare_params.json",
+    "powertrain.py": "3 of 15 design checks fail. These are real open "
+                     "engineering issues, documented in CLAUDE.md. Do not "
+                     "loosen a check to make this pass",
 }
 
 TIMEOUT_S = 300
