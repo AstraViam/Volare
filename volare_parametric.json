@@ -1,0 +1,235 @@
+{
+  "parts": [
+    {
+      "name": "hull_port",
+      "collection": "SUPPLIED",
+      "cfd_zone": "hull-above-wl",
+      "supplied": true,
+      "triangles": 37557,
+      "area_m2_numpy": 6.905144453155781
+    },
+    {
+      "name": "hull_stbd",
+      "collection": "SUPPLIED",
+      "cfd_zone": "hull-above-wl",
+      "supplied": true,
+      "triangles": 37557,
+      "area_m2_numpy": 6.905144335443689
+    },
+    {
+      "name": "pod_shell",
+      "collection": "COCKPIT",
+      "cfd_zone": "pod-shell",
+      "supplied": false,
+      "triangles": 21894,
+      "area_m2_numpy": 4.580295519492437
+    },
+    {
+      "name": "beam_aft",
+      "collection": "SUPPLIED",
+      "cfd_zone": "beam-aft",
+      "supplied": true,
+      "triangles": 1096,
+      "area_m2_numpy": 1.4241638831134091
+    },
+    {
+      "name": "beam_fwd",
+      "collection": "SUPPLIED",
+      "cfd_zone": "beam-fwd",
+      "supplied": true,
+      "triangles": 1094,
+      "area_m2_numpy": 1.3536806810058182
+    },
+    {
+      "name": "rail_stbd",
+      "collection": "FRAME",
+      "cfd_zone": "rail-stbd",
+      "supplied": false,
+      "triangles": 1044,
+      "area_m2_numpy": 1.1139024376940485
+    },
+    {
+      "name": "rail_port",
+      "collection": "FRAME",
+      "cfd_zone": "rail-port",
+      "supplied": false,
+      "triangles": 1044,
+      "area_m2_numpy": 1.1139024352613511
+    },
+    {
+      "name": "hull_clamp_stbd_2",
+      "collection": "FRAME",
+      "cfd_zone": "bracket",
+      "supplied": false,
+      "triangles": 576,
+      "area_m2_numpy": 0.015170086152978605
+    },
+    {
+      "name": "hull_clamp_port_2",
+      "collection": "FRAME",
+      "cfd_zone": "bracket",
+      "supplied": false,
+      "triangles": 576,
+      "area_m2_numpy": 0.015170085046901297
+    },
+    {
+      "name": "rail_pad_stbd_1",
+      "collection": "FRAME",
+      "cfd_zone": "pad",
+      "supplied": false,
+      "triangles": 216,
+      "area_m2_numpy": 0.010075003896793529
+    },
+    {
+      "name": "rail_pad_port_1",
+      "collection": "FRAME",
+      "cfd_zone": "pad",
+      "supplied": false,
+      "triangles": 216,
+      "area_m2_numpy": 0.010075003896793529
+    },
+    {
+      "name": "rail_pad_stbd_2",
+      "collection": "FRAME",
+      "cfd_zone": "pad",
+      "supplied": false,
+      "triangles": 216,
+      "area_m2_numpy": 0.010075003205457778
+    },
+    {
+      "name": "rail_pad_port_2",
+      "collection": "FRAME",
+      "cfd_zone": "pad",
+      "supplied": false,
+      "triangles": 216,
+      "area_m2_numpy": 0.010075003205457778
+    },
+    {
+      "name": "rail_pad_stbd_3",
+      "collection": "FRAME",
+      "cfd_zone": "pad",
+      "supplied": false,
+      "triangles": 216,
+      "area_m2_numpy": 0.010074995979097136
+    },
+    {
+      "name": "rail_pad_port_3",
+      "collection": "FRAME",
+      "cfd_zone": "pad",
+      "supplied": false,
+      "triangles": 216,
+      "area_m2_numpy": 0.010074995979097136
+    },
+    {
+      "name": "hull_clamp_port_1",
+      "collection": "FRAME",
+      "cfd_zone": "bracket",
+      "supplied": false,
+      "triangles": 582,
+      "area_m2_numpy": 0.004967921577837266
+    },
+    {
+      "name": "hull_clamp_stbd_1",
+      "collection": "FRAME",
+      "cfd_zone": "bracket",
+      "supplied": false,
+      "triangles": 582,
+      "area_m2_numpy": 0.0049679207225614445
+    }
+  ],
+  "reference": {
+    "round_poles_added": true,
+    "rail_outboard_move_mm": 175.0,
+    "pilot_envelope_mm": [
+      1100.0,
+      510.0,
+      1030.0
+    ],
+    "pilot_anthropometry": "PLACEHOLDER - replace with the real pilot"
+  },
+  "recontour": {
+    "x_peak": 312.0613813096836,
+    "run_mm": 1193.2613813096837,
+    "drop_before_mm": 333.00272540858055,
+    "drop_after_mm": 254.3732372614558,
+    "tail_raised_mm": 78.62948814712468,
+    "mean_slope_deg": 12.249497255163304,
+    "max_slope_deg": 13.360138018638825,
+    "target_deg": 13.321981583008688,
+    "base_area_before_m2": 0.07475650174199816,
+    "base_area_after_m2": 0.11310430576074423,
+    "pod_raised_mm": 103.69999999999993
+  },
+  "not_modelled": "bracket blending at completeness 1.00 is in the drag and mass budget but has no geometry here - the brackets themselves are only a bbox in the source STL, so there is nothing to blend yet",
+  "design": {
+    "vars": {
+      "tc_fwd": 0.368565013142264,
+      "tc_aft": 0.38036506486998717,
+      "w_pilot": 0.9999999881400681,
+      "w_brack": 0.9999998915885571,
+      "w_rail": 0.9999999093382987,
+      "closure": 13.321981583008688
+    },
+    "items": [
+      {
+        "name": "beam_fwd",
+        "D_N": 2.3724006721086623,
+        "mass_kg": 2.45486642597238,
+        "chord_mm": 314.63694983974506,
+        "C_D": 0.09047989094650438
+      },
+      {
+        "name": "beam_aft",
+        "D_N": 2.0854832489834947,
+        "mass_kg": 2.3914022485015134,
+        "chord_mm": 304.8762103821663,
+        "C_D": 0.07953721982440576
+      },
+      {
+        "name": "pilot",
+        "D_N": 8.58033132720268,
+        "mass_kg": 2.8999999656061974,
+        "C_D": 0.400000005929966
+      },
+      {
+        "name": "brackets",
+        "D_N": 3.146122326796469,
+        "mass_kg": 0.7999999132708457,
+        "C_D": 0.3055556416824241
+      },
+      {
+        "name": "rails",
+        "D_N": 0.5720223548606232,
+        "mass_kg": 1.4999998640074481,
+        "C_D": 0.1428572115010024
+      },
+      {
+        "name": "pod_shell",
+        "D_N": 6.061886284285967,
+        "mass_kg": 0.2828133970678557,
+        "C_D": 0.15688074350596304
+      }
+    ],
+    "infeasible": [],
+    "violation_mm": 0.0,
+    "D_N": 22.818246214237895,
+    "mass_kg": 10.32908181442624,
+    "R_mass_N": 12.15939511194257,
+    "R_eff_N": 34.97764132618047,
+    "P_W": 534.4583594640375
+  },
+  "built": {
+    "fairing_beam_fwd": {
+      "chord_mm": 314.63694983974506,
+      "tc": 0.368565013142264
+    },
+    "fairing_beam_aft": {
+      "chord_mm": 304.8762103821663,
+      "tc": 0.38036506486998717
+    },
+    "pod_shell_recontoured": {},
+    "windscreen": {},
+    "fairing_rail_port": {},
+    "fairing_rail_stbd": {}
+  }
+}

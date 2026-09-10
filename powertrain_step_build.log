@@ -1,0 +1,13 @@
+
+ FREECAD POWERTRAIN -- SOLID BUILD
+ 19 solids, 8 cable sweeps
+ enclosing volume    158.93 L  (enclosures only, no double count)
+ mass               121.4 kg
+ CG from geometry   X=-510.4 Y=-3.4 Z=687.8 mm
+ CG from the model  X=-510.4 Y=-3.4 Z=687.8 mm
+ agreement          0.0000 mm
+
+ every solid re-measured from its B-rep and agrees with the model
+
+ saved C:\Users\aryam\Downloads\Volare_Migration\Volare_Migration\cad\out\volare_powertrain.FCStd
+ saved C:\Users\aryam\Downloads\Volare_Migration\Volare_Migration\cad\out\volare_powertrain.step

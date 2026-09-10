@@ -1,0 +1,194 @@
+[
+ {
+  "rows": 5,
+  "cols": 3,
+  "slots_per_layer": 15,
+  "total_slots": 30,
+  "spare_slots": 4,
+  "pack_mm": [
+   540.55,
+   423.25,
+   173.3
+  ],
+  "container_mm": [
+   588.55,
+   471.25,
+   211.3
+  ],
+  "fits": true,
+  "path_mm": 3573.4500000000003,
+  "centre": [
+   5.725000000000023,
+   0.0,
+   761.3792751464844
+  ]
+ },
+ {
+  "rows": 6,
+  "cols": 3,
+  "slots_per_layer": 18,
+  "total_slots": 36,
+  "spare_slots": 10,
+  "pack_mm": [
+   540.55,
+   505.90000000000003,
+   173.3
+  ],
+  "container_mm": [
+   588.55,
+   553.9000000000001,
+   211.3
+  ],
+  "fits": true,
+  "path_mm": 3573.4500000000003,
+  "centre": [
+   5.725000000000023,
+   0.0,
+   761.3792751464844
+  ]
+ },
+ {
+  "rows": 4,
+  "cols": 4,
+  "slots_per_layer": 16,
+  "total_slots": 32,
+  "spare_slots": 6,
+  "pack_mm": [
+   717.4,
+   340.6,
+   173.3
+  ],
+  "container_mm": [
+   765.4,
+   388.6,
+   211.3
+  ],
+  "fits": true,
+  "path_mm": 3761.85,
+  "centre": [
+   -82.69999999999999,
+   0.0,
+   761.3821296386719
+  ]
+ },
+ {
+  "rows": 7,
+  "cols": 2,
+  "slots_per_layer": 14,
+  "total_slots": 28,
+  "spare_slots": 2,
+  "pack_mm": [
+   363.7,
+   588.5500000000001,
+   173.3
+  ],
+  "container_mm": [
+   411.7,
+   636.5500000000001,
+   211.3
+  ],
+  "fits": false,
+  "path_mm": 3196.65,
+  "centre": null
+ },
+ {
+  "rows": 8,
+  "cols": 2,
+  "slots_per_layer": 16,
+  "total_slots": 32,
+  "spare_slots": 6,
+  "pack_mm": [
+   363.7,
+   671.2,
+   173.3
+  ],
+  "container_mm": [
+   411.7,
+   719.2,
+   211.3
+  ],
+  "fits": false,
+  "path_mm": 3196.65,
+  "centre": null
+ },
+ {
+  "rows": 3,
+  "cols": 5,
+  "slots_per_layer": 15,
+  "total_slots": 30,
+  "spare_slots": 4,
+  "pack_mm": [
+   894.25,
+   257.95000000000005,
+   173.3
+  ],
+  "container_mm": [
+   942.25,
+   305.95000000000005,
+   211.3
+  ],
+  "fits": false,
+  "path_mm": 3950.2499999999995,
+  "centre": null
+ },
+ {
+  "rows": 3,
+  "cols": 6,
+  "slots_per_layer": 18,
+  "total_slots": 36,
+  "spare_slots": 10,
+  "pack_mm": [
+   1071.1,
+   257.95000000000005,
+   173.3
+  ],
+  "container_mm": [
+   1119.1,
+   305.95000000000005,
+   211.3
+  ],
+  "fits": false,
+  "path_mm": 3950.2499999999995,
+  "centre": null
+ },
+ {
+  "rows": 2,
+  "cols": 7,
+  "slots_per_layer": 14,
+  "total_slots": 28,
+  "spare_slots": 2,
+  "pack_mm": [
+   1247.95,
+   175.3,
+   173.3
+  ],
+  "container_mm": [
+   1295.95,
+   223.3,
+   211.3
+  ],
+  "fits": false,
+  "path_mm": 4138.649999999999,
+  "centre": null
+ },
+ {
+  "rows": 2,
+  "cols": 8,
+  "slots_per_layer": 16,
+  "total_slots": 32,
+  "spare_slots": 6,
+  "pack_mm": [
+   1424.8,
+   175.3,
+   173.3
+  ],
+  "container_mm": [
+   1472.8,
+   223.3,
+   211.3
+  ],
+  "fits": false,
+  "path_mm": 4138.65,
+  "centre": null
+ }
+]

@@ -1,0 +1,260 @@
+{
+  "frame": "X forward, Y port, Z up; origin = centreline x hull mid-length x keel",
+  "units": "scene in metres, displayed in mm",
+  "parts": [
+    {
+      "name": "hull_port",
+      "collection": "SUPPLIED",
+      "cfd_zone": "hull-above-wl",
+      "supplied": true,
+      "triangles": 37557,
+      "area_m2_numpy": 6.905144453155781
+    },
+    {
+      "name": "hull_stbd",
+      "collection": "SUPPLIED",
+      "cfd_zone": "hull-above-wl",
+      "supplied": true,
+      "triangles": 37557,
+      "area_m2_numpy": 6.905144335443689
+    },
+    {
+      "name": "pod_shell",
+      "collection": "COCKPIT",
+      "cfd_zone": "pod-shell",
+      "supplied": false,
+      "triangles": 21894,
+      "area_m2_numpy": 4.580295519492437
+    },
+    {
+      "name": "beam_aft",
+      "collection": "SUPPLIED",
+      "cfd_zone": "beam-aft",
+      "supplied": true,
+      "triangles": 1096,
+      "area_m2_numpy": 1.4241638831134091
+    },
+    {
+      "name": "beam_fwd",
+      "collection": "SUPPLIED",
+      "cfd_zone": "beam-fwd",
+      "supplied": true,
+      "triangles": 1094,
+      "area_m2_numpy": 1.3536806810058182
+    },
+    {
+      "name": "rail_stbd",
+      "collection": "FRAME",
+      "cfd_zone": "rail-stbd",
+      "supplied": false,
+      "triangles": 1044,
+      "area_m2_numpy": 1.1139024376940485
+    },
+    {
+      "name": "rail_port",
+      "collection": "FRAME",
+      "cfd_zone": "rail-port",
+      "supplied": false,
+      "triangles": 1044,
+      "area_m2_numpy": 1.1139024352613511
+    },
+    {
+      "name": "hull_clamp_stbd_2",
+      "collection": "FRAME",
+      "cfd_zone": "bracket",
+      "supplied": false,
+      "triangles": 576,
+      "area_m2_numpy": 0.015170086152978605
+    },
+    {
+      "name": "hull_clamp_port_2",
+      "collection": "FRAME",
+      "cfd_zone": "bracket",
+      "supplied": false,
+      "triangles": 576,
+      "area_m2_numpy": 0.015170085046901297
+    },
+    {
+      "name": "rail_pad_stbd_1",
+      "collection": "FRAME",
+      "cfd_zone": "pad",
+      "supplied": false,
+      "triangles": 216,
+      "area_m2_numpy": 0.010075003896793529
+    },
+    {
+      "name": "rail_pad_port_1",
+      "collection": "FRAME",
+      "cfd_zone": "pad",
+      "supplied": false,
+      "triangles": 216,
+      "area_m2_numpy": 0.010075003896793529
+    },
+    {
+      "name": "rail_pad_stbd_2",
+      "collection": "FRAME",
+      "cfd_zone": "pad",
+      "supplied": false,
+      "triangles": 216,
+      "area_m2_numpy": 0.010075003205457778
+    },
+    {
+      "name": "rail_pad_port_2",
+      "collection": "FRAME",
+      "cfd_zone": "pad",
+      "supplied": false,
+      "triangles": 216,
+      "area_m2_numpy": 0.010075003205457778
+    },
+    {
+      "name": "rail_pad_stbd_3",
+      "collection": "FRAME",
+      "cfd_zone": "pad",
+      "supplied": false,
+      "triangles": 216,
+      "area_m2_numpy": 0.010074995979097136
+    },
+    {
+      "name": "rail_pad_port_3",
+      "collection": "FRAME",
+      "cfd_zone": "pad",
+      "supplied": false,
+      "triangles": 216,
+      "area_m2_numpy": 0.010074995979097136
+    },
+    {
+      "name": "hull_clamp_port_1",
+      "collection": "FRAME",
+      "cfd_zone": "bracket",
+      "supplied": false,
+      "triangles": 582,
+      "area_m2_numpy": 0.004967921577837266
+    },
+    {
+      "name": "hull_clamp_stbd_1",
+      "collection": "FRAME",
+      "cfd_zone": "bracket",
+      "supplied": false,
+      "triangles": 582,
+      "area_m2_numpy": 0.0049679207225614445
+    }
+  ],
+  "reference": {
+    "round_poles_added": true,
+    "rail_outboard_move_mm": 175.0,
+    "pilot_envelope_mm": [
+      1100.0,
+      510.0,
+      1030.0
+    ],
+    "pilot_anthropometry": "PLACEHOLDER - replace with the real pilot"
+  },
+  "verification": {
+    "worst_area_error_pct": 7.815282001808507e-05,
+    "passed": true,
+    "rows": [
+      {
+        "name": "hull_port",
+        "numpy_m2": 6.905144453155781,
+        "blender_m2": 6.905144609237941,
+        "err": "0.0000%"
+      },
+      {
+        "name": "hull_stbd",
+        "numpy_m2": 6.905144335443689,
+        "blender_m2": 6.905144257040587,
+        "err": "0.0000%"
+      },
+      {
+        "name": "pod_shell",
+        "numpy_m2": 4.580295519492437,
+        "blender_m2": 4.580295387877008,
+        "err": "0.0000%"
+      },
+      {
+        "name": "beam_aft",
+        "numpy_m2": 1.4241638831134091,
+        "blender_m2": 1.4241627700891728,
+        "err": "0.0001%"
+      },
+      {
+        "name": "beam_fwd",
+        "numpy_m2": 1.3536806810058182,
+        "blender_m2": 1.3536805480399323,
+        "err": "0.0000%"
+      },
+      {
+        "name": "rail_stbd",
+        "numpy_m2": 1.1139024376940485,
+        "blender_m2": 1.1139025358156687,
+        "err": "0.0000%"
+      },
+      {
+        "name": "rail_port",
+        "numpy_m2": 1.1139024352613511,
+        "blender_m2": 1.1139026619421202,
+        "err": "0.0000%"
+      },
+      {
+        "name": "hull_clamp_stbd_2",
+        "numpy_m2": 0.015170086152978605,
+        "blender_m2": 0.015170084401006534,
+        "err": "0.0000%"
+      },
+      {
+        "name": "hull_clamp_port_2",
+        "numpy_m2": 0.015170085046901297,
+        "blender_m2": 0.015170085630529684,
+        "err": "0.0000%"
+      },
+      {
+        "name": "rail_pad_stbd_1",
+        "numpy_m2": 0.010075003896793529,
+        "blender_m2": 0.01007500514788262,
+        "err": "0.0000%"
+      },
+      {
+        "name": "rail_pad_port_1",
+        "numpy_m2": 0.010075003896793529,
+        "blender_m2": 0.010075008905687355,
+        "err": "0.0000%"
+      },
+      {
+        "name": "rail_pad_stbd_2",
+        "numpy_m2": 0.010075003205457778,
+        "blender_m2": 0.010074999712060162,
+        "err": "0.0000%"
+      },
+      {
+        "name": "rail_pad_port_2",
+        "numpy_m2": 0.010075003205457778,
+        "blender_m2": 0.010075003502379332,
+        "err": "0.0000%"
+      },
+      {
+        "name": "rail_pad_stbd_3",
+        "numpy_m2": 0.010074995979097136,
+        "blender_m2": 0.010074996630692112,
+        "err": "0.0000%"
+      },
+      {
+        "name": "rail_pad_port_3",
+        "numpy_m2": 0.010074995979097136,
+        "blender_m2": 0.010075000113147325,
+        "err": "0.0000%"
+      },
+      {
+        "name": "hull_clamp_port_1",
+        "numpy_m2": 0.004967921577837266,
+        "blender_m2": 0.004967919211413374,
+        "err": "0.0000%"
+      },
+      {
+        "name": "hull_clamp_stbd_1",
+        "numpy_m2": 0.0049679207225614445,
+        "blender_m2": 0.004967916865783906,
+        "err": "0.0001%"
+      }
+    ]
+  }
+}

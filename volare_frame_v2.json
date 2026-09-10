@@ -1,0 +1,263 @@
+{
+  "parts": [
+    {
+      "name": "hull_port",
+      "collection": "SUPPLIED",
+      "cfd_zone": "hull-above-wl",
+      "supplied": true,
+      "triangles": 37557,
+      "area_m2_numpy": 6.905144453155781
+    },
+    {
+      "name": "hull_stbd",
+      "collection": "SUPPLIED",
+      "cfd_zone": "hull-above-wl",
+      "supplied": true,
+      "triangles": 37557,
+      "area_m2_numpy": 6.905144335443689
+    },
+    {
+      "name": "pod_shell",
+      "collection": "COCKPIT",
+      "cfd_zone": "pod-shell",
+      "supplied": false,
+      "triangles": 21894,
+      "area_m2_numpy": 4.580295519492437
+    },
+    {
+      "name": "beam_aft",
+      "collection": "SUPPLIED",
+      "cfd_zone": "beam-aft",
+      "supplied": true,
+      "triangles": 1096,
+      "area_m2_numpy": 1.4241638831134091
+    },
+    {
+      "name": "beam_fwd",
+      "collection": "SUPPLIED",
+      "cfd_zone": "beam-fwd",
+      "supplied": true,
+      "triangles": 1094,
+      "area_m2_numpy": 1.3536806810058182
+    },
+    {
+      "name": "rail_stbd",
+      "collection": "FRAME",
+      "cfd_zone": "rail-stbd",
+      "supplied": false,
+      "triangles": 1044,
+      "area_m2_numpy": 1.1139024376940485
+    },
+    {
+      "name": "rail_port",
+      "collection": "FRAME",
+      "cfd_zone": "rail-port",
+      "supplied": false,
+      "triangles": 1044,
+      "area_m2_numpy": 1.1139024352613511
+    },
+    {
+      "name": "hull_clamp_stbd_2",
+      "collection": "FRAME",
+      "cfd_zone": "bracket",
+      "supplied": false,
+      "triangles": 576,
+      "area_m2_numpy": 0.015170086152978605
+    },
+    {
+      "name": "hull_clamp_port_2",
+      "collection": "FRAME",
+      "cfd_zone": "bracket",
+      "supplied": false,
+      "triangles": 576,
+      "area_m2_numpy": 0.015170085046901297
+    },
+    {
+      "name": "rail_pad_stbd_1",
+      "collection": "FRAME",
+      "cfd_zone": "pad",
+      "supplied": false,
+      "triangles": 216,
+      "area_m2_numpy": 0.010075003896793529
+    },
+    {
+      "name": "rail_pad_port_1",
+      "collection": "FRAME",
+      "cfd_zone": "pad",
+      "supplied": false,
+      "triangles": 216,
+      "area_m2_numpy": 0.010075003896793529
+    },
+    {
+      "name": "rail_pad_stbd_2",
+      "collection": "FRAME",
+      "cfd_zone": "pad",
+      "supplied": false,
+      "triangles": 216,
+      "area_m2_numpy": 0.010075003205457778
+    },
+    {
+      "name": "rail_pad_port_2",
+      "collection": "FRAME",
+      "cfd_zone": "pad",
+      "supplied": false,
+      "triangles": 216,
+      "area_m2_numpy": 0.010075003205457778
+    },
+    {
+      "name": "rail_pad_stbd_3",
+      "collection": "FRAME",
+      "cfd_zone": "pad",
+      "supplied": false,
+      "triangles": 216,
+      "area_m2_numpy": 0.010074995979097136
+    },
+    {
+      "name": "rail_pad_port_3",
+      "collection": "FRAME",
+      "cfd_zone": "pad",
+      "supplied": false,
+      "triangles": 216,
+      "area_m2_numpy": 0.010074995979097136
+    },
+    {
+      "name": "hull_clamp_port_1",
+      "collection": "FRAME",
+      "cfd_zone": "bracket",
+      "supplied": false,
+      "triangles": 582,
+      "area_m2_numpy": 0.004967921577837266
+    },
+    {
+      "name": "hull_clamp_stbd_1",
+      "collection": "FRAME",
+      "cfd_zone": "bracket",
+      "supplied": false,
+      "triangles": 582,
+      "area_m2_numpy": 0.0049679207225614445
+    }
+  ],
+  "reference": {
+    "round_poles_added": true,
+    "rail_outboard_move_mm": 175.0,
+    "pilot_envelope_mm": [
+      1100.0,
+      510.0,
+      1030.0
+    ],
+    "pilot_anthropometry": "PLACEHOLDER - replace with the real pilot"
+  },
+  "frame_v2": {
+    "rail_y_mm": 375.0,
+    "pod_lift_mm": 103.69999999999993,
+    "stack": {
+      "clamp_od": 124.0,
+      "clamp_top": {
+        "fwd": 530.1,
+        "aft": 621.4
+      },
+      "shim_fwd_mm": 91.29999999999995,
+      "rail_bottom": 621.4,
+      "rail_top": 671.4,
+      "pod_floor": 681.4
+    },
+    "checks": [
+      {
+        "check": "clamp spacing (c-c)",
+        "value_mm": 750.0,
+        "limit_mm": 750.0,
+        "sense": ">=",
+        "pass": true,
+        "note": "ENERGY_REQ_38; note 09 Q-TC-5 asks if this is c-c or inner-face"
+      },
+      {
+        "check": "clamp width",
+        "value_mm": 60.0,
+        "limit_mm": 50.0,
+        "sense": ">=",
+        "pass": true,
+        "note": "ENERGY_REQ_38"
+      },
+      {
+        "check": "clamp gasket",
+        "value_mm": 2.0,
+        "limit_mm": 1.0,
+        "sense": ">=",
+        "pass": true,
+        "note": "ENERGY_REQ_38"
+      },
+      {
+        "check": "pod floor above rail top",
+        "value_mm": 10.0,
+        "limit_mm": 5.0,
+        "sense": ">=",
+        "pass": true,
+        "note": "was -85.7 mm, i.e. the rail passed through the floor"
+      },
+      {
+        "check": "rail bottom above fwd clamp top",
+        "value_mm": 91.29999999999995,
+        "limit_mm": 0.0,
+        "sense": ">=",
+        "pass": true,
+        "note": "negative means the forward clamp fouls the rail"
+      },
+      {
+        "check": "rail bottom above aft clamp top",
+        "value_mm": 0.0,
+        "limit_mm": 0.0,
+        "sense": ">=",
+        "pass": true,
+        "note": "negative means the aft clamp fouls the rail"
+      },
+      {
+        "check": "forward shim height",
+        "value_mm": 91.29999999999995,
+        "limit_mm": 120.0,
+        "sense": "<=",
+        "pass": true,
+        "note": "forced by the 91.4 mm pole height step; a packer this tall is a structural part, not a washer - it carries 79% of the load (note 08 s1) and needs its own check"
+      },
+      {
+        "check": "rail outer face to hull inner face",
+        "value_mm": 365.5,
+        "limit_mm": 50.0,
+        "sense": ">=",
+        "pass": true,
+        "note": "room for the clamp bolts and a fairing"
+      },
+      {
+        "check": "rail protrusion beyond pod edge",
+        "value_mm": 75.0,
+        "limit_mm": 0.0,
+        "sense": ">=",
+        "pass": true,
+        "note": "positive means the rail is exposed and needs fairing (drag item)"
+      },
+      {
+        "check": "pod crown after raising",
+        "value_mm": 1178.6999999999998,
+        "limit_mm": 99999.0,
+        "sense": "<=",
+        "pass": true,
+        "note": "check against any air-draft or CG limit"
+      },
+      {
+        "check": "clamp inner face to pod edge",
+        "value_mm": 5.0,
+        "limit_mm": 0.0,
+        "sense": ">=",
+        "pass": true,
+        "note": "positive means the clamp tucks under the pod; negative means it needs an outboard bracket"
+      },
+      {
+        "check": "MEASURED pod floor over rail top",
+        "value_mm": 10.040521621704102,
+        "limit_mm": 5.0,
+        "sense": ">=",
+        "pass": true,
+        "note": "read off the built meshes, not the parameters"
+      }
+    ]
+  }
+}
