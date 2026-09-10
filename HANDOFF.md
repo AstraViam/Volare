@@ -4,7 +4,7 @@
 stands. Anyone, human or AI, should be able to read this page and start work
 without reading the rest of the repository.
 
-Last updated: 2026-09-10 (second session) · Branch: `claude/epic-lovelace-36k14r`
+Last updated: 2026-09-10 (third session) · Branch: `claude/epic-lovelace-36k14r`
 
 ---
 
@@ -21,7 +21,7 @@ through one file and are otherwise separate.
 |---|---|---|
 | `powertrain/` — 26S21P battery pack, drivetrain, mission, compliance | MATLAB | Structured; blocked on 2 measured data files |
 | `cad/` — geometry, frame, aero, optimisation, Blender scenes | Python | 14 of 16 modules self-test green |
-| `propulsor/` — contra-rotating propulsor optimiser | MATLAB | **Incomplete: core solver files were never uploaded** |
+| `propulsor/` — contra-rotating propulsor optimiser | MATLAB | Incomplete but **planned**. Solver core is sound and kept; see `propulsor/DESIGN.md` |
 | `notes/`, `docs/` — design record and competition rules | Markdown | Complete |
 
 ---
@@ -80,7 +80,8 @@ Volare/
 │   └── out/                generated .blend, .json, .csv
 │       └── figures/        rendered PNGs
 │
-├── propulsor/              contra-rotating optimiser (incomplete)
+├── propulsor/              contra-rotating optimiser. INCOMPLETE but planned;
+│                        read DESIGN.md before touching it
 ├── source_documents/       supplied cockpit STLs, not to be modified
 └── tools/                  repo utilities  ← two scripts MISSING, see section 5
 ```
@@ -116,6 +117,18 @@ python invariants.py          # physics properties only
 
 Outputs land in `powertrain/python/volare/figures/`, which is git-ignored
 because `verify.py` rebuilds it in about eight seconds.
+
+**MATLAB sources, without MATLAB.** GNU Octave runs the numerical core, and
+CI uses it. Every `propulsor/*.m` file parses in Octave today.
+
+```bash
+sudo apt-get install -y --no-install-recommends octave
+octave --no-gui --quiet tools/octave_check.m     # parse + portability gate
+```
+
+Write to the MATLAB/Octave intersection: no `arguments` blocks, no `string()`,
+no `classdef`, no `dictionary()`, and guard every toolbox call. The check above
+fails the build otherwise. Reasoning is in `propulsor/DESIGN.md` section 2.
 
 **MATLAB pack project.** Open MATLAB at `powertrain/` and run:
 
@@ -226,10 +239,11 @@ code on first run.
 
 ## 7. Suggested next actions, in order
 
-1. **Upload the 19 missing `propulsor/` solver files, or delete the folder.**
-   It is now the only hard blocker. Thirteen files that cannot run are worse
-   than none, because a reader cannot tell whether the tool is broken or
-   simply absent.
+1. **Build `propulsor/` per `DESIGN.md`, starting with `units.m`.** The
+   decision to salvage rather than restart is recorded there with evidence:
+   the BEM solver, CRP coupling and surface-piercing kinematics already
+   present are the hard parts, and they are sound. Work section 6's staged
+   order; stage 0 is about 30 lines and unblocks `config()`.
 2. **Resolve the cockpit STL path.** Pick one canonical location and make
    `volare_params.json` agree, then remove the fallback in `boat.py`.
 3. **Run `TEST_ALL.m` and `RUN_EVERYTHING.m` in MATLAB** and record the result
@@ -245,6 +259,29 @@ code on first run.
 
 Append one entry per working session. Newest first. Keep entries short: what
 changed, what broke, what is next.
+
+### 2026-09-10 (third session) — propulsor planned, Octave adopted
+Assessed whether to delete `propulsor/` and restart. **Salvage, not restart.**
+Reading the code rather than the README: `bem_rotor.m` reduces the coupled
+(a, a') system to one scalar equation per station and solves it with Illinois
+bracketing on a cell-centred grid, having explicitly rejected fixed-point
+iteration as unstable at high solidity. `optimization_driver.m` already carries
+toolbox-free `pso_local` and `pattern_search`. Deleting would discard the hard
+half and rebuild it at the same design.
+
+Wrote `propulsor/DESIGN.md`: architecture, 22-file plan with measured status,
+`params` schema, 12-stage build order, and the unknowns needing CFD.
+
+Adopted **GNU Octave** as the development and CI runtime, because no session
+and no runner has MATLAB, and unrun MATLAB is almost certainly broken MATLAB.
+All 13 existing propulsor files parse in Octave with zero MATLAB-only
+constructs. Added `tools/octave_check.m` plus a CI job; verified it exits 1 on
+a violation and 0 when clean.
+
+Confirmed the motor contradiction numerically: 42 kW needs either 160.4 N·m at
+2500 rpm or 4010.7 rpm at 100 N·m, 60% beyond either hard limit.
+
+Next: `units.m`, then build stages 1 and 2.
 
 ### 2026-09-10 (second session) — second upload placed, blockers cleared
 Merged 46 new files from `main`. Placed them by reading their own path

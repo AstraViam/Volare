@@ -1,3 +1,18 @@
+> **STATUS: INCOMPLETE — `main.m` cannot run yet. Being rebuilt, not restarted.**
+>
+> 13 of the 32 planned files exist. The solver core that is present —
+> `bem_rotor.m`, `crp_interaction.m`, `surface_piercing_model.m` and
+> `config.m` — is sound and is being kept. What is missing is the surrounding
+> layer, starting with `units.m`, whose absence stops `config()` running at all.
+>
+> **Read [`DESIGN.md`](DESIGN.md) before touching anything here.** It carries
+> the architecture, the file-by-file plan, the `params` schema, the staged
+> build order, and the MATLAB-versus-Octave decision.
+>
+> The document below is the engineering rationale to build against.
+
+---
+
 # MEBC Energy Class — Coaxial Contra-Rotating Propulsor Design Tool
 
 MATLAB design and optimisation framework for the contra-rotating propulsor of a

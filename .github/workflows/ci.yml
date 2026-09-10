@@ -50,3 +50,15 @@ jobs:
         env:
           MPLBACKEND: Agg
         run: python verify.py
+
+  matlab-portability:
+    name: MATLAB sources parse under Octave
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Octave
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends octave
+      - name: Parse and portability check
+        run: octave --no-gui --quiet tools/octave_check.m
