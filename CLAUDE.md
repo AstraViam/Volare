@@ -72,6 +72,15 @@ hand-transform STL coordinates.
 - `powertrain/` is self-contained MATLAB. It shares numbers with the Python side
   only through `powertrain/params/volare_params.json`. Never duplicate a
   constant across the two languages; read it from the shared file.
+- **Every engineering number lives in the parameter file.** `cad/scripts/`
+  reads it through `cad/scripts/params.py`, which is standard library only so
+  it works unchanged under Blender and FreeCAD. Use
+  `params.get("section.name")`; never add a literal to a script. A missing
+  parameter raises rather than defaulting, because a CAD model built on
+  invented dimensions looks authoritative and is not.
+- The STL-derived numbers in `volare.py` are the exception and stay literal.
+  They are measurements of supplied geometry, self-checked in that module, not
+  design choices anybody may vary.
 
 ---
 

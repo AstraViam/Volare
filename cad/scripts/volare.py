@@ -17,6 +17,8 @@ The two source STLs do NOT share a frame:
 """
 import numpy as np
 
+import params
+
 # --- assembly STL frame -> canonical boat frame -------------------------------
 # Verified against note 08: pod nose must land 639.6 mm ahead of the forward
 # crossbeam (note says 640 mm) and the beam span must be 2998.6 mm.
@@ -126,16 +128,36 @@ DISCREPANCIES = [
 RULES = {
     "ENERGY_REQ_3":   "hulls + beams supplied, 65 kg, 2 poles dia 104 mm, 3.0 m apart - do not modify",
     "ENERGY_REQ_38":  "cockpit clamps envelop the beam, >=50 mm wide, >=750 mm apart",
+    "ENERGY_REQ_186": "hydrofoils are NOT permitted (new in 2027)",
+    "ENERGY_REQ_194": "motor seat withstands 200% of maximum motor torque (new in 2027)",
+    "ENERGY_REQ_195": "220 x 111 x 80 mm waterproof volume per traction chain (new in 2027)",
     "ENERGY_REQ_48":  "cockpit mass excluding hulls <= 250 kg",
     "ENERGY_REQ_7":   "stored energy <= 10 kWh, battery factor 1.0, hydrogen 0.35",
-    "ENERGY_REQ_188": "motor <= 25 kW nominal",
+    "ENERGY_REQ_188": ("sum of INSTANTANEOUS power of all motors <= 25 kW, "
+                       "no peak permitted (v1.1, tightened for 2027 from "
+                       "'total nominal power')"),
     "ENERGY_REQ_28":  "solar <= 4 m2 including mounting frame",
     "ENERGY_REQ_25/26/50/51/52": "energy container >=500 mm from pilot, behind an A1 bulkhead",
 }
 
-CLAMP_MIN_SPACING = 750.0     # mm, ENERGY_REQ_38 - baseline rails are at 400 mm
-CLAMP_MIN_WIDTH = 50.0        # mm
-BEAM_DIAMETER = 104.0         # mm, round carbon pole (STL models it as square)
+# --------------------------------------------------------------------------
+# EVERYTHING BELOW COMES FROM THE PARAMETER FILE
+#
+# These used to be literals here, which meant editing volare_params.json did
+# not reach the CAD. They are now read from it, so a parameter change
+# propagates into the geometry without anyone editing code. That is what lets
+# design work and analysis proceed in parallel.
+#
+# The STL-derived numbers ABOVE stay literal on purpose. They are measurements
+# of supplied geometry, re-derived from the files and self-checked at the
+# bottom of this module, not design choices anybody may vary.
+#
+# params.py is standard library only, so this import works unchanged under
+# Blender and FreeCAD as well as plain CPython.
+# --------------------------------------------------------------------------
+CLAMP_MIN_SPACING = params.get("rules.clamp_min_spacing_mm")   # ENERGY_REQ_38
+CLAMP_MIN_WIDTH = params.get("rules.clamp_min_width_mm")       # ENERGY_REQ_38
+BEAM_DIAMETER = params.get("boat.beam_diameter_m") * 1000.0    # m -> mm
 
 # Mass basis, confirmed by the team 2026-09-04. This settles note 09's Q-TC-2 and
 # note 06's "governing unknown": the 250 kg cap DOES include the pilot, and it
@@ -146,9 +168,9 @@ BEAM_DIAMETER = 104.0         # mm, round carbon pole (STL models it as square)
 # figure against a cap that excludes hulls. Cockpit items alone are 202 kg; with
 # a 70 kg pilot that is 272 kg, i.e. 22 kg over - a gap the levers in note 06 can
 # actually close. See mass.py.
-MASS_CAP_KG = 250.0           # entire cockpit INCLUDING pilot, EXCLUDING hulls
-HULLS_BEAMS_KG = 65.0         # supplied, ENERGY_REQ_3, outside the cap
-PILOT_DESIGN_KG = 70.0
+MASS_CAP_KG = params.get("rules.mass_limit_excl_hulls_kg")   # ENERGY_REQ_48
+HULLS_BEAMS_KG = params.get("rules.hull_mass_kg")           # ENERGY_REQ_3, outside the cap
+PILOT_DESIGN_KG = params.get("boat.pilot_mass_kg")          # stated design value
 NOTE06_COCKPIT_KG = 202.0     # note 06 section 8 total (282) minus its 80 kg hulls
 NOTE06_TOTAL_KG = NOTE06_COCKPIT_KG + PILOT_DESIGN_KG    # 272 kg vs the 250 cap
 MASS_OVERAGE_KG = NOTE06_TOTAL_KG - MASS_CAP_KG          # 22 kg over
@@ -156,12 +178,16 @@ MAX_DISPLACEMENT_KG = MASS_CAP_KG + HULLS_BEAMS_KG       # 315 kg at the cap
 DESIGN_DISPLACEMENT_KG = NOTE06_TOTAL_KG + HULLS_BEAMS_KG   # 337 kg as it stands
 
 # --- design point -------------------------------------------------------------
-V_DESIGN = 15.28              # m/s, 55 km/h
-RHO_AIR = 1.225               # kg/m3
-Q_DESIGN = 0.5 * RHO_AIR * V_DESIGN ** 2      # 143.0 Pa
-NU_AIR = 1.5e-5               # m2/s
-PILOT_MASS_KG = 70.0          # design pilot
-SLAM_G = 3.0
+V_DESIGN = params.get("boat.target_speed_kmh") / 3.6         # m/s, 55 km/h
+RHO_AIR = params.get("boat.air_density_kg_m3")
+Q_DESIGN = 0.5 * RHO_AIR * V_DESIGN ** 2                    # about 143 Pa
+NU_AIR = params.get("boat.air_kinematic_viscosity_m2_s")
+SLAM_G = params.get("boat.slam_load_g")
+
+# PILOT_MASS_KG was a second name for PILOT_DESIGN_KG, and two names for one
+# number is how they drift apart. Kept as an alias so existing callers keep
+# working; it cannot now disagree with itself.
+PILOT_MASS_KG = PILOT_DESIGN_KG
 
 
 def selfcheck():

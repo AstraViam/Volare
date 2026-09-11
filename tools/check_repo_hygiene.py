@@ -27,6 +27,9 @@ LOAD_BEARING = [
     ("powertrain/00_common/P50B_ProjectRoot.m",
      "P50B_ProjectRoot() returns the parent of its own folder; it must sit in "
      "powertrain/00_common/ or the whole MATLAB project resolves elsewhere"),
+    ("cad/scripts/params.py",
+     "every cad script reads volare_params.json through this loader; without "
+     "it the geometry falls back to nothing and the scripts refuse to run"),
     ("cad/scripts/volare.py",
      "cad/scripts modules resolve the repo root as parents[2]; they must stay "
      "exactly two levels below the repository root"),

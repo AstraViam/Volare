@@ -12,13 +12,14 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).parent))
 import geom
+import params
 import volare as V
 
 # Fairing shell: 2 x 300 gsm E-glass wet layup + gelcoat, plus internal ribs and
 # the bonding flange. Estimate - weigh a test panel before trusting it.
 FAIRING_AREAL_KG_M2 = 2.2
-SCREEN_AREAL_KG_M2 = 4.8        # 4 mm polycarbonate
-POLE_CLEARANCE_MM = 6.0         # radial gap between pole and fairing inner skin
+SCREEN_AREAL_KG_M2 = params.get("cockpit.screen_areal_density_kg_m2")
+POLE_CLEARANCE_MM = params.get("cockpit.fairing_pole_clearance_mm")
 
 
 def naca_thickness(xc, t_over_c):

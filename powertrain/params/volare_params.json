@@ -1657,6 +1657,24 @@
       "u": "knot",
       "s": "DATASHEET",
       "n": "Monaco ENERGY_REQ_37 minimum."
+    },
+    "air_density_kg_m3": {
+      "v": 1.225,
+      "u": "kg/m3",
+      "s": "DATASHEET",
+      "n": "ISA sea level, 15 deg C. Used for the aerodynamic pressure the cockpit and fairings are sized against. Monaco in July is warmer, so this is mildly conservative: density falls about 0.35% per kelvin, so 30 deg C gives about 1.16 and 5% less load."
+    },
+    "air_kinematic_viscosity_m2_s": {
+      "v": 1.5e-05,
+      "u": "m2/s",
+      "s": "ASSUMPTION",
+      "n": "Round value used in note 01's Reynolds numbers. The ISA figure at 15 deg C is 1.47e-5, so this is 2% high and the Reynolds numbers 2% low. Kept because note 01's published Re values were derived with it and volare.py self-checks against them."
+    },
+    "slam_load_g": {
+      "v": 3.0,
+      "u": "g",
+      "s": "ASSUMPTION",
+      "n": "Vertical slam acceleration the cockpit structure is sized to. No measurement supplied. Small planing craft see 3 to 6 g in a seaway; 3 g is at the lenient end and should be revisited once instrumented run data exists."
     }
   },
   "mass": {
@@ -2142,6 +2160,18 @@
       "u": "-",
       "s": "DESIGN_CHOICE",
       "n": "ENERGY_REQ_31."
+    },
+    "screen_areal_density_kg_m2": {
+      "v": 4.8,
+      "u": "kg/m2",
+      "s": "ASSUMPTION",
+      "n": "4 mm polycarbonate. Areal density from the sheet supplier's nominal 1.20 g/cm3. Weigh an offcut before trusting it; the windscreen is one of the few places a material swap is cheap."
+    },
+    "fairing_pole_clearance_mm": {
+      "v": 6.0,
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "Radial gap between the beam pole and the fairing inner skin. Sets the minimum fairing section that can physically wrap the pole, so the optimiser treats it as a hard geometric constraint. Raise it if the layup comes out thicker than planned."
     }
   },
   "telemetry": {

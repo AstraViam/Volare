@@ -136,6 +136,39 @@ def make_cable(run):
         return shape.removeSplitter()
 
 
+def check_source_is_current(src):
+    """Refuse to build solids from geometry that no longer matches the params.
+
+    The CAD chain is volare_params.json -> scripts/powertrain.py ->
+    out/powertrain.json -> this script. Nothing here reads a parameter
+    directly, which is the right design: one place computes the layout and
+    everything downstream consumes it, so Blender and FreeCAD cannot disagree.
+
+    The weakness is staleness. Someone changes a parameter, forgets to rerun
+    powertrain.py, and this writes a STEP file that looks authoritative and
+    describes the previous design. A supplier then quotes against it.
+
+    So compare the two files. Modification time is a weak test, but here it is
+    the right one: out/powertrain.json is GENERATED, so its timestamp really
+    does track when it was last derived. That is the opposite of the parameter
+    file, where an edit to a comment moves the timestamp without changing
+    anything, which is why the check in powertrain.py compares values instead.
+
+    Returns a warning string, or None when current.
+    """
+    params_path = os.path.join(
+        os.environ.get("P50B_ROOT",
+                       os.path.join(os.path.dirname(ROOT), "powertrain")),
+        "params", "volare_params.json")
+    if not os.path.isfile(params_path):
+        return None
+    if os.path.getmtime(src) < os.path.getmtime(params_path):
+        return ("out/powertrain.json is older than the parameter file. "
+                "Rerun 'python cad/scripts/powertrain.py' first, or the STEP "
+                "you are about to write describes the previous design.")
+    return None
+
+
 def main():
     src = os.path.join(OUT, "powertrain.json")
 
@@ -143,6 +176,16 @@ def main():
         say("ERROR: %s not found." % src)
         say("Run:  python scripts/powertrain.py")
         return 1
+
+    stale = check_source_is_current(src)
+    if stale:
+        if os.environ.get("VOLARE_ALLOW_STALE") == "1":
+            say("WARNING: %s" % stale)
+            say("         building anyway because VOLARE_ALLOW_STALE=1")
+        else:
+            say("ERROR: %s" % stale)
+            say("       set VOLARE_ALLOW_STALE=1 to override deliberately")
+            return 1
 
     with open(src, "r") as f:
         data = json.load(f)
