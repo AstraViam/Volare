@@ -4,7 +4,7 @@
 stands. Anyone, human or AI, should be able to read this page and start work
 without reading the rest of the repository.
 
-Last updated: 2026-09-11 (ninth session) · Branch: `claude/epic-lovelace-36k14r`
+Last updated: 2026-09-11 (tenth session) · Branch: `claude/epic-lovelace-36k14r`
 
 ---
 
@@ -20,7 +20,7 @@ through one file and are otherwise separate.
 | Subsystem | Language | Status |
 |---|---|---|
 | `powertrain/` — 26S21P battery pack, drivetrain, mission, compliance | MATLAB | Structured; blocked on 2 measured data files |
-| `cad/` — geometry, frame, aero, optimisation, Blender scenes, CAD export | Python | 21 modules, 20 self-test green; `powertrain.py` fails on the real mass overrun |
+| `cad/` — geometry, frame, aero, optimisation, Blender scenes, CAD export | Python | 22 modules, 21 self-test green; `powertrain.py` fails on the real mass overrun |
 | `propulsor/` — contra-rotating propulsor optimiser | MATLAB | **PAUSED at the user's request.** Stages 0-4 built and gated, 147 checks green, BEM runs end to end. Stages 5-12 remain; see `propulsor/DESIGN.md` |
 | `notes/`, `docs/` — design record and competition rules | Markdown | Complete |
 
@@ -98,6 +98,20 @@ python -m venv .venv && .venv/bin/pip install numpy scipy matplotlib
 .venv/bin/python cad/scripts/mass.py          # any module runs standalone
 for f in cad/scripts/*.py; do .venv/bin/python "$f" || echo "FAIL $f"; done
 ```
+
+**CAD export.** These need cadquery on top of the above. It pulls in OCP, a
+~400 MB wheel, and nothing else in `cad/scripts` needs it — the exporters skip
+cleanly rather than failing where it is absent.
+
+```bash
+.venv/bin/pip install cadquery
+.venv/bin/python cad/scripts/export_assembly_step.py   # the whole boat, one STEP
+.venv/bin/python cad/scripts/export_motor_step.py      # the propulsion unit
+.venv/bin/python cad/scripts/export_supplied.py        # the Organiser's mesh
+```
+
+Outputs land in `cad/out/step/`, which has its own README explaining what each
+file is for and what the assembly currently shows.
 
 **Blender scenes.** These add `cad/scripts` to `sys.path` themselves.
 
@@ -258,27 +272,31 @@ code on first run.
 
 **From the new CAD, all measured and all open.**
 
-4. **Fix the 5.42 mm centreline mis-mate** in `Main_Assembly_v_scaled.step`.
+4. **Decide which frame is real.** `frame_geometry.py` and the Onshape CAD
+   describe different frames: rails 854 apart against 750, 104 × 45 against
+   100 × 50, 2970 long against 3113, sloped rails against a 91.3 mm shim.
+   `export_assembly_step.py` prints the diff every run. Until this is settled
+   every rail-dependent mass and stiffness number is provisional, so it blocks
+   items 7 and 8.
+5. **Fix the 5.42 mm centreline mis-mate** in `Main_Assembly_v_scaled.step`.
    The hulls and forward pole are at Y = +5.42; everything else is at Y = 0.
-5. **Move the clamps out 2.5 mm a side.** Clear gap between clamps is 745.0 mm.
-   Centre-to-centre ENERGY_REQ_38 passes comfortably; as a clear gap it is
-   5 mm short. 2.5 mm a side makes the question moot.
-6. **Model the pod as a shell.** It is a solid 0.66 m³ body, so interference
+   Referred to the hull centreline the clamps are 10.8 mm from symmetric.
+6. **Move the clamps out 2.5 mm a side.** Clear gap between clamps is 745.0 mm
+   against a 750 mm minimum. Centre-to-centre the rule passes with 104 mm
+   spare, so this is 5 mm of insurance against the stricter reading.
+7. **Model the pod as a shell.** It is a solid 0.66 m³ body, so interference
    inside the cockpit cannot be tested at all — only containment. Every clash
    answer about cockpit equipment is unavailable until this changes.
-7. **Weigh the cooling pack now that it exists in CAD.** The finned exchanger
+8. **Weigh the cooling pack now that it exists in CAD.** The finned exchanger
    and tray are the 3.7 kg the budget says is under-modelled. Measure the
    solids, do not estimate.
-8. **Close the mass budget.** 9.2 kg over. Dropping the solar array saves about
-   10 kg and is decided; cooling eats most of it. Items 1 and 7 both move this.
-9. **Act on the 2027 rule changes.** Reserve the 220 × 111 × 80 mm waterproof
-   sensor volume (ENERGY_REQ_195), design the motor seat to 200 N·m
-   (ENERGY_REQ_194), check the monitoring connector part number against the
-   revised ENERGY_REQ_184 list, decide the post-August-2028 cell chemistry
-   (ENERGY_REQ_193). All in `docs/reference/RULES_CHANGES_2026_to_2027.md` §7.
-10. **Decide the rail section.** `frame_geometry.py` models 100 × 50 × 3 RHS
-    solid; the Onshape rails are 104 × 45 solid. Note 02 specifies hollow.
-    Solid versus hollow is roughly a factor of three on rail steel mass.
+9. **Close the mass budget.** 9.2 kg over. Dropping the solar array saves about
+   10 kg and is decided; cooling eats most of it. Items 1 and 8 both move this.
+10. **Act on the 2027 rule changes.** Reserve the 220 × 111 × 80 mm waterproof
+    sensor volume (ENERGY_REQ_195), design the motor seat to 200 N·m
+    (ENERGY_REQ_194), check the monitoring connector part number against the
+    revised ENERGY_REQ_184 list, decide the post-August-2028 cell chemistry
+    (ENERGY_REQ_193). All in `docs/reference/RULES_CHANGES_2026_to_2027.md` §7.
 
 **Propulsor — PAUSED at the user's request. Resume from here.**
 
@@ -305,6 +323,57 @@ code on first run.
 
 Append one entry per working session. Newest first. Keep entries short: what
 changed, what broke, what is next.
+
+### 2026-09-11 (tenth session) — exporters consolidated, frame conflict surfaced
+
+Consolidation, not new capability. Three exporters had grown three copies of
+the same primitives and two competing pictures of the boat.
+
+- **`cad/scripts/solids.py` is new.** `box_solid`, `cylinder_solid`,
+  `capsule_chain`, `as_shape`, `intersects` and `write_binary_stl` live in one
+  place. The copies had already diverged: one returned a `Workplane`, the other
+  a `Shape`, and the intersection test silently returned zero for whichever it
+  was not handed. Six self-checks, including a boolean that has to find exactly
+  500 000 mm³ between two half-overlapped boxes.
+- **`export_step.py` became `export_supplied.py` and does one job.** It writes
+  the Organiser's supplied mesh, split and labelled, as the ENERGY_REQ_3
+  reference. The designed-parts half it used to carry is now
+  `export_assembly_step.py`'s, done better against real CAD. Its outputs
+  `volare_designed.step` and `volare_designed.stl` are deleted, not
+  regenerated: they described frame v2 against the old supplied pod, which is
+  neither the frame the team drew nor the cockpit they drew it in.
+- **One script, one job.** `export_assembly_step.py` builds the boat,
+  `export_motor_step.py` builds the propulsion unit and is imported by the
+  assembly rather than repeated, `export_supplied.py` writes the supplied
+  reference.
+
+**The consolidation surfaced a real conflict.** `frame_geometry.py` holds the
+frame the repository proposed; the Onshape file holds the frame the team drew.
+They are not the same frame, and the exporter now prints the diff every run:
+
+| | CAD | frame v2 |
+|---|---|---|
+| rail spacing c-c | 854.0 | 750.0 |
+| rail section | 104 × 45 | 100 × 50 |
+| rail length | 2970.2 | 3112.6 |
+| clamp width | 109.0 | 60.0 |
+| forward station | rails sloped to follow the pole step | shimmed level, 91.3 mm |
+
+Until somebody picks one, every mass and stiffness number that leans on the
+rails is provisional.
+
+**A max() in my first version of that comparison was wrong.** Taking max(|Y|)
+over both sides looks harmless and is not: once the hull pair defines the
+origin, the cockpit sub-assembly is 5.42 mm off it, the two sides stop being
+mirror images, and max(|Y|) reports the further one as if it were both. It
+inflated clamp spacing to 864.8 mm and the clear gap to 755.8 mm, turning a gap
+that misses ENERGY_REQ_38 into one that passes. The real figures are 854.0 c-c
+and **745.0 clear**, 5 mm short on the clear-gap reading. Referred to the hull
+centreline the clamps land at +432.4 and −421.6, which is 10.8 mm from
+symmetric, and the rule asks for symmetry about the ship's centreline by name.
+
+`tools/run_python_selftests.py`: 22 modules, 21 pass, `powertrain.py` fails on
+the 9.2 kg mass overrun as expected. Repo hygiene clean at 268 tracked files.
 
 ### 2026-09-11 (ninth session) — the team's CAD arrived; whole boat in one STEP
 

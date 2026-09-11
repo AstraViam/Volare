@@ -41,7 +41,6 @@ Team Volare / ICT Mumbai.
 from __future__ import annotations
 
 import json
-import math
 import sys
 from pathlib import Path
 
@@ -62,6 +61,9 @@ except ImportError:                                  # pragma: no cover
     HAVE_CADQUERY = False
 
 import export_motor_step as MOTOR  # noqa: E402
+import frame_geometry as FG  # noqa: E402
+import params  # noqa: E402
+import solids as S  # noqa: E402
 import volare as V  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -154,55 +156,93 @@ def to_canonical(solid, F):
             .rotate(cq.Vector(0, 0, 0), cq.Vector(0, 0, 1), 180.0))
 
 
-def box_solid(centre, size):
-    return cq.Workplane("XY").box(*size).translate(tuple(centre))
 
 
-def capsule_chain(points, od):
-    """A cable run as cylinders with spheres at the joints.
 
-    A sweep along a polyline with sharp corners fails or self-intersects, and
-    in some kernels it fails silently. Capsules cannot. For clearance checking
-    the envelope is identical except inside the corner radius, where a real
-    cable is fatter than a sweep, not thinner.
+def compare_frame(parts, F):
+    """Diff the repo's frame v2 intent against what the CAD actually has.
+
+    `frame_geometry.py` holds the frame the repository proposed; the Onshape
+    file holds the frame the team drew. They are not the same frame, and until
+    somebody decides which is real, every mass and stiffness number that leans
+    on the rails is provisional. Printing the differences is cheaper than
+    discovering them in a fabrication drawing.
     """
-    r = od / 2.0
-    solid = None
-    for a, b in zip(points[:-1], points[1:]):
-        d = np.asarray(b, float) - np.asarray(a, float)
-        length = float(np.linalg.norm(d))
-        if length < 1e-6:
-            continue
-        seg = cq.Workplane("XY").circle(r).extrude(length)
-        u = d / length
-        cross = np.cross([0.0, 0.0, 1.0], u)
-        angle = math.degrees(math.acos(max(-1.0, min(1.0, float(u[2])))))
-        if abs(angle) > 1e-9:
-            if np.linalg.norm(cross) < 1e-12:
-                cross = np.array([1.0, 0.0, 0.0])
-            seg = seg.rotate((0, 0, 0), tuple(cross), angle)
-        seg = seg.translate(tuple(a))
-        solid = seg if solid is None else solid.union(seg)
-    for p in points[1:-1]:
-        ball = cq.Workplane("XY").sphere(r).translate(tuple(p))
-        solid = ball if solid is None else solid.union(ball)
-    return solid
+    rails = [to_canonical(p["solid"], F) for p in parts
+             if p.get("kind") == "rail"]
+    clamps = [to_canonical(p["solid"], F) for p in parts
+              if p.get("kind") == "clamp"]
+    if not rails or not clamps:
+        return
 
+    def sides(boxes):
+        """Port and starboard centre Y, in canonical coordinates.
 
-def as_shape(obj):
-    """cq.Assembly children hold Workplanes or Shapes. Normalise to a Shape."""
-    return obj.val() if isinstance(obj, cq.Workplane) else obj
+        Taking max(|Y|) over both sides looks harmless and is not: once the
+        hull pair defines the origin, the cockpit sub-assembly is 5.42 mm off
+        it, the two sides are no longer mirror images, and max(|Y|) reports
+        the further one as if it were both. That inflates the spacing by twice
+        the offset and turns a clamp gap that misses the rule into one that
+        passes it.
+        """
+        ys = sorted(0.5 * (b.ymin + b.ymax) for b in boxes)
+        return ys[-1], ys[0]                        # port (+Y), starboard (-Y)
 
+    rb = [r.BoundingBox() for r in rails]
+    cb = [c.BoundingBox() for c in clamps]
+    r_port, r_stbd = sides(rb)
+    c_port, c_stbd = sides(cb)
+    c_width = float(np.mean([b.ylen for b in cb]))
 
-def intersects(a, b):
-    """Volume shared by two solids, mm^3. Zero when they only touch."""
-    try:
-        common = as_shape(a).intersect(as_shape(b))
-    except Exception:
-        return 0.0          # a failed boolean is not evidence of a clash
-    if common is None or not common.Solids():
-        return 0.0
-    return abs(common.Volume())
+    cad = {
+        "rail spacing c-c": r_port - r_stbd,
+        "rail width (Y)": float(np.mean([b.ylen for b in rb])),
+        "rail height (Z)": float(np.mean([b.zlen for b in rb])),
+        "rail length (X)": float(np.mean([b.xlen for b in rb])),
+        "clamp spacing c-c": c_port - c_stbd,
+        "clamp width (Y)": c_width,
+    }
+    intent = {
+        "rail spacing c-c": 2 * FG.rail_y(),
+        "rail width (Y)": FG.RAIL_W,
+        "rail height (Z)": FG.RAIL_H,
+        "rail length (X)": V.BASELINE["rail"]["length"],
+        "clamp spacing c-c": 2 * FG.rail_y(),
+        "clamp width (Y)": FG.CLAMP_W,
+    }
+    st = FG.stack_heights()
+    print("\n frame: what frame_geometry.py proposes against what the CAD has")
+    for what in intent:
+        d = cad[what] - intent[what]
+        print(f"   {'same ' if abs(d) < 1.0 else 'DIFF '} {what:<18} "
+              f"CAD {cad[what]:8.1f}   frame v2 {intent[what]:8.1f}   "
+              f"{d:+8.1f} mm")
+
+    need = params.get("rules.clamp_min_spacing_mm")
+    clear = (c_port - c_width / 2.0) - (c_stbd + c_width / 2.0)
+    print(f"\n   ENERGY_REQ_38 needs {need:.0f} mm between clamps installed "
+          f"symmetrically")
+    print( "   either side of the ship's centreline, which the hulls define.")
+    print(f"     CAD clamps    {cad['clamp spacing c-c']:7.1f} mm c-c "
+          f"({cad['clamp spacing c-c'] - need:+.1f}),  "
+          f"{clear:7.1f} mm clear ({clear - need:+.1f})")
+    print(f"     frame v2      {intent['clamp spacing c-c']:7.1f} mm c-c "
+          f"({intent['clamp spacing c-c'] - need:+.1f}),  "
+          f"{intent['clamp spacing c-c'] - FG.CLAMP_W:7.1f} mm clear "
+          f"({intent['clamp spacing c-c'] - FG.CLAMP_W - need:+.1f})")
+    print( "   Read centre-to-centre both pass. Read as a clear gap the CAD is "
+           "5 mm short")
+    print( "   and frame v2 is 60 mm short. Moving the CAD clamps out 2.5 mm a "
+           "side settles")
+    print( "   the CAD under either reading.")
+    print(f"\n   The CAD clamps sit at Y {c_port:+.1f} and {c_stbd:+.1f} about "
+          f"the hull centreline,")
+    print(f"   so they are {abs(c_port + c_stbd):.1f} mm from symmetric. That "
+           "is the 5.42 mm mis-mate")
+    print( "   above, and symmetry is what the rule asks for by name.")
+    print(f"\n   Frame v2 shims the forward station level "
+          f"({st['shim_fwd_mm']:.1f} mm); the CAD slopes the")
+    print( "   rails to follow the pole step instead. One of the two has to go.")
 
 
 def main() -> int:
@@ -258,6 +298,8 @@ def main() -> int:
     print( "         sub-assemblies is mis-mated by that much. It is small, "
            "and it is real.")
 
+    compare_frame(parts, F)
+
     asm = cq.Assembly(name="volare_assembly")
     counts = {}
 
@@ -282,19 +324,20 @@ def main() -> int:
             centre = part.get("centre_mm", part.get("centre"))
             designed.append((part["name"],
                              ZONE_GROUP.get(part.get("zone", ""), "STRUCTURE"),
-                             box_solid(centre, size).val()))
+                             S.box_solid(centre, size)))
         cables = []
         for c in pt.get("cables", []):
-            run = capsule_chain(c.get("points_mm", c.get("points")), c["od_mm"])
+            run = S.capsule_chain(c.get("points_mm", c.get("points")),
+                                  c["od_mm"])
             if run is not None:
-                cables.append((c["name"], as_shape(run)))
+                cables.append((c["name"], run))
     else:
         cables = []
 
     # --- 3. the motor, built by export_motor_step, not copied ----------
     motor_asm, motor_info = MOTOR.build_assembly()
     for child in motor_asm.children:
-        solid = as_shape(child.obj)
+        solid = S.as_shape(child.obj)
         if child.loc is not None:
             solid = solid.moved(child.loc)
         group = child.name.split("/")[0]
@@ -312,7 +355,7 @@ def main() -> int:
         for sname, ssolid in structure:
             if sname.startswith("pod"):
                 continue          # the pod is a solid body, not a shell; see below
-            v = intersects(solid, ssolid)
+            v = S.intersects(solid, ssolid)
             if v > worst[0]:
                 worst = (v, sname)
         if worst[0] > 1.0:
