@@ -1,54 +1,71 @@
-# `cad/out/step/` — the boat as a CAD assembly
-
-Regenerate with:
+# `cad/out/step/` — the boat as CAD
 
 ```bash
-python cad/scripts/export_step.py          # needs cadquery for the STEP half
+python cad/scripts/export_assembly_step.py    # the whole boat, one file
+python cad/scripts/export_motor_step.py       # the propulsion unit alone
+python cad/scripts/export_step.py             # designed parts + supplied STL
 ```
 
-All four files are in the **canonical boat frame**: X forward, Y to port, Z up,
+Everything is in the **canonical boat frame**: X forward, Y to port, Z up,
 origin at centreline × hull mid-length × keel bottom, **millimetres**. Load any
 combination and they overlay exactly. That is checked by re-measuring the
 transformed hull box, not assumed from the transform.
 
-| File | What | Format | Why |
-|---|---|---|---|
-| `volare_designed.step` | frame v2, powertrain boxes, cable runs | STEP AP214, true B-rep | 35 solids in a named tree; measurable edges, mateable faces |
-| `volare_designed.stl` | the same, tessellated | binary STL | for viewers that cannot read STEP |
-| `volare_supplied.stl` | hulls, both poles, pod shell, hull fittings | binary STL | supplied by the Organiser, **ENERGY_REQ_3: do not modify** |
-| `volare_supplied_frame.stl` | the original rails and pads | binary STL | what frame v2 replaces; separate so an overlay is unambiguous |
+| File | What | Solids |
+|---|---|---|
+| `volare_assembly.step` | **the whole boat** — hulls, poles, pod, frame, cooling, powertrain, cables, outboard, rotors | 47 |
+| `volare_motor.step` | the Competr outboard built from its drawing, with the team's contra-rotating rotors | 12 |
+| `volare_designed.step` | frame v2 and powertrain only, against the *supplied STL* baseline | 35 |
+| `volare_designed.stl` `volare_supplied.stl` `volare_supplied_frame.stl` | the older mesh-based pairing, kept because it records the supplied geometry | — |
 
-## Why the supplied geometry is not in the STEP
+## Where the geometry comes from
 
-It only ever existed as a mesh. Wrapping a tessellation in a STEP shell gives a
-file that is large, slow, and impossible to mate to, while looking like a solid
-model. STL is what a mesh is, labelled honestly.
+Three sources, kept visibly separate in the assembly tree.
 
-## Reading the designed file
+- **`cad/blender/Main_Assembly_v_scaled.step`** — the team's Onshape model:
+  hulls, both poles, the pod, the rails and clamps, and the cooling pack. Its
+  13 solids are recognised by volume, not by index, and the expected count of
+  each is asserted.
+- **`cad/out/powertrain.json`** — boxes and cable runs solved by
+  `cad/scripts/powertrain.py` from `powertrain/params/volare_params.json`.
+- **`cad/scripts/export_motor_step.py`** — the outboard, built from the
+  dimensioned Competr drawing, with the rotors generated from the converged
+  propulsor design.
 
-The assembly tree groups by function, and the group names carry the message:
+## The frame is derived, not hard-coded
 
-```
-FRAME               9   rails, clamps, forward shims, keel beam
-POWERTRAIN_HV       9   high-voltage chain
-POWERTRAIN_LV       3   low-voltage chain
-POWERTRAIN_COOLING  1
-STRUCTURE           1
-CABLES              7   capsule chains, see the script docstring
-CLASH               5   red. These intersect the pod shell.
-```
+The Onshape file has its own origin and its X points aft. The exporter measures
+the hulls and derives the transform from them, so a re-export from Onshape with
+a moved origin still lands correctly instead of silently shifting the boat.
 
-`CLASH` is not a modelling error and not an accepted design. Those five
-components currently interfere and the group exists so nobody has to rediscover
-which five.
+## What the assembly currently shows
 
-## What the overlay shows
+- **The hull pair sits 5.42 mm off the cockpit centreline.** The rails, clamps,
+  pod and aft pole are all symmetric about Y = 0; the hulls and the forward
+  pole are both at Y = +5.42. One of the two sub-assemblies is mis-mated by
+  that much. Small, but real, and it is the ship's centreline that
+  ENERGY_REQ_38 measures clamp symmetry against.
+- **The rails give 750.0 mm clear between their inner faces**, centres at
+  ±427.0. The clamps are 109 mm wide on the same centres, so the clear gap
+  between clamps is 745.0 mm. Read as centre-to-centre, ENERGY_REQ_38's 750 mm
+  minimum passes with 104 mm to spare; read as a clear gap it is 5 mm short.
+  Moving the clamps out 2.5 mm a side settles it either way.
+- **The poles are round D104 × 2 mm wall tubes.** Vertex radii about the pole
+  axis take exactly two values, 50.0 and 52.0 mm. `BASELINE["beam_*"]
+  ["section_mm"] = (104, 104)` is a bounding box and had been read as a square
+  section.
+- **No designed part clashes with the structure.** The pod is excluded from
+  that test on purpose: in this CAD it is a solid 0.66 m³ body rather than a
+  shell, so everything in the cockpit "intersects" it. Containment is the
+  question the solid can answer, and every cockpit part is inside its envelope.
+  A shell is needed before interference means anything there.
+- **The designed rotors are 380 and 361 mm.** The Competr gearcase on the
+  drawing is built around a roughly 230 mm propeller. The pair is about 65 per
+  cent larger and will not fit the stock gearcase or its gearing.
 
-- The clamps bore 108 mm over the measured 104.1 mm poles: **2.0 mm radial**,
-  the design gasket thickness.
-- Frame v2 lifts the pod floor **+103.7 mm**, clearing the 85.7 mm rail/pod
-  interference measured in the supplied assembly (note 00 says 83 mm; the
-  measured value wins, see `cad/scripts/volare.py`).
-- Four sub-millimetre shards on the hull bows are dropped as tessellation
-  noise; 101 514 of the source file's 105 174 triangles are carried through
-  unmodified.
+## Size
+
+`volare_assembly.step` is 23 MB, most of it the Onshape hull and pod surfaces.
+It is tracked so teammates without cadquery can open the boat, but the
+repository is now at the point where Git LFS is worth doing rather than worth
+considering.

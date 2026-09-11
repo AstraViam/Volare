@@ -568,22 +568,41 @@ def build(P: dict | None = None, solve: bool = True) -> dict:
         "ENERGY_REQ_185 free volume, ON the crown so it is open to the sky "
         "and outside every closed compartment"))
 
-    motor_size = np.array([mo["length_m"], mo["width_m"],
-                           mo["depth_m"]]) * 1000.0
+    # The outboard envelope comes from the DIMENSIONED DRAWING, not from the
+    # specification table. The table reads "300x210x800mm", and length_m = 0.8
+    # was being used as an 800 mm fore-aft dimension, which laid a 705 mm-tall
+    # outboard on its side and put 800 mm of it astern. The drawing (datasheet
+    # section 6, page 7) gives 322 fore-aft, 210 across, 705 cowling top to
+    # gearcase bottom. mo["length_m"] and friends are left in the parameter
+    # file because the MATLAB side still quotes the table.
+    motor_size = np.array([mo["drawing_length_mm"], mo["drawing_width_mm"],
+                           mo["drawing_height_mm"]])
     motor_c = v3("motor_centre_mm")
+
+    # Height is set by the anti-ventilation plate, which is what the drawing
+    # dimensions everything from, not by motor_centre_mm's Z.
+    plate_z = pt["motor_plate_z_mm"]
+    gear_h = mo["drawing_height_mm"] * mo["gearcase_fraction"]
+    motor_c = np.array([motor_c[0], motor_c[1],
+                        plate_z - gear_h + motor_size[2] / 2.0])
 
     parts.append(Part(
         "outboard", motor_size, motor_c, mo["mass_kg"], "HV",
         f"{mo['power_nominal_W']/1000:.1f} kW nominal, capped to "
         f"{mo['configured_power_limit_W']/1000:.0f} kW by ENERGY_REQ_188"))
 
-    shaft_len = mo["shaft_length_m"] * 1000.0
-
+    # What used to be modelled as a 120 x 90 x 500 drive leg is inside the
+    # 705 mm envelope above. The separate part carrying trim_mass_kg is the
+    # transom bracket and trim assembly, dimensioned in datasheet section 7.
     parts.append(Part(
-        "drive_leg", np.array([120.0, 90.0, shaft_len]),
-        motor_c + np.array([0.0, 0.0, -(motor_size[2] + shaft_len) / 2.0]),
+        "drive_leg", np.array([mo["bracket_length_mm"], mo["bracket_width_mm"],
+                               mo["bracket_height_mm"]]),
+        np.array([motor_c[0] + mo["drawing_length_mm"] / 2.0
+                  + mo["bracket_length_mm"] / 2.0 + 5.0, motor_c[1],
+                  plate_z + mo["transom_mounting_height_mm"]
+                  - mo["bracket_height_mm"] / 2.0]),
         mo["trim_mass_kg"], "HV",
-        "shaft, gearbox and the contra-rotating propulsor below"))
+        "transom bracket and hydraulic trim assembly, datasheet section 7"))
 
     # --- cables, routed from the SOLVED positions -------------------------
     hv_od = pt["hv_cable_od_mm"]

@@ -4,9 +4,9 @@
  "source": "/home/user/Volare/powertrain/params/volare_params.json",
  "mass_kg": 121.39700000000002,
  "cg_mm": [
-  -392.5920945328138,
+  -359.55997677043086,
   -2.8847562693965867,
-  672.2784435220992
+  615.5894396752167
  ],
  "parts": [
   {
@@ -234,7 +234,7 @@
    "name": "vcu",
    "size": [
     260.0,
-    160.0,
+    175.0,
     90.0
    ],
    "centre": [
@@ -301,14 +301,14 @@
   {
    "name": "outboard",
    "size": [
-    800.0,
-    300.0,
-    210.0
+    322.0,
+    210.0,
+    705.0
    ],
    "centre": [
     -990.0,
     0.0,
-    500.0
+    172.725
    ],
    "mass_kg": 25.0,
    "zone": "HV",
@@ -318,19 +318,19 @@
   {
    "name": "drive_leg",
    "size": [
-    120.0,
-    90.0,
-    500.0
+    470.0,
+    600.0,
+    250.0
    ],
    "centre": [
-    -990.0,
+    -589.0,
     0.0,
-    145.0
+    275.0
    ],
    "mass_kg": 10.0,
    "zone": "HV",
    "parent": null,
-   "note": "shaft, gearbox and the contra-rotating propulsor below"
+   "note": "transom bracket and hydraulic trim assembly, datasheet section 7"
   }
  ],
  "cables": [
@@ -459,13 +459,13 @@
     [
      -990.0,
      -40.0,
-     605.0
+     525.225
     ]
    ],
    "od_mm": 22.0,
    "min_bend_mm": 132.0,
-   "length_mm": 335.81486828234,
-   "tightest_bend_mm": 237.08631709566825,
+   "length_mm": 385.8561236754456,
+   "tightest_bend_mm": 213.6977788932078,
    "zone": "HV",
    "note": "screened three-phase. Descends monotonically: no climb over the outboard, because a hairpin there cannot meet the bend radius"
   },
@@ -485,13 +485,13 @@
     [
      -990.0,
      0.0,
-     605.0
+     525.225
     ]
    ],
    "od_mm": 22.0,
    "min_bend_mm": 132.0,
-   "length_mm": 335.81486828234,
-   "tightest_bend_mm": 237.08631709566825,
+   "length_mm": 385.8561236754456,
+   "tightest_bend_mm": 213.6977788932078,
    "zone": "HV",
    "note": "screened three-phase. Descends monotonically: no climb over the outboard, because a hairpin there cannot meet the bend radius"
   },
@@ -511,13 +511,13 @@
     [
      -990.0,
      40.0,
-     605.0
+     525.225
     ]
    ],
    "od_mm": 22.0,
    "min_bend_mm": 132.0,
-   "length_mm": 335.81486828234,
-   "tightest_bend_mm": 237.08631709566825,
+   "length_mm": 385.8561236754456,
+   "tightest_bend_mm": 213.6977788932078,
    "zone": "HV",
    "note": "screened three-phase. Descends monotonically: no climb over the outboard, because a hairpin there cannot meet the bend radius"
   }

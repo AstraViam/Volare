@@ -976,6 +976,108 @@
       "u": "W",
       "s": "DESIGN_CHOICE",
       "n": "Enforced controller limit. The choice is ours; the reason is ENERGY_REQ_188 v1.1, which caps the sum of INSTANTANEOUS power of all motors at 25 kW and permits no peak. The Competr outboard is rated above this, so the controller must hard-limit and the limit must be demonstrable to the Technical Committee. Distinct from motor.power_max_W, which is the hardware peak and is not a permitted operating point."
+    },
+    "drawing_length_mm": {
+      "v": 322.0,
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "Powerhead fore-aft length, dimensioned on the side view. Competr Technical Datasheet 06/25, section 6 'Outboard dimensions', page 7. NOTE: the general-specification table gives '300x210x800mm', which is width x width x HEIGHT, not a fore-aft length. length_m = 0.8 was being read as an 800 mm fore-aft dimension and used that way in cad/out/powertrain.json, which laid the outboard on its side."
+    },
+    "drawing_width_mm": {
+      "v": 210.0,
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "Powerhead width athwartships, dimensioned on the rear view. Competr Technical Datasheet 06/25, section 6 'Outboard dimensions', page 7"
+    },
+    "drawing_height_mm": {
+      "v": 705.0,
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "Cowling top to gearcase bottom, dimensioned on the side view. The table's 800 mm includes the bracket. Competr Technical Datasheet 06/25, section 6 'Outboard dimensions', page 7"
+    },
+    "drawing_overall_length_mm": {
+      "v": 546.0,
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "Fore-aft extent at propeller level, propeller tips to gearcase trailing edge. Competr Technical Datasheet 06/25, section 6 'Outboard dimensions', page 7"
+    },
+    "propeller_arrangement": {
+      "v": "tractive",
+      "u": "-",
+      "s": "DATASHEET",
+      "n": "Both rotors are FORWARD of the gearcase, pulling. Datasheet section 5.1 calls it 'a tractive, counter-rotating propeller architecture'; the side view, the transom view and the trim views all show the rotors ahead of the leg. Anything that places them aft is wrong."
+    },
+    "stock_propeller_diameter_mm": {
+      "v": 230.0,
+      "u": "mm",
+      "s": "DIGITISED",
+      "n": "Scaled off the rear view against its own 210 mm dimension, +/- about 10 mm. NOT dimensioned by Competr. The team's designed rotors are hydro.front_diameter_m and hydro.rear_diameter_m, 380 and 361 mm, which are 65 per cent larger than what this gearcase is drawn around."
+    },
+    "bracket_width_mm": {
+      "v": 600.0,
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "Competr Technical Datasheet 06/25, section 7.2 rear view, page 8."
+    },
+    "bracket_height_mm": {
+      "v": 250.0,
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "Section 7.2 rear view, page 8."
+    },
+    "bracket_length_mm": {
+      "v": 470.0,
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "Section 7.3 side view, page 8. Fore-aft, transom face to the outboard's swivel axis."
+    },
+    "transom_angle_deg": {
+      "v": 14.0,
+      "u": "deg",
+      "s": "DATASHEET",
+      "n": "The transom rake the mounting-height figure is drawn for. Section 10.1, page 10."
+    },
+    "transom_mounting_height_mm": {
+      "v": 400.0,
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "Bracket top to the anti-ventilation plate, measured down the transom. Section 10.1, page 10."
+    },
+    "trim_min_deg": {
+      "v": -5.0,
+      "u": "deg",
+      "s": "DATASHEET",
+      "n": "Section 11.2, page 11."
+    },
+    "trim_max_deg": {
+      "v": 30.0,
+      "u": "deg",
+      "s": "DATASHEET",
+      "n": "Section 11.3, page 11."
+    },
+    "cowl_fraction": {
+      "v": 0.277,
+      "u": "-",
+      "s": "DIGITISED",
+      "n": "Cowling height as a fraction of motor.drawing_height_mm. Competr Technical Datasheet 06/25, section 6 page 7. Scaled off the side and rear views; Competr dimensions the 705 mm total but not how it divides."
+    },
+    "leg_fraction": {
+      "v": 0.468,
+      "u": "-",
+      "s": "DIGITISED",
+      "n": "Leg height as a fraction of motor.drawing_height_mm. Competr Technical Datasheet 06/25, section 6 page 7. Scaled off the side and rear views; Competr dimensions the 705 mm total but not how it divides."
+    },
+    "gearcase_fraction": {
+      "v": 0.255,
+      "u": "-",
+      "s": "DIGITISED",
+      "n": "Gearcase height as a fraction of motor.drawing_height_mm, measured DOWN from the anti-ventilation plate. Competr Technical Datasheet 06/25, section 6 page 7. Scaled off the side and rear views; Competr dimensions the 705 mm total but not how it divides."
+    },
+    "gearcase_od_fraction": {
+      "v": 0.52,
+      "u": "-",
+      "s": "DIGITISED",
+      "n": "Gearcase diameter as a fraction of motor.drawing_width_mm. Competr Technical Datasheet 06/25, section 6 page 7. Scaled off the side and rear views; Competr dimensions the 705 mm total but not how it divides."
     }
   },
   "inverter": {
@@ -2813,12 +2915,12 @@
     "vcu_size_mm": {
       "v": [
         260.0,
-        160.0,
+        175.0,
         90.0
       ],
       "u": "mm",
       "s": "DATASHEET",
-      "n": "Competr control unit, IP67. Datasheet section 2: 260x160x90 mm, 1x 35-way and 1x 23-way sealed connectors."
+      "n": "Competr control unit, IP67. The general-specification table says 260x160x90; the dimensioned drawing in section 9 page 9 says 260 wide x 175 deep x 90 high. The drawing wins. 1x 35-way and 1x 23-way sealed connectors on the 260 mm face."
     },
     "vcu_centre_mm": {
       "v": [
@@ -2838,7 +2940,7 @@
       ],
       "u": "mm",
       "s": "DESIGN_CHOICE",
-      "n": "Transom-mounted, just aft of the pod tail at X = -886 mm. The powerhead spans Z 100 to 900 mm and the leg hangs below it."
+      "n": "Transom station. The pod tail is at X = -886 mm and the outboard hangs aft of it. Vertical position is NOT taken from here any more: powertrain.motor_plate_z_mm sets it, because the Competr drawing dimensions the unit from the anti-ventilation plate."
     },
     "motor_shaft_angle_deg": {
       "v": 0.0,
@@ -2971,6 +3073,12 @@
       "u": "mm",
       "s": "DESIGN_CHOICE",
       "n": "ON the crown over the cockpit, where ENERGY_REQ_185's open-to-sky and outside-every-closed-compartment conditions are both met and it is 400 mm clear of the nearest HV run. It was at X = -60, where the terminal-box cable came within 72 mm of the 100 mm the rule requires."
+    },
+    "motor_plate_z_mm": {
+      "v": 0.0,
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "Anti-ventilation plate level with the hull keel, the standard outboard setting: high enough that the plate is not dragging, low enough that the rotors do not draw air. It sets the whole unit's height, because the drawing dimensions everything from the plate. With the plate here the rotor tips are about 280 mm below the keel, which is what hydro.propulsor_type 'fully submerged' assumes."
     }
   },
   "rules": {
