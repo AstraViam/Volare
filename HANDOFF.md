@@ -4,7 +4,7 @@
 stands. Anyone, human or AI, should be able to read this page and start work
 without reading the rest of the repository.
 
-Last updated: 2026-09-11 (seventh session) · Branch: `claude/epic-lovelace-36k14r`
+Last updated: 2026-09-11 (eighth session) · Branch: `claude/epic-lovelace-36k14r`
 
 ---
 
@@ -20,7 +20,7 @@ through one file and are otherwise separate.
 | Subsystem | Language | Status |
 |---|---|---|
 | `powertrain/` — 26S21P battery pack, drivetrain, mission, compliance | MATLAB | Structured; blocked on 2 measured data files |
-| `cad/` — geometry, frame, aero, optimisation, Blender scenes | Python | 14 of 16 modules self-test green |
+| `cad/` — geometry, frame, aero, optimisation, Blender scenes, CAD export | Python | 19 modules, 18 self-test green; `powertrain.py` fails on the real mass overrun |
 | `propulsor/` — contra-rotating propulsor optimiser | MATLAB | **PAUSED at the user's request.** Stages 0-4 built and gated, 147 checks green, BEM runs end to end. Stages 5-12 remain; see `propulsor/DESIGN.md` |
 | `notes/`, `docs/` — design record and competition rules | Markdown | Complete |
 
@@ -242,45 +242,116 @@ code on first run.
 
 ## 7. Suggested next actions, in order
 
-1. **Close the mass budget.** It is 9.2 kg over. Dropping the solar array
-   saves about 10 kg and is decided, but the CAD says cooling is under-modelled
-   by 3.7 kg, which eats most of it. Needs either the component-by-component
-   hunt through frame, shell and mounting hardware, or the pack-to-6-kWh and
-   carbon-rail levers back on the table.
-2. **Rerun `P50B_MassBudget` and `P50B_ExportCompliance` in MATLAB.** The
-   budget still carries an 80 kg pilot; the design value is now 70 kg. That
-   alone recovers 10 kg and may close the gap outright. Cannot be done from a
-   Claude session, there is no MATLAB.
-3. **Act on the 2027 rule changes.** Reserve the 220 x 111 x 80 mm waterproof
+**Blocked on a person, do these first because nobody else can.**
+
+1. **Rerun `P50B_MassBudget` and `P50B_ExportCompliance` in MATLAB.** The budget
+   still carries an 80 kg pilot; the design value is now 70 kg. That alone
+   recovers 10 kg and may close the 9.2 kg gap outright. No Claude session has
+   MATLAB. Record the result in section 8.
+2. **Run `TEST_ALL.m` and `RUN_EVERYTHING.m` in MATLAB.** Neither has been
+   executed since the restructure. This is the largest remaining unknown.
+3. **Supply the propulsor drawing.** The user asked on 2026-09-11 for the whole
+   motor to be built from a scaled drawing. No image or file reached the
+   repository, so nothing was built. Re-send it, or say where it lives.
+
+**Engineering, open.**
+
+4. **Close the mass budget.** 9.2 kg over. Dropping the solar array saves about
+   10 kg and is decided, but the CAD says cooling is under-modelled by 3.7 kg,
+   which eats most of it. Either the component-by-component hunt through frame,
+   shell and mounting hardware, or the pack-to-6-kWh and carbon-rail levers back
+   on the table. The cooling question is parked by explicit user decision.
+5. **Act on the 2027 rule changes.** Reserve the 220 x 111 x 80 mm waterproof
    sensor volume (ENERGY_REQ_195), design the motor seat to 200 N·m
    (ENERGY_REQ_194), check the ordered monitoring connector part number against
    the revised ENERGY_REQ_184 list, and decide the post-August-2028 cell
    chemistry (ENERGY_REQ_193). All listed in
    `docs/reference/RULES_CHANGES_2026_to_2027.md` section 7.
-2. **Widen the pitch search bounds before the first optimisation run.**
-   Efficiency has not turned over by P/D = 2.2 and the configured bounds stop
-   at 1.52, so the optimiser would pin against the upper bound and report it
-   as converged. `DESIGN.md` section 9c has the numbers.
-3. **Stage 5: couple the rotors through `crp_interaction.m`.** Both wrappers
-   and the single-rotor solver are in place; what remains is verifying the
-   coupled loop converges and that the rear rotor genuinely recovers swirl.
-   The gate is that rear-rotor inflow strictly exceeds the free-stream
-   advance speed and that swirl recovery is positive.
-2. **Resolve the cockpit STL path.** Pick one canonical location and make
-   `volare_params.json` agree, then remove the fallback in `boat.py`.
-3. **Run `TEST_ALL.m` and `RUN_EVERYTHING.m` in MATLAB** and record the result
-   in section 8. Neither has been executed since the restructure; there is no
-   MATLAB in the environment these sessions run in. This is the largest
-   remaining unknown.
-4. Work `DATA_NEEDED.md`, which ranks the measurements still standing in as
-   estimates by accuracy gained per unit of effort.
-5. Consider Git LFS. The repository is 51 MB; see `docs/data-management.md`.
-   Still not urgent.
+6. **Resolve the five CLASH components.** `energy_container`, `terminal_box`,
+   `dcdc`, `heat_exchanger` and `monitor_bay` intersect the pod shell. They are
+   grouped red in `cad/out/step/volare_designed.step` so they cannot be
+   overlooked, but they are not resolved.
+7. **Decide the rail section.** `frame_geometry.py` models the rails solid,
+   matching the Blender model, but note 02 specifies 100 × 50 × 3 hollow RHS.
+   The primitive carries `wall_mm` so a consumer can build the true section.
+   Solid versus hollow is roughly a factor of three on rail steel mass, so this
+   feeds directly into item 4.
+
+**Propulsor — PAUSED at the user's request. Resume from here.**
+
+8. **Widen the pitch search bounds before the first optimisation run.**
+   Efficiency has not turned over by P/D = 2.2 and the configured bounds stop at
+   1.52, so the optimiser would pin against the upper bound and report it as
+   converged. `propulsor/DESIGN.md` section 9c has the numbers.
+9. **Stage 5: couple the rotors through `crp_interaction.m`.** Both wrappers and
+   the single-rotor solver are in place; what remains is verifying the coupled
+   loop converges and that the rear rotor genuinely recovers swirl. The gate is
+   that rear-rotor inflow strictly exceeds the free-stream advance speed and
+   that swirl recovery is positive.
+
+**Housekeeping.**
+
+10. **Resolve the cockpit STL path.** Pick one canonical location, make
+    `volare_params.json` agree, then remove the fallback in `boat.py`.
+11. Work `DATA_NEEDED.md`, which ranks the measurements still standing in as
+    estimates by accuracy gained per unit of effort.
+12. Consider Git LFS. The repository is 57 MB; see `docs/data-management.md`.
+    Still not urgent, but `cad/out/step/` added 5.9 MB.
+
+---
 
 ## 8. Session log
 
 Append one entry per working session. Newest first. Keep entries short: what
 changed, what broke, what is next.
+
+### 2026-09-11 (eighth session) — full boat exported as a CAD assembly
+
+The deliverable is `cad/out/step/`, four files in one coordinate frame, plus a
+README that explains what each is for.
+
+- `cad/scripts/frame_geometry.py` is new. Frame v2 was defined inside
+  `cad/blender/frame_redesign.py`, which put geometry maths in the Blender
+  layer against the rule in CLAUDE.md. The STEP exporter was the second
+  consumer, so the maths moved to `cad/scripts/` and both read it. Its
+  self-check reproduces the Blender stack-up exactly: 750.0 mm clamp spacing,
+  124.0 mm clamp OD, 91.3 mm forward shim, 671.4 / 681.4 mm rail top and pod
+  floor, 9 parts.
+- `cad/scripts/export_step.py` is new. It writes `volare_designed.step`
+  (35 true B-rep solids in a named tree), its tessellation,
+  `volare_supplied.stl` (hulls, both poles, pod shell, hull fittings) and
+  `volare_supplied_frame.stl` (the original rails and pads that v2 replaces).
+- **The supplied geometry is split by measured size, not by triangle index.**
+  Each connected component of `FULLCOCPITV1_3.stl` is matched against
+  `volare.BASELINE`, so a re-exported STL with a different component order
+  still lands in the right file, and a component that no longer matches the
+  measured baseline fails loudly instead of being mislabelled. Counts are
+  asserted: 2 hulls, 2 poles, 1 pod, 2 rails, 6 pads, 4 fittings.
+- **The shared frame is verified by measuring, not asserted.** After the
+  transform the hull box lands on X = −0.04, Y = −0.04, Z = −0.05 mm, so the
+  origin the frame claims is the origin the mesh actually has.
+- **The poles are round tubes, not square.** Vertex radii about the pole axis
+  take exactly two values, 50.0 and 52.0 mm: a D104 × 2 mm wall tube with open
+  ends. `BASELINE["beam_*"]["section_mm"] = (104, 104)` is a bounding box and
+  had been read as a square section. The v2 clamp bores 108 mm over it, giving
+  the 2.0 mm radial gasket gap by design — now measured, not assumed.
+- Frame v2 lifts the pod floor +103.7 mm, clearing the 85.7 mm rail/pod
+  interference measured in the supplied assembly.
+- Three defects fixed in the exporter while writing it: `cylinder_solid` built
+  its solid twice and discarded the first, `Assembly.save` is deprecated in
+  cadquery 2.8 in favour of `export`, and importing cadquery unconditionally
+  would have broken `tools/run_python_selftests.py` on any machine without the
+  400 MB OCP wheel. The cadquery import is now optional and the supplied half,
+  which is pure numpy, still runs and still checks the frame without it.
+- Five components remain in group `CLASH`, red, intersecting the pod shell.
+  Grouped, not hidden, and not resolved.
+
+`tools/run_python_selftests.py`: 19 modules, 18 pass, `powertrain.py` fails on
+the 9.2 kg mass overrun as expected.
+
+**Requested and not delivered:** the user asked for the whole motor to be built
+from a scaled drawing. No image or file reached the repository, so nothing was
+built. See section 7 item 3.
 
 ### 2026-09-11 (seventh session) — design checks fixed, CAD now param-driven
 Propulsor work paused at the user's request; this session was structure and
