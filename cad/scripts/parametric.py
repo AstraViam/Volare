@@ -10,6 +10,13 @@ from functools import lru_cache
 from pathlib import Path
 import numpy as np
 
+
+# numpy renamed trapz to trapezoid in 2.0. Blender 4.0 ships numpy 1.26, which
+# has only the old name; the analysis venv has 2.4, which has only the new one
+# without a deprecation shim in every build. CLAUDE.md requires this module to
+# run under Blender, so bind once here and use _trapz below.
+_trapz = getattr(np, "trapezoid", None) or np.trapz
+
 sys.path.insert(0, str(Path(__file__).parent))
 import geom
 import params
@@ -165,7 +172,7 @@ def recontour_pod(T, max_slope_deg, ease=0.15):
     r = t > (1 - ease * 0.6)
     tt = (t[r] - (1 - ease * 0.6)) / (ease * 0.6)
     g[r] = 1.0 - 0.55 * (0.5 * (1 - np.cos(np.pi * tt)))     # ease out, sharp base
-    gbar = float(np.trapezoid(g, t))
+    gbar = float(_trapz(g, t))
 
     slope = np.tan(np.radians(max_slope_deg))
     drop = slope * L * gbar                                  # max slope == target

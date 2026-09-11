@@ -9,6 +9,13 @@ import struct
 from pathlib import Path
 import numpy as np
 
+
+# numpy renamed trapz to trapezoid in 2.0. Blender 4.0 ships numpy 1.26, which
+# has only the old name; the analysis venv has 2.4, which has only the new one
+# without a deprecation shim in every build. CLAUDE.md requires this module to
+# run under Blender, so bind once here and use _trapz below.
+_trapz = getattr(np, "trapezoid", None) or np.trapz
+
 # ---------------------------------------------------------------- mesh basics
 
 
@@ -294,7 +301,7 @@ def _selftest():
     T = pod_to_boat(P.reshape(-1, 3)).reshape(-1, 3, 3)
 
     xs, A, W, H = section_profile(T, 0, n=400)
-    v_int = np.trapezoid(A, xs) / 1e6
+    v_int = _trapz(A, xs) / 1e6
     v_div = abs(signed_volume(T)) / 1e6
     err = abs(v_int - v_div) / v_div
     print(f"  {'OK  ' if err < 0.01 else 'FAIL'} pod volume: divergence {v_div:.2f} L vs "

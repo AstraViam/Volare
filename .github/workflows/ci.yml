@@ -65,3 +65,21 @@ jobs:
       - name: Propulsor build-stage gates
         working-directory: propulsor
         run: octave --no-gui --quiet tests/ci.m
+
+  blender:
+    name: Blender scene builders
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Blender and numpy for its Python
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends blender python3-numpy
+      - name: Build every scene
+        run: |
+          set -e
+          blender -b -P cad/blender/build_scene.py -- --out cad/out/ci_baseline.blend
+          blender -b -P cad/blender/frame_redesign.py
+          blender -b -P cad/blender/parametric_scene.py
+          blender -b -P cad/blender/build_powertrain.py
+          blender -b -P cad/blender/build_full_assembly.py

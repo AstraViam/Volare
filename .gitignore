@@ -68,6 +68,15 @@ powertrain/python/volare/**/__pycache__/
 *_build.log
 powertrain_step_build.log
 
+# --- Blender render output ---
+# cad/out/views/ is regenerated in about fifteen seconds by
+#   blender -b cad/out/volare_baseline.blend -P cad/blender/render_views.py
+# and CI now runs every scene builder on each push, so the renders are
+# verifiable without being tracked. cad/out/figures/ stays tracked because
+# those are matplotlib plots from the analysis, produced by the same
+# environment CI uses, so they do not churn.
+cad/out/views/
+
 # --- Secrets -----------------------------------------------------------------
 # Never commit telemetry endpoints, API keys or radio credentials.
 .env
