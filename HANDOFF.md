@@ -4,7 +4,7 @@
 stands. Anyone, human or AI, should be able to read this page and start work
 without reading the rest of the repository.
 
-Last updated: 2026-09-11 (sixth session) · Branch: `claude/epic-lovelace-36k14r`
+Last updated: 2026-09-11 (seventh session) · Branch: `claude/epic-lovelace-36k14r`
 
 ---
 
@@ -21,7 +21,7 @@ through one file and are otherwise separate.
 |---|---|---|
 | `powertrain/` — 26S21P battery pack, drivetrain, mission, compliance | MATLAB | Structured; blocked on 2 measured data files |
 | `cad/` — geometry, frame, aero, optimisation, Blender scenes | Python | 14 of 16 modules self-test green |
-| `propulsor/` — contra-rotating propulsor optimiser | MATLAB | **Stages 0-4 built and gated, 147 checks green.** The BEM solver runs end to end. Stages 5-12 remain; see `propulsor/DESIGN.md` |
+| `propulsor/` — contra-rotating propulsor optimiser | MATLAB | **PAUSED at the user's request.** Stages 0-4 built and gated, 147 checks green, BEM runs end to end. Stages 5-12 remain; see `propulsor/DESIGN.md` |
 | `notes/`, `docs/` — design record and competition rules | Markdown | Complete |
 
 ---
@@ -242,7 +242,16 @@ code on first run.
 
 ## 7. Suggested next actions, in order
 
-1. **Act on the 2027 rule changes.** Reserve the 220 x 111 x 80 mm waterproof
+1. **Close the mass budget.** It is 9.2 kg over. Dropping the solar array
+   saves about 10 kg and is decided, but the CAD says cooling is under-modelled
+   by 3.7 kg, which eats most of it. Needs either the component-by-component
+   hunt through frame, shell and mounting hardware, or the pack-to-6-kWh and
+   carbon-rail levers back on the table.
+2. **Rerun `P50B_MassBudget` and `P50B_ExportCompliance` in MATLAB.** The
+   budget still carries an 80 kg pilot; the design value is now 70 kg. That
+   alone recovers 10 kg and may close the gap outright. Cannot be done from a
+   Claude session, there is no MATLAB.
+3. **Act on the 2027 rule changes.** Reserve the 220 x 111 x 80 mm waterproof
    sensor volume (ENERGY_REQ_195), design the motor seat to 200 N·m
    (ENERGY_REQ_194), check the ordered monitoring connector part number against
    the revised ENERGY_REQ_184 list, and decide the post-August-2028 cell
@@ -272,6 +281,51 @@ code on first run.
 
 Append one entry per working session. Newest first. Keep entries short: what
 changed, what broke, what is next.
+
+### 2026-09-11 (seventh session) — design checks fixed, CAD now param-driven
+Propulsor work paused at the user's request; this session was structure and
+design.
+
+**The three failing powertrain.py checks were not what they looked like.** Two
+were bugs in the checks, one was a real physical error, and the genuine
+engineering problem was hidden behind them.
+
+- Stale geometry export was a false alarm of my own making: the check compared
+  file modification times, so annotating a comment in volare_params.json
+  tripped it. It was also silent the other way. It now compares the 12 values
+  the export was built from and names the parameter that moved.
+- The phase-U cable asked for a 37 mm bend radius in a cable rated 132 mm. The
+  route climbed over the outboard and hairpinned, and the inverter sits only
+  90 mm above the outboard top, so LENGTHENING the legs made it worse: 105 mm
+  at a 152 mm leg falling to 82 mm at 232 mm. A monotonic descent gave 237 mm
+  and a SHORTER run, 545 to 336 mm, which also helps EMC.
+- The CAD-versus-budget mass comparison was wrong in sign and magnitude. It
+  looked for a budget line "HV harness and switchgear"; the budget has two
+  lines, "HV switchgear" and "HV harness (cable)". Nothing matched, 9.6 kg
+  vanished, and the CAD looked 7.0 kg heavy when it is 2.1 kg light. Replaced
+  with an explicit mapping plus a completeness check, because a membership test
+  cannot fail loudly and a mapping can. Its tolerance was also structurally
+  broken: abs(delta) <= margin_kg with margin_kg at -9.2 could never pass.
+
+19 checks now, 1 failing, and that one is the real problem: the mass budget is
+9.2 kg over the 250 kg cap.
+
+**Per-line mass audit** now prints. The disagreement is concentrated in two
+places: the CAD models only a heat exchanger and pump against a 7.0 kg cooling
+allowance, 3.7 kg short and most likely coolant, hoses and cold plate; LV is
+1.1 kg heavy.
+
+**The CAD is now driven from volare_params.json.** Only 3 of 24 scripts read
+it; the rest hardcoded, so a parameter edit silently failed to reach the
+geometry. Added `cad/scripts/params.py`, standard library only so it works
+under Blender and FreeCAD as well as CPython, and made `volare.py` derive its
+rules and design constants from it. Verified by propagation: changing pilot
+mass to 95 kg and beam diameter to 120 mm moved through to the CAD.
+
+Pilot mass is a stated 70 kg design value, configurable, with a check that
+fails loudly if `volare.py` and the parameter file drift; they did, 70 against
+80. Added `motor.power_limit_W` at 25 kW as the enforced controller limit that
+makes the outboard legal under ENERGY_REQ_188.
 
 ### 2026-09-11 (sixth session) — propulsor stages 3 and 4, solver running
 Built `hydrofoil_polar.m`, `propeller_geometry.m`, `prandtl_loss.m`,
