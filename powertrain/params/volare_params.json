@@ -1,6 +1,5 @@
 {
   "schema_version": "1.0.0",
-
   "_README": [
     "SINGLE SOURCE OF TRUTH for the Volare / P50B 26S21P project.",
     "",
@@ -22,7 +21,6 @@
     "entropic dU/dT, discharge curves, cycle life) because it is bulky and",
     "changes as a unit."
   ],
-
   "provenance_tags": {
     "MEASURED": "Measured in-house on this project's hardware. Highest confidence.",
     "DATASHEET": "Direct from a manufacturer datasheet held in 04_data/.",
@@ -33,7 +31,6 @@
     "ASSUMPTION": "Engineering estimate, defensible but unverified.",
     "PLACEHOLDER": "Invented to let the model run. NOT quotable. Must be replaced."
   },
-
   "meta": {
     "project": "Volare - Monaco Energy Class 2026",
     "pack": "P50B 26S21P",
@@ -41,127 +38,440 @@
     "outboard_datasheet": "New_Datasheet Competr_0625.pdf",
     "cell_dataset": "params/cells/p50b.json"
   },
-
   "cell": {
     "_note": "Scalar cell properties. Curves are in params/cells/p50b.json.",
-
-    "manufacturer":    { "v": "Molicel",         "u": "-", "s": "DATASHEET" },
-    "part_number":     { "v": "INR-21700-P50B",  "u": "-", "s": "DATASHEET" },
-    "chemistry":       { "v": "NMC",             "u": "-", "s": "DATASHEET" },
-
-    "capacity_Ah":         { "v": 5.0,   "u": "A*hr", "s": "DATASHEET", "n": "Typical. Minimum rated is 4.85 Ah." },
-    "capacity_min_Ah":     { "v": 4.85,  "u": "A*hr", "s": "DATASHEET", "n": "Guaranteed minimum. Use for worst-case range." },
-    "v_nominal_V":         { "v": 3.6,   "u": "V",    "s": "DATASHEET" },
-    "v_max_V":             { "v": 4.2,   "u": "V",    "s": "DATASHEET", "n": "Charge termination." },
-    "v_min_V":             { "v": 2.5,   "u": "V",    "s": "DATASHEET", "n": "Discharge cut-off." },
-    "energy_nominal_Wh":   { "v": 18.0,  "u": "W*hr", "s": "DATASHEET" },
-
-    "mass_kg":             { "v": 0.070, "u": "kg",   "s": "DATASHEET", "n": "Published values span 68-71 g. Weigh a sample lot: 3 g is 1.6 kg across the pack." },
-    "diameter_m":          { "v": 0.02155, "u": "m",  "s": "DATASHEET", "n": "Maximum envelope including shrink wrap." },
-    "height_m":            { "v": 0.07015, "u": "m",  "s": "DATASHEET", "n": "Maximum envelope including terminal cap." },
-
-    "i_max_discharge_A":   { "v": 60.0,  "u": "A",    "s": "DATASHEET", "n": "12 C continuous, quoted to a 70 degC cut-off." },
-    "i_max_charge_A":      { "v": 25.0,  "u": "A",    "s": "DATASHEET", "n": "5 C fast charge." },
-
-    "ac_impedance_1kHz_ohm": { "v": 0.0065, "u": "Ohm", "s": "DATASHEET",
-      "n": "Production screening figure. DO NOT use for loss or thermal work - it is roughly half the DC value and using it halves predicted heat." },
-
-    "dcir_ref_ohm":        { "v": 0.0128, "u": "Ohm", "s": "DATASHEET",
-      "n": "Datasheet DCIR. Cross-check: the digitised R0 map in cells/p50b.json gives 11.64 mOhm at 50% SOC / 23 degC, which agrees to 9%." },
-
-    "cp_J_kgK":            { "v": 1050.0, "u": "J/(kg*K)", "s": "ASSUMPTION", "n": "Typical 21700 NMC. Literature range 950-1150." },
-    "k_radial_W_mK":       { "v": 0.85,   "u": "W/(m*K)",  "s": "ASSUMPTION", "n": "Across the jelly roll. Dominates side-cooled designs." },
-    "k_axial_W_mK":        { "v": 25.0,   "u": "W/(m*K)",  "s": "ASSUMPTION", "n": "Along the windings. Dominates END-cooled designs - which is what this pack uses." },
-
-    "R_core_can_KW":       { "v": 2.0,    "u": "K/W", "s": "ASSUMPTION",
-      "n": "Radial core-to-can. Your thermistor reads the can; your safety limit applies to the core. Tune against an instrumented module." },
-    "core_mass_fraction":  { "v": 0.75,   "u": "-",   "s": "ASSUMPTION", "n": "Thermal mass split, core vs can." },
-
-    "R1_ref_ohm":          { "v": 0.0040, "u": "Ohm", "s": "ASSUMPTION", "n": "Charge-transfer RC branch. LOW confidence - needs HPPC." },
-    "tau1_s":              { "v": 10.0,   "u": "s",   "s": "ASSUMPTION" },
-    "R2_ref_ohm":          { "v": 0.0050, "u": "Ohm", "s": "ASSUMPTION", "n": "Diffusion RC branch. LOW confidence - needs HPPC." },
-    "tau2_s":              { "v": 120.0,  "u": "s",   "s": "ASSUMPTION" },
-    "Ea_over_R_K":         { "v": 1255.0, "u": "K",   "s": "DIGITISED",
-      "n": "Arrhenius activation for R0, FITTED from the digitised temperature-series curves over 0-60 degC by tools/export_cell_tables.py. Supersedes the 2500 K that was previously assumed - the assumption was 2x the measured value, and this parameter governs the whole thermal-feedback question. Restricted to 0-60 degC on purpose: one exponent cannot span -40 to +60, because the low-temperature rise is a different mechanism." },
-    "T_ref_K":             { "v": 298.15, "u": "K",   "s": "CALCULATED" },
-
-    "T_discharge_min_C":   { "v": -20, "u": "degC", "s": "ASSUMPTION", "n": "Typical high-power NMC. Confirm on the controlled datasheet." },
-    "T_discharge_max_C":   { "v": 60,  "u": "degC", "s": "ASSUMPTION" },
-    "T_charge_min_C":      { "v": 0,   "u": "degC", "s": "ASSUMPTION", "n": "Charging below 0 degC risks lithium plating." },
-    "T_charge_max_C":      { "v": 45,  "u": "degC", "s": "ASSUMPTION" },
-    "T_cutoff_C":          { "v": 70,  "u": "degC", "s": "DATASHEET",  "n": "The 60 A rating is quoted to this cut-off." },
-    "T_warn_C":            { "v": 45,  "u": "degC", "s": "DESIGN_CHOICE", "n": "Working ceiling. Cycle life over the season, not a safety limit." },
-    "T_max_C":             { "v": 60,  "u": "degC", "s": "DESIGN_CHOICE", "n": "Hard derate point." },
-
-    "usable_soc_min":      { "v": 0.10, "u": "-", "s": "DESIGN_CHOICE", "n": "Reserve at the bottom." },
-    "usable_soc_max":      { "v": 0.95, "u": "-", "s": "DESIGN_CHOICE", "n": "Protects life at the top." }
+    "manufacturer": {
+      "v": "Molicel",
+      "u": "-",
+      "s": "DATASHEET"
+    },
+    "part_number": {
+      "v": "INR-21700-P50B",
+      "u": "-",
+      "s": "DATASHEET"
+    },
+    "chemistry": {
+      "v": "NMC",
+      "u": "-",
+      "s": "DATASHEET"
+    },
+    "capacity_Ah": {
+      "v": 5.0,
+      "u": "A*hr",
+      "s": "DATASHEET",
+      "n": "Typical. Minimum rated is 4.85 Ah."
+    },
+    "capacity_min_Ah": {
+      "v": 4.85,
+      "u": "A*hr",
+      "s": "DATASHEET",
+      "n": "Guaranteed minimum. Use for worst-case range."
+    },
+    "v_nominal_V": {
+      "v": 3.6,
+      "u": "V",
+      "s": "DATASHEET"
+    },
+    "v_max_V": {
+      "v": 4.2,
+      "u": "V",
+      "s": "DATASHEET",
+      "n": "Charge termination."
+    },
+    "v_min_V": {
+      "v": 2.5,
+      "u": "V",
+      "s": "DATASHEET",
+      "n": "Discharge cut-off."
+    },
+    "energy_nominal_Wh": {
+      "v": 18.0,
+      "u": "W*hr",
+      "s": "DATASHEET"
+    },
+    "mass_kg": {
+      "v": 0.07,
+      "u": "kg",
+      "s": "DATASHEET",
+      "n": "Published values span 68-71 g. Weigh a sample lot: 3 g is 1.6 kg across the pack."
+    },
+    "diameter_m": {
+      "v": 0.02155,
+      "u": "m",
+      "s": "DATASHEET",
+      "n": "Maximum envelope including shrink wrap."
+    },
+    "height_m": {
+      "v": 0.07015,
+      "u": "m",
+      "s": "DATASHEET",
+      "n": "Maximum envelope including terminal cap."
+    },
+    "i_max_discharge_A": {
+      "v": 60.0,
+      "u": "A",
+      "s": "DATASHEET",
+      "n": "12 C continuous, quoted to a 70 degC cut-off."
+    },
+    "i_max_charge_A": {
+      "v": 25.0,
+      "u": "A",
+      "s": "DATASHEET",
+      "n": "5 C fast charge."
+    },
+    "ac_impedance_1kHz_ohm": {
+      "v": 0.0065,
+      "u": "Ohm",
+      "s": "DATASHEET",
+      "n": "Production screening figure. DO NOT use for loss or thermal work - it is roughly half the DC value and using it halves predicted heat."
+    },
+    "dcir_ref_ohm": {
+      "v": 0.0128,
+      "u": "Ohm",
+      "s": "DATASHEET",
+      "n": "Datasheet DCIR. Cross-check: the digitised R0 map in cells/p50b.json gives 11.64 mOhm at 50% SOC / 23 degC, which agrees to 9%."
+    },
+    "cp_J_kgK": {
+      "v": 1050.0,
+      "u": "J/(kg*K)",
+      "s": "ASSUMPTION",
+      "n": "Typical 21700 NMC. Literature range 950-1150."
+    },
+    "k_radial_W_mK": {
+      "v": 0.85,
+      "u": "W/(m*K)",
+      "s": "ASSUMPTION",
+      "n": "Across the jelly roll. Dominates side-cooled designs."
+    },
+    "k_axial_W_mK": {
+      "v": 25.0,
+      "u": "W/(m*K)",
+      "s": "ASSUMPTION",
+      "n": "Along the windings. Dominates END-cooled designs - which is what this pack uses."
+    },
+    "R_core_can_KW": {
+      "v": 2.0,
+      "u": "K/W",
+      "s": "ASSUMPTION",
+      "n": "Radial core-to-can. Your thermistor reads the can; your safety limit applies to the core. Tune against an instrumented module."
+    },
+    "core_mass_fraction": {
+      "v": 0.75,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Thermal mass split, core vs can."
+    },
+    "R1_ref_ohm": {
+      "v": 0.004,
+      "u": "Ohm",
+      "s": "ASSUMPTION",
+      "n": "Charge-transfer RC branch. LOW confidence - needs HPPC."
+    },
+    "tau1_s": {
+      "v": 10.0,
+      "u": "s",
+      "s": "ASSUMPTION"
+    },
+    "R2_ref_ohm": {
+      "v": 0.005,
+      "u": "Ohm",
+      "s": "ASSUMPTION",
+      "n": "Diffusion RC branch. LOW confidence - needs HPPC."
+    },
+    "tau2_s": {
+      "v": 120.0,
+      "u": "s",
+      "s": "ASSUMPTION"
+    },
+    "Ea_over_R_K": {
+      "v": 1255.0,
+      "u": "K",
+      "s": "DIGITISED",
+      "n": "Arrhenius activation for R0, FITTED from the digitised temperature-series curves over 0-60 degC by tools/export_cell_tables.py. Supersedes the 2500 K that was previously assumed - the assumption was 2x the measured value, and this parameter governs the whole thermal-feedback question. Restricted to 0-60 degC on purpose: one exponent cannot span -40 to +60, because the low-temperature rise is a different mechanism."
+    },
+    "T_ref_K": {
+      "v": 298.15,
+      "u": "K",
+      "s": "CALCULATED"
+    },
+    "T_discharge_min_C": {
+      "v": -20,
+      "u": "degC",
+      "s": "ASSUMPTION",
+      "n": "Typical high-power NMC. Confirm on the controlled datasheet."
+    },
+    "T_discharge_max_C": {
+      "v": 60,
+      "u": "degC",
+      "s": "ASSUMPTION"
+    },
+    "T_charge_min_C": {
+      "v": 0,
+      "u": "degC",
+      "s": "ASSUMPTION",
+      "n": "Charging below 0 degC risks lithium plating."
+    },
+    "T_charge_max_C": {
+      "v": 45,
+      "u": "degC",
+      "s": "ASSUMPTION"
+    },
+    "T_cutoff_C": {
+      "v": 70,
+      "u": "degC",
+      "s": "DATASHEET",
+      "n": "The 60 A rating is quoted to this cut-off."
+    },
+    "T_warn_C": {
+      "v": 45,
+      "u": "degC",
+      "s": "DESIGN_CHOICE",
+      "n": "Working ceiling. Cycle life over the season, not a safety limit."
+    },
+    "T_max_C": {
+      "v": 60,
+      "u": "degC",
+      "s": "DESIGN_CHOICE",
+      "n": "Hard derate point."
+    },
+    "usable_soc_min": {
+      "v": 0.1,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "Reserve at the bottom."
+    },
+    "usable_soc_max": {
+      "v": 0.95,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "Protects life at the top."
+    }
   },
-
   "pack": {
     "_note": "26S21P in TWO LAYERS of 13 groups. Each group is 3 rows x 7 columns.",
-
-    "n_series":        { "v": 26, "u": "-", "s": "DESIGN_CHOICE", "n": "Matches the Competr 26S requirement exactly." },
-    "n_parallel":      { "v": 21, "u": "-", "s": "DESIGN_CHOICE" },
-    "n_layers":        { "v": 2,  "u": "-", "s": "DESIGN_CHOICE" },
-    "groups_per_layer":{ "v": 13, "u": "-", "s": "CALCULATED" },
-
-    "group_rows":      { "v": 3, "u": "-", "s": "DESIGN_CHOICE" },
-    "group_cols":      { "v": 7, "u": "-", "s": "DESIGN_CHOICE" },
-
-    "grid_rows":           { "v": 5, "u": "-", "s": "CALCULATED", "n": "Group slot grid, ROWS. Changed from 4x4 to 5x3 because the 4x4 container is 765 mm long and the pod has only 670 mm that is both tall enough and aft of the ENERGY_REQ_50 bulkhead. cad/scripts/pack_fit.py sweeps every grid that can hold 13 slots per layer; 5x3 is the only one that fits, and it also shortens the series path by 5%." },
-    "grid_cols":           { "v": 3, "u": "-", "s": "CALCULATED", "n": "Group slot grid, COLUMNS. See grid_rows. 15 slots per layer for 13 groups, leaving 2 per layer for the BMS, contactor and fuse." },
-
-    "cell_clearance_m":   { "v": 0.0020, "u": "m", "s": "DESIGN_CHOICE",
-      "n": "Cell-to-cell edge gap. Too narrow for a coolant tube - this is why the pack is end-cooled, not side-cooled. See cooling._architecture." },
-    "group_clearance_x_m":{ "v": 0.0120, "u": "m", "s": "DESIGN_CHOICE", "n": "Carries the series interconnect at pack potential." },
-    "group_clearance_y_m":{ "v": 0.0120, "u": "m", "s": "DESIGN_CHOICE" },
-    "layer_gap_m":        { "v": 0.0100, "u": "m", "s": "DESIGN_CHOICE", "n": "Houses the interlayer cold plate." },
-
-    "enclosure_wall_m":   { "v": 0.0030, "u": "m", "s": "DESIGN_CHOICE" },
-    "enclosure_clear_m":  { "v": 0.0080, "u": "m", "s": "DESIGN_CHOICE" },
-    "enclosure_lid_m":    { "v": 0.0030, "u": "m", "s": "DESIGN_CHOICE" },
-    "enclosure_base_m":   { "v": 0.0040, "u": "m", "s": "DESIGN_CHOICE" },
-
-    "non_cell_mass_fraction": { "v": 0.35, "u": "-", "s": "ASSUMPTION",
-      "n": "Holders, busbars, enclosure, cold plates, BMS, harness as a fraction of cell mass. Replace with a measured build." },
-
-    "enclosure_air_volume_m3": { "v": 0.05, "u": "m^3", "s": "ASSUMPTION" },
-    "enclosure_UA_WK":         { "v": 3.0,  "u": "W/K", "s": "ASSUMPTION", "n": "Enclosure to ambient." },
-    "h_internal_W_m2K":        { "v": 6.0,  "u": "W/(m^2*K)", "s": "ASSUMPTION", "n": "Natural convection inside a sealed enclosure." }
+    "n_series": {
+      "v": 26,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "Matches the Competr 26S requirement exactly."
+    },
+    "n_parallel": {
+      "v": 21,
+      "u": "-",
+      "s": "DESIGN_CHOICE"
+    },
+    "n_layers": {
+      "v": 2,
+      "u": "-",
+      "s": "DESIGN_CHOICE"
+    },
+    "groups_per_layer": {
+      "v": 13,
+      "u": "-",
+      "s": "CALCULATED"
+    },
+    "group_rows": {
+      "v": 3,
+      "u": "-",
+      "s": "DESIGN_CHOICE"
+    },
+    "group_cols": {
+      "v": 7,
+      "u": "-",
+      "s": "DESIGN_CHOICE"
+    },
+    "grid_rows": {
+      "v": 5,
+      "u": "-",
+      "s": "CALCULATED",
+      "n": "Group slot grid, ROWS. Changed from 4x4 to 5x3 because the 4x4 container is 765 mm long and the pod has only 670 mm that is both tall enough and aft of the ENERGY_REQ_50 bulkhead. cad/scripts/pack_fit.py sweeps every grid that can hold 13 slots per layer; 5x3 is the only one that fits, and it also shortens the series path by 5%."
+    },
+    "grid_cols": {
+      "v": 3,
+      "u": "-",
+      "s": "CALCULATED",
+      "n": "Group slot grid, COLUMNS. See grid_rows. 15 slots per layer for 13 groups, leaving 2 per layer for the BMS, contactor and fuse."
+    },
+    "cell_clearance_m": {
+      "v": 0.002,
+      "u": "m",
+      "s": "DESIGN_CHOICE",
+      "n": "Cell-to-cell edge gap. Too narrow for a coolant tube - this is why the pack is end-cooled, not side-cooled. See cooling._architecture."
+    },
+    "group_clearance_x_m": {
+      "v": 0.012,
+      "u": "m",
+      "s": "DESIGN_CHOICE",
+      "n": "Carries the series interconnect at pack potential."
+    },
+    "group_clearance_y_m": {
+      "v": 0.012,
+      "u": "m",
+      "s": "DESIGN_CHOICE"
+    },
+    "layer_gap_m": {
+      "v": 0.01,
+      "u": "m",
+      "s": "DESIGN_CHOICE",
+      "n": "Houses the interlayer cold plate."
+    },
+    "enclosure_wall_m": {
+      "v": 0.003,
+      "u": "m",
+      "s": "DESIGN_CHOICE"
+    },
+    "enclosure_clear_m": {
+      "v": 0.008,
+      "u": "m",
+      "s": "DESIGN_CHOICE"
+    },
+    "enclosure_lid_m": {
+      "v": 0.003,
+      "u": "m",
+      "s": "DESIGN_CHOICE"
+    },
+    "enclosure_base_m": {
+      "v": 0.004,
+      "u": "m",
+      "s": "DESIGN_CHOICE"
+    },
+    "non_cell_mass_fraction": {
+      "v": 0.35,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Holders, busbars, enclosure, cold plates, BMS, harness as a fraction of cell mass. Replace with a measured build."
+    },
+    "enclosure_air_volume_m3": {
+      "v": 0.05,
+      "u": "m^3",
+      "s": "ASSUMPTION"
+    },
+    "enclosure_UA_WK": {
+      "v": 3.0,
+      "u": "W/K",
+      "s": "ASSUMPTION",
+      "n": "Enclosure to ambient."
+    },
+    "h_internal_W_m2K": {
+      "v": 6.0,
+      "u": "W/(m^2*K)",
+      "s": "ASSUMPTION",
+      "n": "Natural convection inside a sealed enclosure."
+    }
   },
-
   "busbar": {
     "_note": "Interconnect: cell-to-busbar joints, collector rails, manifolds, series links.",
-
-    "thickness_m":          { "v": 0.0015, "u": "m", "s": "DESIGN_CHOICE" },
-    "edge_clearance_m":     { "v": 0.0020, "u": "m", "s": "DESIGN_CHOICE" },
-    "rail_width_m":         { "v": 0.0080, "u": "m", "s": "DESIGN_CHOICE",
-      "n": "The segment beside the centre feed carries 3 cells' worth: 55 A at the worst legal case, needing 11 mm2. 6 mm x 1.5 mm gave only 9 mm2." },
-    "manifold_width_m":     { "v": 0.0120, "u": "m", "s": "DESIGN_CHOICE", "n": "Carries up to two thirds of group current." },
-    "series_link_width_m":  { "v": 0.0300, "u": "m", "s": "DESIGN_CHOICE",
-      "n": "Sized so the 450 A continuous rating exceeds the 385 A worst legal draw AND sits above the 400 A fuse, as Monaco ENERGY_REQ_59 requires." },
-    "series_link_thick_m":  { "v": 0.0030, "u": "m", "s": "DESIGN_CHOICE" },
-    "routing_factor":       { "v": 1.15,   "u": "-", "s": "ASSUMPTION", "n": "Straight-line length understates a real bar with bend radii." },
-
-    "joints_per_cell":      { "v": 2, "u": "-", "s": "DESIGN_CHOICE", "n": "Positive and negative tab." },
-    "welds_per_joint":      { "v": 2, "u": "-", "s": "DESIGN_CHOICE" },
-    "weld_resistance_ohm":  { "v": 0.00020, "u": "Ohm", "s": "ASSUMPTION",
-      "n": "1092 joints in the pack, 16% of interconnect resistance. Four-wire measurement on one scrap joint would settle it - cheapest high-value test in the project." },
-
-    "operating_temp_C":     { "v": 60, "u": "degC", "s": "ASSUMPTION", "n": "Busbars in a sealed pack run hotter than expected. 15.7% more resistance than the 20 degC handbook value." },
-    "cu_rho_20C_ohm_m":     { "v": 1.724e-8, "u": "Ohm*m", "s": "PUBLISHED_TEST", "n": "Annealed copper, IEC 60228. A MATERIAL property, shared by the busbars and the HV harness -- the busbar. prefix is historical, not a statement about where it applies." },
-    "cu_tempco_per_K":      { "v": 0.00393,  "u": "1/K",   "s": "PUBLISHED_TEST" },
-    "cu_density_kg_m3":     { "v": 8960, "u": "kg/m^3", "s": "PUBLISHED_TEST" },
-    "cu_cp_J_kgK":          { "v": 385,  "u": "J/(kg*K)", "s": "PUBLISHED_TEST" },
-
-    "density_limit_cont_A_mm2": { "v": 5.0, "u": "A/mm^2", "s": "DESIGN_CHOICE", "n": "Sustained, still air, limited convection. Rule of thumb, not a standard." },
-    "density_limit_peak_A_mm2": { "v": 8.0, "u": "A/mm^2", "s": "DESIGN_CHOICE", "n": "Momentary only; needs a demonstrated short duty cycle." },
-
-    "G_can_busbar_WK":      { "v": 0.015, "u": "W/K", "s": "ASSUMPTION" },
-    "busbar_cooled":        { "v": false, "u": "-",   "s": "DESIGN_CHOICE" },
-    "R_busbar_coolant_KW":  { "v": 2.0,   "u": "K/W", "s": "ASSUMPTION" }
+    "thickness_m": {
+      "v": 0.0015,
+      "u": "m",
+      "s": "DESIGN_CHOICE"
+    },
+    "edge_clearance_m": {
+      "v": 0.002,
+      "u": "m",
+      "s": "DESIGN_CHOICE"
+    },
+    "rail_width_m": {
+      "v": 0.008,
+      "u": "m",
+      "s": "DESIGN_CHOICE",
+      "n": "The segment beside the centre feed carries 3 cells' worth: 55 A at the worst legal case, needing 11 mm2. 6 mm x 1.5 mm gave only 9 mm2."
+    },
+    "manifold_width_m": {
+      "v": 0.012,
+      "u": "m",
+      "s": "DESIGN_CHOICE",
+      "n": "Carries up to two thirds of group current."
+    },
+    "series_link_width_m": {
+      "v": 0.03,
+      "u": "m",
+      "s": "DESIGN_CHOICE",
+      "n": "Sized so the 450 A continuous rating exceeds the 385 A worst legal draw AND sits above the 400 A fuse, as Monaco ENERGY_REQ_59 requires."
+    },
+    "series_link_thick_m": {
+      "v": 0.003,
+      "u": "m",
+      "s": "DESIGN_CHOICE"
+    },
+    "routing_factor": {
+      "v": 1.15,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Straight-line length understates a real bar with bend radii."
+    },
+    "joints_per_cell": {
+      "v": 2,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "Positive and negative tab."
+    },
+    "welds_per_joint": {
+      "v": 2,
+      "u": "-",
+      "s": "DESIGN_CHOICE"
+    },
+    "weld_resistance_ohm": {
+      "v": 0.0002,
+      "u": "Ohm",
+      "s": "ASSUMPTION",
+      "n": "1092 joints in the pack, 16% of interconnect resistance. Four-wire measurement on one scrap joint would settle it - cheapest high-value test in the project."
+    },
+    "operating_temp_C": {
+      "v": 60,
+      "u": "degC",
+      "s": "ASSUMPTION",
+      "n": "Busbars in a sealed pack run hotter than expected. 15.7% more resistance than the 20 degC handbook value."
+    },
+    "cu_rho_20C_ohm_m": {
+      "v": 1.724e-08,
+      "u": "Ohm*m",
+      "s": "PUBLISHED_TEST",
+      "n": "Annealed copper, IEC 60228. A MATERIAL property, shared by the busbars and the HV harness -- the busbar. prefix is historical, not a statement about where it applies."
+    },
+    "cu_tempco_per_K": {
+      "v": 0.00393,
+      "u": "1/K",
+      "s": "PUBLISHED_TEST"
+    },
+    "cu_density_kg_m3": {
+      "v": 8960,
+      "u": "kg/m^3",
+      "s": "PUBLISHED_TEST"
+    },
+    "cu_cp_J_kgK": {
+      "v": 385,
+      "u": "J/(kg*K)",
+      "s": "PUBLISHED_TEST"
+    },
+    "density_limit_cont_A_mm2": {
+      "v": 5.0,
+      "u": "A/mm^2",
+      "s": "DESIGN_CHOICE",
+      "n": "Sustained, still air, limited convection. Rule of thumb, not a standard."
+    },
+    "density_limit_peak_A_mm2": {
+      "v": 8.0,
+      "u": "A/mm^2",
+      "s": "DESIGN_CHOICE",
+      "n": "Momentary only; needs a demonstrated short duty cycle."
+    },
+    "G_can_busbar_WK": {
+      "v": 0.015,
+      "u": "W/K",
+      "s": "ASSUMPTION"
+    },
+    "busbar_cooled": {
+      "v": false,
+      "u": "-",
+      "s": "DESIGN_CHOICE"
+    },
+    "R_busbar_coolant_KW": {
+      "v": 2.0,
+      "u": "K/W",
+      "s": "ASSUMPTION"
+    }
   },
-
   "cooling": {
     "_architecture": [
       "END (AXIAL) COOLING VIA COLD PLATES - not side cooling.",
@@ -191,47 +501,157 @@
       "bend losses, coolant advection so the fluid warms along the path, and",
       "counter-flow routing on alternate circuits."
     ],
-
-    "mode":              { "v": "end_plate", "u": "-", "s": "DESIGN_CHOICE", "n": "end_plate or side_tube. See _architecture." },
-
-    "n_plates":          { "v": 3, "u": "-", "s": "CALCULATED", "n": "Base, interlayer, lid." },
-    "plate_thickness_m": { "v": 0.0050, "u": "m", "s": "DESIGN_CHOICE" },
-    "plate_material_k_W_mK": { "v": 167.0, "u": "W/(m*K)", "s": "PUBLISHED_TEST", "n": "6061-T6 aluminium." },
-    "plate_density_kg_m3":   { "v": 2700.0, "u": "kg/m^3", "s": "PUBLISHED_TEST" },
-    "plate_cp_J_kgK":        { "v": 896.0,  "u": "J/(kg*K)", "s": "PUBLISHED_TEST" },
-
-    "tubes_per_plate":   { "v": 8, "u": "-", "s": "DESIGN_CHOICE",
-      "n": "Serpentine passes across the plate. Sets wetted length and hence velocity for a given flow." },
-    "n_circuits":        { "v": 3, "u": "-", "s": "DESIGN_CHOICE",
-      "n": "The flat-layout study found a sharp optimum at 3: Re just below the turbulent transition, good h, and 0.24 bar. 2 circuits buys 0.2 K for 3x the pressure; 5 falls off the laminar cliff. Re-verify for this plate geometry." },
-    "interleave_circuits": { "v": true, "u": "-", "s": "DESIGN_CHOICE", "n": "Spread each circuit across the pack rather than giving it one region." },
-    "counter_flow":      { "v": true, "u": "-", "s": "DESIGN_CHOICE",
-      "n": "Reverse alternate circuits. Peak temperature is unchanged - that is set by total heat removal - but spread drops ~16%, and spread drives SOC divergence and differential ageing." },
-
-    "tube_id_m":         { "v": 0.0060, "u": "m", "s": "DESIGN_CHOICE" },
-    "n_bends_per_tube":  { "v": 2, "u": "-", "s": "ASSUMPTION", "n": "Serpentine return bends." },
-    "K_bend":            { "v": 1.5, "u": "-", "s": "PUBLISHED_TEST", "n": "Minor loss coefficient per 180 degree bend." },
-
-    "flow_L_per_min":    { "v": 8.0,  "u": "L/min", "s": "DESIGN_CHOICE", "n": "Total, split between circuits." },
-    "inlet_T_C":         { "v": 28.0, "u": "degC",  "s": "ASSUMPTION",   "n": "After the seawater heat exchanger." },
-
-    "fluid":             { "v": "water_inhibited", "u": "-", "s": "DESIGN_CHOICE",
-      "n": "The flat study found 50/50 glycol is ~3x the viscosity of water and drags the flow toward laminar, costing 0.7 K at sustained power. Freeze protection is not a requirement in Monaco in July; corrosion inhibition is, and is bought separately." },
-    "rho_kg_m3":         { "v": 997.0,   "u": "kg/m^3",    "s": "PUBLISHED_TEST", "n": "Water at 30 degC." },
-    "cp_J_kgK":          { "v": 4180.0,  "u": "J/(kg*K)",  "s": "PUBLISHED_TEST" },
-    "mu_Pa_s":           { "v": 0.000797,"u": "Pa*s",      "s": "PUBLISHED_TEST", "n": "Water at 30 degC. 50/50 glycol would be 0.0025." },
-    "k_W_mK":            { "v": 0.615,   "u": "W/(m*K)",   "s": "PUBLISHED_TEST", "n": "Water at 30 degC. 50/50 glycol would be 0.38." },
-
-    "R_can_plate_KW":    { "v": 1.20, "u": "K/W", "s": "ASSUMPTION",
-      "n": "Cell end face to plate through the thermal interface pad. Cannot be calculated to useful accuracy - bond-line thickness and fill fraction dominate. Measure on an instrumented module." },
-    "R_plate_tubewall_KW": { "v": 0.35, "u": "K/W", "s": "ASSUMPTION", "n": "Through the plate to the embedded tube wall." },
-    "cell_ends_cooled":  { "v": 2, "u": "-", "s": "CALCULATED", "n": "Both ends of every cell contact a plate in this stack-up." },
-
-    "gap_filler_k_W_mK": { "v": 1.5,  "u": "W/(m*K)", "s": "ASSUMPTION", "n": "Potting compound between cell cans. Air only would be 0.03." },
-    "gap_contact_frac":  { "v": 0.16, "u": "-",       "s": "ASSUMPTION", "n": "Effective conduction area fraction between adjacent cans." },
-
-    "allowed_coolant_rise_K": { "v": 5.0, "u": "K", "s": "DESIGN_CHOICE", "n": "Sizing target for flow rate." },
-
+    "mode": {
+      "v": "end_plate",
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "end_plate or side_tube. See _architecture."
+    },
+    "n_plates": {
+      "v": 3,
+      "u": "-",
+      "s": "CALCULATED",
+      "n": "Base, interlayer, lid."
+    },
+    "plate_thickness_m": {
+      "v": 0.005,
+      "u": "m",
+      "s": "DESIGN_CHOICE"
+    },
+    "plate_material_k_W_mK": {
+      "v": 167.0,
+      "u": "W/(m*K)",
+      "s": "PUBLISHED_TEST",
+      "n": "6061-T6 aluminium."
+    },
+    "plate_density_kg_m3": {
+      "v": 2700.0,
+      "u": "kg/m^3",
+      "s": "PUBLISHED_TEST"
+    },
+    "plate_cp_J_kgK": {
+      "v": 896.0,
+      "u": "J/(kg*K)",
+      "s": "PUBLISHED_TEST"
+    },
+    "tubes_per_plate": {
+      "v": 8,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "Serpentine passes across the plate. Sets wetted length and hence velocity for a given flow."
+    },
+    "n_circuits": {
+      "v": 3,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "The flat-layout study found a sharp optimum at 3: Re just below the turbulent transition, good h, and 0.24 bar. 2 circuits buys 0.2 K for 3x the pressure; 5 falls off the laminar cliff. Re-verify for this plate geometry."
+    },
+    "interleave_circuits": {
+      "v": true,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "Spread each circuit across the pack rather than giving it one region."
+    },
+    "counter_flow": {
+      "v": true,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "Reverse alternate circuits. Peak temperature is unchanged - that is set by total heat removal - but spread drops ~16%, and spread drives SOC divergence and differential ageing."
+    },
+    "tube_id_m": {
+      "v": 0.006,
+      "u": "m",
+      "s": "DESIGN_CHOICE"
+    },
+    "n_bends_per_tube": {
+      "v": 2,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Serpentine return bends."
+    },
+    "K_bend": {
+      "v": 1.5,
+      "u": "-",
+      "s": "PUBLISHED_TEST",
+      "n": "Minor loss coefficient per 180 degree bend."
+    },
+    "flow_L_per_min": {
+      "v": 8.0,
+      "u": "L/min",
+      "s": "DESIGN_CHOICE",
+      "n": "Total, split between circuits."
+    },
+    "inlet_T_C": {
+      "v": 28.0,
+      "u": "degC",
+      "s": "ASSUMPTION",
+      "n": "After the seawater heat exchanger."
+    },
+    "fluid": {
+      "v": "water_inhibited",
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "The flat study found 50/50 glycol is ~3x the viscosity of water and drags the flow toward laminar, costing 0.7 K at sustained power. Freeze protection is not a requirement in Monaco in July; corrosion inhibition is, and is bought separately."
+    },
+    "rho_kg_m3": {
+      "v": 997.0,
+      "u": "kg/m^3",
+      "s": "PUBLISHED_TEST",
+      "n": "Water at 30 degC."
+    },
+    "cp_J_kgK": {
+      "v": 4180.0,
+      "u": "J/(kg*K)",
+      "s": "PUBLISHED_TEST"
+    },
+    "mu_Pa_s": {
+      "v": 0.000797,
+      "u": "Pa*s",
+      "s": "PUBLISHED_TEST",
+      "n": "Water at 30 degC. 50/50 glycol would be 0.0025."
+    },
+    "k_W_mK": {
+      "v": 0.615,
+      "u": "W/(m*K)",
+      "s": "PUBLISHED_TEST",
+      "n": "Water at 30 degC. 50/50 glycol would be 0.38."
+    },
+    "R_can_plate_KW": {
+      "v": 1.2,
+      "u": "K/W",
+      "s": "ASSUMPTION",
+      "n": "Cell end face to plate through the thermal interface pad. Cannot be calculated to useful accuracy - bond-line thickness and fill fraction dominate. Measure on an instrumented module."
+    },
+    "R_plate_tubewall_KW": {
+      "v": 0.35,
+      "u": "K/W",
+      "s": "ASSUMPTION",
+      "n": "Through the plate to the embedded tube wall."
+    },
+    "cell_ends_cooled": {
+      "v": 2,
+      "u": "-",
+      "s": "CALCULATED",
+      "n": "Both ends of every cell contact a plate in this stack-up."
+    },
+    "gap_filler_k_W_mK": {
+      "v": 1.5,
+      "u": "W/(m*K)",
+      "s": "ASSUMPTION",
+      "n": "Potting compound between cell cans. Air only would be 0.03."
+    },
+    "gap_contact_frac": {
+      "v": 0.16,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Effective conduction area fraction between adjacent cans."
+    },
+    "allowed_coolant_rise_K": {
+      "v": 5.0,
+      "u": "K",
+      "s": "DESIGN_CHOICE",
+      "n": "Sizing target for flow rate."
+    },
     "_R_cell_coolant_note": [
       "Cell-to-coolant thermal resistance, per cell, for the END-PLATE pack.",
       "",
@@ -262,48 +682,172 @@
       "tools/crosscheck.py compares the total, so the two implementations",
       "cannot drift apart again silently."
     ],
-    "R_solid_cell_KW":    { "v": 0.775, "u": "K/W", "s": "CALCULATED", "n": "(R_can_plate + R_plate_tubewall) / cell_ends_cooled. Both ends of every cell reach a plate." },
-    "R_conv_cell_KW":     { "v": 0.134361, "u": "K/W", "s": "CALCULATED", "n": "Convective film, per cell, from the resolved tube hydraulics at cooling.flow_L_per_min. Derived by python/volare/layout3d.py hydraulics(). Rerun if the flow rate changes." },
-    "R_cell_coolant_KW":  { "v": 0.909361, "u": "K/W", "s": "CALCULATED", "n": "Total per-cell resistance to coolant for the end-plate pack. Replaces the 5.0 K/W bottom-cooled figure P50B_ThermalDesign used to hard-code." }
+    "R_solid_cell_KW": {
+      "v": 0.775,
+      "u": "K/W",
+      "s": "CALCULATED",
+      "n": "(R_can_plate + R_plate_tubewall) / cell_ends_cooled. Both ends of every cell reach a plate."
+    },
+    "R_conv_cell_KW": {
+      "v": 0.134361,
+      "u": "K/W",
+      "s": "CALCULATED",
+      "n": "Convective film, per cell, from the resolved tube hydraulics at cooling.flow_L_per_min. Derived by python/volare/layout3d.py hydraulics(). Rerun if the flow rate changes."
+    },
+    "R_cell_coolant_KW": {
+      "v": 0.909361,
+      "u": "K/W",
+      "s": "CALCULATED",
+      "n": "Total per-cell resistance to coolant for the end-plate pack. Replaces the 5.0 K/W bottom-cooled figure P50B_ThermalDesign used to hard-code."
+    }
   },
-
   "motor": {
     "_note": "Competr counter-rotating electric outboard. Axial-flux PMSM, water cooled.",
-
-    "manufacturer":       { "v": "Competr", "u": "-", "s": "DATASHEET" },
-    "type":               { "v": "Axial flux PMSM, water cooled", "u": "-", "s": "DATASHEET" },
-
-    "power_nominal_W":    { "v": 26900, "u": "W", "s": "DATASHEET", "n": "26.9 kW (40 HP). EXCEEDS the Monaco 25 kW limit - see configured_power_limit_W." },
-    "power_max_W":        { "v": 42000, "u": "W", "s": "DATASHEET", "n": "Hardware peak. NOT a permitted operating point." },
-    "torque_max_Nm":      { "v": 100,   "u": "N*m", "s": "DATASHEET" },
-    "mass_kg":            { "v": 25.0,  "u": "kg", "s": "DATASHEET", "n": "Outboard only. Trim assembly adds 10 kg." },
-    "trim_mass_kg":       { "v": 10.0,  "u": "kg", "s": "DATASHEET" },
-    "length_m":           { "v": 0.800, "u": "m", "s": "DATASHEET" },
-    "width_m":            { "v": 0.300, "u": "m", "s": "DATASHEET" },
-    "depth_m":            { "v": 0.210, "u": "m", "s": "DATASHEET" },
-    "shaft_length_m":     { "v": 0.500, "u": "m", "s": "DATASHEET" },
-
-    "bus_v_nominal_V":    { "v": 96.0,  "u": "V", "s": "DATASHEET", "n": "Competr stock pack. The P50B 26S gives 93.6 V." },
-    "bus_v_max_V":        { "v": 109.0, "u": "V", "s": "DATASHEET", "n": "At 100% SoC. Equals 26 x 4.2 V exactly - confirms 26S." },
-    "bus_i_max_A":        { "v": 375.0, "u": "A", "s": "DATASHEET", "n": "Continuous." },
-
-    "configured_power_limit_W": { "v": 25000, "u": "W", "s": "DESIGN_CHOICE",
-      "n": "MONACO ENERGY_REQ_188 HARD CAP. Applied to motor ELECTRICAL input, not shaft power - a shaft cap of 25 kW would draw 26.9 kW and break the rule. Enforced by bisection in the drivetrain solver." },
-
-    "pole_pairs":         { "v": 10,      "u": "-",   "s": "ASSUMPTION", "n": "Axial-flux marine machines commonly 8-14. Sets electrical frequency." },
-    "Ld_H":               { "v": 85e-6,   "u": "H",   "s": "ASSUMPTION" },
-    "Lq_H":               { "v": 95e-6,   "u": "H",   "s": "ASSUMPTION", "n": "Slight saliency assumed." },
-    "rated_phase_current_peak_A": { "v": 400, "u": "A", "s": "ASSUMPTION", "n": "Sets the flux-linkage back-calculation." },
-    "peak_efficiency":    { "v": 0.955,   "u": "-",   "s": "ASSUMPTION",
-      "n": "Phase resistance is BACK-SOLVED from this so the loss model reproduces it. Assuming a resistance and separately declaring an efficiency is how a model ends up reporting 89% while claiming 95.5%." },
-
-    "iron_loss_k1_W_per_Hz":  { "v": 0.85,   "u": "W/Hz",   "s": "ASSUMPTION", "n": "Hysteresis, linear in electrical frequency." },
-    "iron_loss_k2_W_per_Hz2": { "v": 1.2e-3, "u": "W/Hz^2", "s": "ASSUMPTION", "n": "Eddy current, quadratic." },
-    "windage_k_W_per_rpm3":   { "v": 2.5e-10,"u": "W/rpm^3","s": "ASSUMPTION" },
-    "mech_loss_const_W":      { "v": 60,     "u": "W",      "s": "ASSUMPTION", "n": "Bearing drag and seal friction." },
-    "cu_tempco_per_K":        { "v": 0.00393,"u": "1/K",    "s": "PUBLISHED_TEST" },
-    "winding_temp_calib_C":   { "v": 100,    "u": "degC",   "s": "ASSUMPTION", "n": "Temperature at which the loss model is evaluated." },
-
+    "manufacturer": {
+      "v": "Competr",
+      "u": "-",
+      "s": "DATASHEET"
+    },
+    "type": {
+      "v": "Axial flux PMSM, water cooled",
+      "u": "-",
+      "s": "DATASHEET"
+    },
+    "power_nominal_W": {
+      "v": 26900,
+      "u": "W",
+      "s": "DATASHEET",
+      "n": "26.9 kW (40 HP). EXCEEDS the Monaco 25 kW limit - see configured_power_limit_W."
+    },
+    "power_max_W": {
+      "v": 42000,
+      "u": "W",
+      "s": "DATASHEET",
+      "n": "Hardware peak. NOT a permitted operating point: ENERGY_REQ_188 v1.1 caps instantaneous power at motor.power_limit_W and forbids peaks. The controller limit is what makes this outboard legal."
+    },
+    "torque_max_Nm": {
+      "v": 100,
+      "u": "N*m",
+      "s": "DATASHEET"
+    },
+    "mass_kg": {
+      "v": 25.0,
+      "u": "kg",
+      "s": "DATASHEET",
+      "n": "Outboard only. Trim assembly adds 10 kg."
+    },
+    "trim_mass_kg": {
+      "v": 10.0,
+      "u": "kg",
+      "s": "DATASHEET"
+    },
+    "length_m": {
+      "v": 0.8,
+      "u": "m",
+      "s": "DATASHEET"
+    },
+    "width_m": {
+      "v": 0.3,
+      "u": "m",
+      "s": "DATASHEET"
+    },
+    "depth_m": {
+      "v": 0.21,
+      "u": "m",
+      "s": "DATASHEET"
+    },
+    "shaft_length_m": {
+      "v": 0.5,
+      "u": "m",
+      "s": "DATASHEET"
+    },
+    "bus_v_nominal_V": {
+      "v": 96.0,
+      "u": "V",
+      "s": "DATASHEET",
+      "n": "Competr stock pack. The P50B 26S gives 93.6 V."
+    },
+    "bus_v_max_V": {
+      "v": 109.0,
+      "u": "V",
+      "s": "DATASHEET",
+      "n": "At 100% SoC. Equals 26 x 4.2 V exactly - confirms 26S."
+    },
+    "bus_i_max_A": {
+      "v": 375.0,
+      "u": "A",
+      "s": "DATASHEET",
+      "n": "Continuous."
+    },
+    "configured_power_limit_W": {
+      "v": 25000,
+      "u": "W",
+      "s": "DESIGN_CHOICE",
+      "n": "MONACO ENERGY_REQ_188 HARD CAP. Applied to motor ELECTRICAL input, not shaft power - a shaft cap of 25 kW would draw 26.9 kW and break the rule. Enforced by bisection in the drivetrain solver."
+    },
+    "pole_pairs": {
+      "v": 10,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Axial-flux marine machines commonly 8-14. Sets electrical frequency."
+    },
+    "Ld_H": {
+      "v": 8.5e-05,
+      "u": "H",
+      "s": "ASSUMPTION"
+    },
+    "Lq_H": {
+      "v": 9.5e-05,
+      "u": "H",
+      "s": "ASSUMPTION",
+      "n": "Slight saliency assumed."
+    },
+    "rated_phase_current_peak_A": {
+      "v": 400,
+      "u": "A",
+      "s": "ASSUMPTION",
+      "n": "Sets the flux-linkage back-calculation."
+    },
+    "peak_efficiency": {
+      "v": 0.955,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Phase resistance is BACK-SOLVED from this so the loss model reproduces it. Assuming a resistance and separately declaring an efficiency is how a model ends up reporting 89% while claiming 95.5%."
+    },
+    "iron_loss_k1_W_per_Hz": {
+      "v": 0.85,
+      "u": "W/Hz",
+      "s": "ASSUMPTION",
+      "n": "Hysteresis, linear in electrical frequency."
+    },
+    "iron_loss_k2_W_per_Hz2": {
+      "v": 0.0012,
+      "u": "W/Hz^2",
+      "s": "ASSUMPTION",
+      "n": "Eddy current, quadratic."
+    },
+    "windage_k_W_per_rpm3": {
+      "v": 2.5e-10,
+      "u": "W/rpm^3",
+      "s": "ASSUMPTION"
+    },
+    "mech_loss_const_W": {
+      "v": 60,
+      "u": "W",
+      "s": "ASSUMPTION",
+      "n": "Bearing drag and seal friction."
+    },
+    "cu_tempco_per_K": {
+      "v": 0.00393,
+      "u": "1/K",
+      "s": "PUBLISHED_TEST"
+    },
+    "winding_temp_calib_C": {
+      "v": 100,
+      "u": "degC",
+      "s": "ASSUMPTION",
+      "n": "Temperature at which the loss model is evaluated."
+    },
     "_speed_note": [
       "THE COMPETR DATASHEET STATES NO MOTOR SPEED ANYWHERE.",
       "",
@@ -338,133 +882,505 @@
       "the project and it gates the gearbox ratio, which gates the propeller,",
       "which gates the boat speed."
     ],
-    "max_speed_rpm":            { "v": 4000, "u": "rpm", "s": "ASSUMPTION", "n": "Back-solved from the datasheet: 42 kW at 100 N*m needs 4011 rpm. See _speed_note - the datasheet states no speed, and the hydrodynamics brief says 2500." },
-    "max_speed_rpm_brief":      { "v": 2500, "u": "rpm", "s": "ASSUMPTION", "n": "The conflicting figure from the hydrodynamics team's brief. Carried so the disagreement is visible, not used by the model." },
-    "nominal_speed_rpm_brief":  { "v": 1300, "u": "rpm", "s": "ASSUMPTION", "n": "Also from their brief. At 1300 rpm and 100 N*m the power ceiling is 13.6 kW, so the 25 kW nominal cannot be produced there. Their audit says so explicitly." },
-    "gearbox_ratio":      { "v": 2.0,   "u": "-",   "s": "ASSUMPTION", "n": "Datasheet confirms a gearbox exists but not its ratio." },
-    "gearbox_efficiency": { "v": 0.97,  "u": "-",   "s": "ASSUMPTION" },
-
-    "C_winding_J_K":      { "v": 3200.0, "u": "J/K", "s": "ASSUMPTION" },
-    "C_case_J_K":         { "v": 6000.0, "u": "J/K", "s": "ASSUMPTION" },
-    "R_wind_case_KW":     { "v": 0.020,  "u": "K/W", "s": "ASSUMPTION" },
-    "R_case_sea_KW":      { "v": 0.0055, "u": "K/W", "s": "ASSUMPTION", "n": "Submerged outboard - the sea is an excellent heat sink and the reason it takes this power at all." },
-    "R_wind_coolant_KW":        { "v": 0.045, "u": "K/W", "s": "ASSUMPTION", "n": "Winding to COOLANT, the whole path, used by the drivetrain thermal check. Distinct from R_wind_case_KW, which is only winding to case -- adding the two would double-count the case." },
-    "coolant_inlet_max_C":      { "v": 50, "u": "degC", "s": "ASSUMPTION", "n": "Highest coolant inlet temperature the motor is assumed to tolerate. Confirm with Competr; it bounds how hard the pack and the motor can share one loop." },
-    "T_winding_warn_C":   { "v": 130,    "u": "degC", "s": "ASSUMPTION" },
-    "T_winding_max_C":    { "v": 155,    "u": "degC", "s": "ASSUMPTION", "n": "Class F insulation assumed." },
-
-    "propeller_type":     { "v": "Counter-rotating", "u": "-", "s": "DATASHEET" },
-    "position_sensor":    { "v": "SSI absolute encoder", "u": "-", "s": "DATASHEET", "n": "Constrains inverter selection." },
-    "temp_sensor":        { "v": "Analog PTC", "u": "-", "s": "DATASHEET" }
+    "max_speed_rpm": {
+      "v": 4000,
+      "u": "rpm",
+      "s": "ASSUMPTION",
+      "n": "Back-solved from the datasheet: 42 kW at 100 N*m needs 4011 rpm. See _speed_note - the datasheet states no speed, and the hydrodynamics brief says 2500."
+    },
+    "max_speed_rpm_brief": {
+      "v": 2500,
+      "u": "rpm",
+      "s": "ASSUMPTION",
+      "n": "The conflicting figure from the hydrodynamics team's brief. Carried so the disagreement is visible, not used by the model."
+    },
+    "nominal_speed_rpm_brief": {
+      "v": 1300,
+      "u": "rpm",
+      "s": "ASSUMPTION",
+      "n": "Also from their brief. At 1300 rpm and 100 N*m the power ceiling is 13.6 kW, so the 25 kW nominal cannot be produced there. Their audit says so explicitly."
+    },
+    "gearbox_ratio": {
+      "v": 2.0,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Datasheet confirms a gearbox exists but not its ratio."
+    },
+    "gearbox_efficiency": {
+      "v": 0.97,
+      "u": "-",
+      "s": "ASSUMPTION"
+    },
+    "C_winding_J_K": {
+      "v": 3200.0,
+      "u": "J/K",
+      "s": "ASSUMPTION"
+    },
+    "C_case_J_K": {
+      "v": 6000.0,
+      "u": "J/K",
+      "s": "ASSUMPTION"
+    },
+    "R_wind_case_KW": {
+      "v": 0.02,
+      "u": "K/W",
+      "s": "ASSUMPTION"
+    },
+    "R_case_sea_KW": {
+      "v": 0.0055,
+      "u": "K/W",
+      "s": "ASSUMPTION",
+      "n": "Submerged outboard - the sea is an excellent heat sink and the reason it takes this power at all."
+    },
+    "R_wind_coolant_KW": {
+      "v": 0.045,
+      "u": "K/W",
+      "s": "ASSUMPTION",
+      "n": "Winding to COOLANT, the whole path, used by the drivetrain thermal check. Distinct from R_wind_case_KW, which is only winding to case -- adding the two would double-count the case."
+    },
+    "coolant_inlet_max_C": {
+      "v": 50,
+      "u": "degC",
+      "s": "ASSUMPTION",
+      "n": "Highest coolant inlet temperature the motor is assumed to tolerate. Confirm with Competr; it bounds how hard the pack and the motor can share one loop."
+    },
+    "T_winding_warn_C": {
+      "v": 130,
+      "u": "degC",
+      "s": "ASSUMPTION"
+    },
+    "T_winding_max_C": {
+      "v": 155,
+      "u": "degC",
+      "s": "ASSUMPTION",
+      "n": "Class F insulation assumed."
+    },
+    "propeller_type": {
+      "v": "Counter-rotating",
+      "u": "-",
+      "s": "DATASHEET"
+    },
+    "position_sensor": {
+      "v": "SSI absolute encoder",
+      "u": "-",
+      "s": "DATASHEET",
+      "n": "Constrains inverter selection."
+    },
+    "temp_sensor": {
+      "v": "Analog PTC",
+      "u": "-",
+      "s": "DATASHEET"
+    },
+    "power_limit_W": {
+      "v": 25000.0,
+      "u": "W",
+      "s": "DESIGN_CHOICE",
+      "n": "Enforced controller limit. The choice is ours; the reason is ENERGY_REQ_188 v1.1, which caps the sum of INSTANTANEOUS power of all motors at 25 kW and permits no peak. The Competr outboard is rated above this, so the controller must hard-limit and the limit must be demonstrable to the Technical Committee. Distinct from motor.power_max_W, which is the hardware peak and is not a permitted operating point."
+    }
   },
-
   "inverter": {
     "_note": "NOT SELECTED. Competr lists it as 'on request'. These parameters describe a representative device; the sizing requirements above them follow from the motor and pack and do not depend on the choice.",
-
-    "status":             { "v": "OPEN - Competr datasheet lists inverter as 'on request'", "u": "-", "s": "DATASHEET" },
-    "topology":           { "v": "Six-switch bridge, SVPWM", "u": "-", "s": "DESIGN_CHOICE" },
-    "technology":         { "v": "SiC MOSFET", "u": "-", "s": "ASSUMPTION",
-      "n": "At a 93.6 V bus the drive is conduction-dominated, not switching-dominated, so on-resistance matters far more than switching energy." },
-
-    "f_switching_Hz":     { "v": 10000,  "u": "Hz",  "s": "DESIGN_CHOICE" },
-    "dead_time_s":        { "v": 1.5e-6, "u": "s",   "s": "ASSUMPTION" },
-    "power_factor":       { "v": 0.95,   "u": "-",   "s": "ASSUMPTION", "n": "Typical PMSM under MTPA." },
-    "overshoot_factor":   { "v": 1.35,   "u": "-",   "s": "DESIGN_CHOICE", "n": "di/dt overshoot on stray inductance." },
-    "current_design_margin": { "v": 1.25, "u": "-",  "s": "DESIGN_CHOICE" },
-
-    "Vce0_V":             { "v": 0.0,     "u": "V",   "s": "ASSUMPTION", "n": "Zero for a MOSFET channel; ~0.8 V for an IGBT." },
-    "Rds_on_ohm":         { "v": 0.0016,  "u": "Ohm", "s": "ASSUMPTION", "n": "Per switch position at 25 degC." },
-    "Rds_on_tempco":      { "v": 1.6,     "u": "-",   "s": "ASSUMPTION", "n": "Multiplier at 125 degC junction. Using the cold value understates loss by ~60%." },
-    "diode_Vf_V":         { "v": 1.4,     "u": "V",   "s": "ASSUMPTION" },
-    "Eon_J":              { "v": 3.2e-3,  "u": "J",   "s": "ASSUMPTION" },
-    "Eoff_J":             { "v": 1.9e-3,  "u": "J",   "s": "ASSUMPTION" },
-    "Erec_J":             { "v": 0.6e-3,  "u": "J",   "s": "ASSUMPTION" },
-    "E_ref_voltage_V":    { "v": 400,     "u": "V",   "s": "ASSUMPTION", "n": "At 93.6 V the switching term scales down ~4.3x from this." },
-    "E_ref_current_A":    { "v": 400,     "u": "A",   "s": "ASSUMPTION" },
-
-    "dc_link_C_F":        { "v": 1.5e-3,  "u": "F",   "s": "ASSUMPTION" },
-    "dc_link_ESR_ohm":    { "v": 1.2e-3,  "u": "Ohm", "s": "ASSUMPTION" },
-    "dc_link_ripple_coeff": { "v": 0.5,   "u": "-",   "s": "ASSUMPTION", "n": "Peak DC-link RMS ripple as a fraction of phase RMS." },
-
-    "gate_driver_W":      { "v": 25, "u": "W", "s": "ASSUMPTION" },
-    "control_W":          { "v": 15, "u": "W", "s": "ASSUMPTION" },
-
-    "C_junction_J_K":     { "v": 90.0,   "u": "J/K", "s": "ASSUMPTION" },
-    "C_heatsink_J_K":     { "v": 2400.0, "u": "J/K", "s": "ASSUMPTION" },
-    "R_junc_hs_KW":       { "v": 0.030,  "u": "K/W", "s": "ASSUMPTION" },
-    "R_hs_coolant_KW":    { "v": 0.020,  "u": "K/W", "s": "ASSUMPTION", "n": "The inverter rejects into the same coolant loop as the pack and competes with it." },
-    "T_junction_warn_C":  { "v": 100, "u": "degC", "s": "ASSUMPTION" },
-    "T_junction_max_C":   { "v": 125, "u": "degC", "s": "DESIGN_CHOICE" },
-    "coolant_inlet_C":    { "v": 40,  "u": "degC", "s": "ASSUMPTION" }
+    "status": {
+      "v": "OPEN - Competr datasheet lists inverter as 'on request'",
+      "u": "-",
+      "s": "DATASHEET"
+    },
+    "topology": {
+      "v": "Six-switch bridge, SVPWM",
+      "u": "-",
+      "s": "DESIGN_CHOICE"
+    },
+    "technology": {
+      "v": "SiC MOSFET",
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "At a 93.6 V bus the drive is conduction-dominated, not switching-dominated, so on-resistance matters far more than switching energy."
+    },
+    "f_switching_Hz": {
+      "v": 10000,
+      "u": "Hz",
+      "s": "DESIGN_CHOICE"
+    },
+    "dead_time_s": {
+      "v": 1.5e-06,
+      "u": "s",
+      "s": "ASSUMPTION"
+    },
+    "power_factor": {
+      "v": 0.95,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Typical PMSM under MTPA."
+    },
+    "overshoot_factor": {
+      "v": 1.35,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "di/dt overshoot on stray inductance."
+    },
+    "current_design_margin": {
+      "v": 1.25,
+      "u": "-",
+      "s": "DESIGN_CHOICE"
+    },
+    "Vce0_V": {
+      "v": 0.0,
+      "u": "V",
+      "s": "ASSUMPTION",
+      "n": "Zero for a MOSFET channel; ~0.8 V for an IGBT."
+    },
+    "Rds_on_ohm": {
+      "v": 0.0016,
+      "u": "Ohm",
+      "s": "ASSUMPTION",
+      "n": "Per switch position at 25 degC."
+    },
+    "Rds_on_tempco": {
+      "v": 1.6,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Multiplier at 125 degC junction. Using the cold value understates loss by ~60%."
+    },
+    "diode_Vf_V": {
+      "v": 1.4,
+      "u": "V",
+      "s": "ASSUMPTION"
+    },
+    "Eon_J": {
+      "v": 0.0032,
+      "u": "J",
+      "s": "ASSUMPTION"
+    },
+    "Eoff_J": {
+      "v": 0.0019,
+      "u": "J",
+      "s": "ASSUMPTION"
+    },
+    "Erec_J": {
+      "v": 0.0006,
+      "u": "J",
+      "s": "ASSUMPTION"
+    },
+    "E_ref_voltage_V": {
+      "v": 400,
+      "u": "V",
+      "s": "ASSUMPTION",
+      "n": "At 93.6 V the switching term scales down ~4.3x from this."
+    },
+    "E_ref_current_A": {
+      "v": 400,
+      "u": "A",
+      "s": "ASSUMPTION"
+    },
+    "dc_link_C_F": {
+      "v": 0.0015,
+      "u": "F",
+      "s": "ASSUMPTION"
+    },
+    "dc_link_ESR_ohm": {
+      "v": 0.0012,
+      "u": "Ohm",
+      "s": "ASSUMPTION"
+    },
+    "dc_link_ripple_coeff": {
+      "v": 0.5,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Peak DC-link RMS ripple as a fraction of phase RMS."
+    },
+    "gate_driver_W": {
+      "v": 25,
+      "u": "W",
+      "s": "ASSUMPTION"
+    },
+    "control_W": {
+      "v": 15,
+      "u": "W",
+      "s": "ASSUMPTION"
+    },
+    "C_junction_J_K": {
+      "v": 90.0,
+      "u": "J/K",
+      "s": "ASSUMPTION"
+    },
+    "C_heatsink_J_K": {
+      "v": 2400.0,
+      "u": "J/K",
+      "s": "ASSUMPTION"
+    },
+    "R_junc_hs_KW": {
+      "v": 0.03,
+      "u": "K/W",
+      "s": "ASSUMPTION"
+    },
+    "R_hs_coolant_KW": {
+      "v": 0.02,
+      "u": "K/W",
+      "s": "ASSUMPTION",
+      "n": "The inverter rejects into the same coolant loop as the pack and competes with it."
+    },
+    "T_junction_warn_C": {
+      "v": 100,
+      "u": "degC",
+      "s": "ASSUMPTION"
+    },
+    "T_junction_max_C": {
+      "v": 125,
+      "u": "degC",
+      "s": "DESIGN_CHOICE"
+    },
+    "coolant_inlet_C": {
+      "v": 40,
+      "u": "degC",
+      "s": "ASSUMPTION"
+    }
   },
-
   "harness": {
     "_note": "Pack terminals to inverter DC terminals. Series resistance in the same circuit as the busbars.",
-
-    "cable_length_pos_m": { "v": 1.2, "u": "m", "s": "ASSUMPTION", "n": "Measure on the actual installation." },
-    "cable_length_neg_m": { "v": 1.2, "u": "m", "s": "ASSUMPTION" },
-    "cable_area_mm2":     { "v": 150, "u": "mm^2", "s": "DESIGN_CHOICE",
-      "n": "70 mm2 derates to only 214 A and could not carry the current. 150 mm2 gives 459 A derated against a 385 A worst legal draw." },
-    "cable_conductor":    { "v": "Copper, tinned, flexible", "u": "-", "s": "DESIGN_CHOICE", "n": "Tinned for marine corrosion; flexible for hull vibration." },
-    "cable_insulation_T_C": { "v": 105, "u": "degC", "s": "ASSUMPTION" },
-    "cable_operating_T_C":  { "v": 70,  "u": "degC", "s": "ASSUMPTION" },
-    "stranding_factor":     { "v": 1.03, "u": "-",   "s": "ASSUMPTION", "n": "Lay length and packing." },
-
-    "base_ampacity_A_mm2":  { "v": 4.5,  "u": "A/mm^2", "s": "ASSUMPTION", "n": "Free air, 105 degC insulation, 30 degC ambient. Cross-check against ABYC E-11 or ISO 13297." },
-    "bundling_derate":      { "v": 0.80, "u": "-", "s": "ASSUMPTION" },
-    "ambient_derate":       { "v": 0.85, "u": "-", "s": "ASSUMPTION" },
-
-    "fuse_rating_A":        { "v": 400, "u": "A", "s": "DESIGN_CHOICE",
-      "n": "Monaco ENERGY_REQ_59 requires protection at or below the continuous rating of everything it protects: busbar 450 A, cable 459 A. Also clears the 385 A worst legal draw. Needs a coordination study against the short-circuit capability of a 21P group." },
-    "fuse_resistance_ohm":  { "v": 0.15e-3, "u": "Ohm", "s": "ASSUMPTION", "n": "Cold. Rises substantially as the element heats." },
-    "contactor_resistance_ohm": { "v": 0.20e-3, "u": "Ohm", "s": "ASSUMPTION", "n": "Degrades over life; check on a maintenance schedule." },
-    "contactor_coil_W":     { "v": 6, "u": "W", "s": "ASSUMPTION" },
-
-    "n_bolted_joints":      { "v": 6, "u": "-", "s": "ASSUMPTION", "n": "Pack terminal x2, fuse x2, contactor x2." },
-    "R_per_bolted_joint_ohm": { "v": 0.020e-3, "u": "Ohm", "s": "ASSUMPTION",
-      "n": "Clean, correctly torqued, anti-oxidant treated. A loose or corroded joint can be 10-50x this and is a fire risk, not just a loss." },
-    "n_mated_connectors":   { "v": 2, "u": "-", "s": "ASSUMPTION" },
-    "R_per_connector_ohm":  { "v": 0.050e-3, "u": "Ohm", "s": "ASSUMPTION" }
+    "cable_length_pos_m": {
+      "v": 1.2,
+      "u": "m",
+      "s": "ASSUMPTION",
+      "n": "Measure on the actual installation."
+    },
+    "cable_length_neg_m": {
+      "v": 1.2,
+      "u": "m",
+      "s": "ASSUMPTION"
+    },
+    "cable_area_mm2": {
+      "v": 150,
+      "u": "mm^2",
+      "s": "DESIGN_CHOICE",
+      "n": "70 mm2 derates to only 214 A and could not carry the current. 150 mm2 gives 459 A derated against a 385 A worst legal draw."
+    },
+    "cable_conductor": {
+      "v": "Copper, tinned, flexible",
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "Tinned for marine corrosion; flexible for hull vibration."
+    },
+    "cable_insulation_T_C": {
+      "v": 105,
+      "u": "degC",
+      "s": "ASSUMPTION"
+    },
+    "cable_operating_T_C": {
+      "v": 70,
+      "u": "degC",
+      "s": "ASSUMPTION"
+    },
+    "stranding_factor": {
+      "v": 1.03,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Lay length and packing."
+    },
+    "base_ampacity_A_mm2": {
+      "v": 4.5,
+      "u": "A/mm^2",
+      "s": "ASSUMPTION",
+      "n": "Free air, 105 degC insulation, 30 degC ambient. Cross-check against ABYC E-11 or ISO 13297."
+    },
+    "bundling_derate": {
+      "v": 0.8,
+      "u": "-",
+      "s": "ASSUMPTION"
+    },
+    "ambient_derate": {
+      "v": 0.85,
+      "u": "-",
+      "s": "ASSUMPTION"
+    },
+    "fuse_rating_A": {
+      "v": 400,
+      "u": "A",
+      "s": "DESIGN_CHOICE",
+      "n": "Monaco ENERGY_REQ_59 requires protection at or below the continuous rating of everything it protects: busbar 450 A, cable 459 A. Also clears the 385 A worst legal draw. Needs a coordination study against the short-circuit capability of a 21P group."
+    },
+    "fuse_resistance_ohm": {
+      "v": 0.00015,
+      "u": "Ohm",
+      "s": "ASSUMPTION",
+      "n": "Cold. Rises substantially as the element heats."
+    },
+    "contactor_resistance_ohm": {
+      "v": 0.0002,
+      "u": "Ohm",
+      "s": "ASSUMPTION",
+      "n": "Degrades over life; check on a maintenance schedule."
+    },
+    "contactor_coil_W": {
+      "v": 6,
+      "u": "W",
+      "s": "ASSUMPTION"
+    },
+    "n_bolted_joints": {
+      "v": 6,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Pack terminal x2, fuse x2, contactor x2."
+    },
+    "R_per_bolted_joint_ohm": {
+      "v": 2e-05,
+      "u": "Ohm",
+      "s": "ASSUMPTION",
+      "n": "Clean, correctly torqued, anti-oxidant treated. A loose or corroded joint can be 10-50x this and is a fire risk, not just a loss."
+    },
+    "n_mated_connectors": {
+      "v": 2,
+      "u": "-",
+      "s": "ASSUMPTION"
+    },
+    "R_per_connector_ohm": {
+      "v": 5e-05,
+      "u": "Ohm",
+      "s": "ASSUMPTION"
+    }
   },
-
   "auxiliary": {
     "_note": "12 V loads, supplied from the traction pack through the Competr DC/DC.",
-
-    "dcdc_rated_W":       { "v": 1000, "u": "W", "s": "DATASHEET" },
-    "dcdc_output_V":      { "v": 12,   "u": "V", "s": "DATASHEET" },
-    "dcdc_efficiency":    { "v": 0.92, "u": "-", "s": "ASSUMPTION" },
-    "dcdc_standby_W":     { "v": 4,    "u": "W", "s": "ASSUMPTION", "n": "Drawn whenever the pack is live." },
-
-    "control_unit_W":     { "v": 18, "u": "W", "s": "ASSUMPTION" },
-    "control_unit_duty":  { "v": 1.00, "u": "-", "s": "DESIGN_CHOICE" },
-    "cooling_pump_W":     { "v": 70, "u": "W", "s": "ASSUMPTION" },
-    "cooling_pump_duty":  { "v": 0.85, "u": "-", "s": "ASSUMPTION" },
-    "cooling_pump_driver_A": { "v": 15, "u": "A", "s": "DATASHEET", "n": "Low-side driver, 12 V." },
-    "bilge_pump_W":       { "v": 45, "u": "W", "s": "ASSUMPTION" },
-    "bilge_pump_duty":    { "v": 0.05, "u": "-", "s": "ASSUMPTION" },
-    "bilge_pump_driver_A": { "v": 15, "u": "A", "s": "DATASHEET" },
-    "instrumentation_W":  { "v": 25, "u": "W", "s": "ASSUMPTION" },
-    "instrumentation_duty": { "v": 1.00, "u": "-", "s": "DESIGN_CHOICE" },
-
-    "trim_pump_driver_A": { "v": 40, "u": "A", "s": "DATASHEET", "n": "H-bridge, 12 V." },
-    "trim_pump_duty":     { "v": 0.01, "u": "-", "s": "ASSUMPTION" },
-    "steering_pump_driver_A": { "v": 40, "u": "A", "s": "DATASHEET" },
-    "steering_pump_duty": { "v": 0.08, "u": "-", "s": "ASSUMPTION", "n": "Higher than trim: a slalom demands frequent correction." },
-
-    "trim_angle_min_deg": { "v": -5,  "u": "deg", "s": "DATASHEET" },
-    "trim_angle_max_deg": { "v": 30,  "u": "deg", "s": "DATASHEET" },
-    "steer_angle_min_deg":{ "v": -40, "u": "deg", "s": "DATASHEET", "n": "Monaco ENERGY_REQ_154 requires at least 40 deg each side. Exactly at the limit." },
-    "steer_angle_max_deg":{ "v": 40,  "u": "deg", "s": "DATASHEET" }
+    "dcdc_rated_W": {
+      "v": 1000,
+      "u": "W",
+      "s": "DATASHEET"
+    },
+    "dcdc_output_V": {
+      "v": 12,
+      "u": "V",
+      "s": "DATASHEET"
+    },
+    "dcdc_efficiency": {
+      "v": 0.92,
+      "u": "-",
+      "s": "ASSUMPTION"
+    },
+    "dcdc_standby_W": {
+      "v": 4,
+      "u": "W",
+      "s": "ASSUMPTION",
+      "n": "Drawn whenever the pack is live."
+    },
+    "control_unit_W": {
+      "v": 18,
+      "u": "W",
+      "s": "ASSUMPTION"
+    },
+    "control_unit_duty": {
+      "v": 1.0,
+      "u": "-",
+      "s": "DESIGN_CHOICE"
+    },
+    "cooling_pump_W": {
+      "v": 70,
+      "u": "W",
+      "s": "ASSUMPTION"
+    },
+    "cooling_pump_duty": {
+      "v": 0.85,
+      "u": "-",
+      "s": "ASSUMPTION"
+    },
+    "cooling_pump_driver_A": {
+      "v": 15,
+      "u": "A",
+      "s": "DATASHEET",
+      "n": "Low-side driver, 12 V."
+    },
+    "bilge_pump_W": {
+      "v": 45,
+      "u": "W",
+      "s": "ASSUMPTION"
+    },
+    "bilge_pump_duty": {
+      "v": 0.05,
+      "u": "-",
+      "s": "ASSUMPTION"
+    },
+    "bilge_pump_driver_A": {
+      "v": 15,
+      "u": "A",
+      "s": "DATASHEET"
+    },
+    "instrumentation_W": {
+      "v": 25,
+      "u": "W",
+      "s": "ASSUMPTION"
+    },
+    "instrumentation_duty": {
+      "v": 1.0,
+      "u": "-",
+      "s": "DESIGN_CHOICE"
+    },
+    "trim_pump_driver_A": {
+      "v": 40,
+      "u": "A",
+      "s": "DATASHEET",
+      "n": "H-bridge, 12 V."
+    },
+    "trim_pump_duty": {
+      "v": 0.01,
+      "u": "-",
+      "s": "ASSUMPTION"
+    },
+    "steering_pump_driver_A": {
+      "v": 40,
+      "u": "A",
+      "s": "DATASHEET"
+    },
+    "steering_pump_duty": {
+      "v": 0.08,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Higher than trim: a slalom demands frequent correction."
+    },
+    "trim_angle_min_deg": {
+      "v": -5,
+      "u": "deg",
+      "s": "DATASHEET"
+    },
+    "trim_angle_max_deg": {
+      "v": 30,
+      "u": "deg",
+      "s": "DATASHEET"
+    },
+    "steer_angle_min_deg": {
+      "v": -40,
+      "u": "deg",
+      "s": "DATASHEET",
+      "n": "Monaco ENERGY_REQ_154 requires at least 40 deg each side. Exactly at the limit."
+    },
+    "steer_angle_max_deg": {
+      "v": 40,
+      "u": "deg",
+      "s": "DATASHEET"
+    }
   },
-
   "boat": {
     "_note": "Hull, propeller and course. Organiser-supplied catamaran hulls.",
-
-    "hull_length_m":         { "v": 2.5325, "u": "m", "s": "MEASURED", "n": "COCKPIT DECK length, not the hull. Measured from Cockpit V1.3.stl. Used by tools/optimise_layout.py to bound the pack footprint. The hull is 5 m overall - see loa_m." },
-    "hull_width_m":          { "v": 0.7, "u": "m", "s": "MEASURED", "n": "COCKPIT DECK width, measured from Cockpit V1.3.stl." },
-    "hull_height_m":         { "v": 0.4856, "u": "m", "s": "MEASURED", "n": "COCKPIT DECK height, measured from Cockpit V1.3.stl. Compare boat.freeboard_m of 0.45 m for the hull itself." },
-    "hull_draft_m":       { "v": 0.14,  "u": "m", "s": "ASSUMPTION" },
-
+    "hull_length_m": {
+      "v": 2.5325,
+      "u": "m",
+      "s": "MEASURED",
+      "n": "COCKPIT DECK length, not the hull. Measured from Cockpit V1.3.stl. Used by tools/optimise_layout.py to bound the pack footprint. The hull is 5 m overall - see loa_m."
+    },
+    "hull_width_m": {
+      "v": 0.7,
+      "u": "m",
+      "s": "MEASURED",
+      "n": "COCKPIT DECK width, measured from Cockpit V1.3.stl."
+    },
+    "hull_height_m": {
+      "v": 0.4856,
+      "u": "m",
+      "s": "MEASURED",
+      "n": "COCKPIT DECK height, measured from Cockpit V1.3.stl. Compare boat.freeboard_m of 0.45 m for the hull itself."
+    },
+    "hull_draft_m": {
+      "v": 0.14,
+      "u": "m",
+      "s": "ASSUMPTION"
+    },
     "_waterline_note": [
       "hull_length_m / hull_width_m above are the COCKPIT DECK envelope used",
       "by tools/optimise_layout.py to bound the pack footprint. They are not",
@@ -476,61 +1392,273 @@
       "surface, so leaving the single most influential geometric input outside",
       "the parameter file defeated the point of having one."
     ],
-    "Lwl_m":              { "v": 4.99,  "u": "m", "s": "ASSUMPTION", "n": "Demihull waterline length. Annex I gives 5.0 m overall; the waterline is marginally shorter. Measure off the Annex II drawings to replace this." },
-    "Bwl_m":              { "v": 0.45,  "u": "m", "s": "ASSUMPTION", "n": "Demihull waterline beam. Overall boat width is 2.5 m across both hulls plus the gap." },
-    "loa_m":              { "v": 5.00,  "u": "m", "s": "DATASHEET", "n": "Annex I overall length." },
-    "boa_m":              { "v": 2.50,  "u": "m", "s": "DATASHEET", "n": "Annex I overall width." },
-    "freeboard_m":        { "v": 0.45,  "u": "m", "s": "DATASHEET", "n": "Annex I freeboard height." },
-    "beam_pitch_m":       { "v": 3.00,  "u": "m", "s": "DATASHEET", "n": "Annex I longitudinal distance between the two crossbeams. ENERGY_REQ_38 requires the cockpit clamps to straddle these." },
-    "buoyancy_L":         { "v": 200.0, "u": "L", "s": "DATASHEET", "n": "ENERGY_REQ_2 requires 200 litres of buoyancy in the hulls." },
-
-    "cockpit_frontal_area_m2": { "v": 0.2755, "u": "m^2", "s": "MEASURED", "n": "Rasterised silhouette of 04_data/geometry/Cockpit V1.3.stl along the direction of travel. Was assumed at 0.42 m2, which was 52% high. Measured by projecting the mesh and counting the shadow, not by summing |n.a| over triangles - that double-counts every surface hidden behind another and overstates a closed body by roughly 2x." },
-    "cockpit_Cd":         { "v": 0.55,  "u": "-", "s": "ASSUMPTION", "n": "Streamlined pod. A blunt box is nearer 0.9." },
-    "cockpit_side_area_m2":   { "v": 0.7765, "u": "m^2", "s": "MEASURED", "n": "Silhouette from abeam, from the STL. Sets the cross-wind heeling force, which nothing models yet." },
-    "cockpit_plan_area_m2":   { "v": 1.5164, "u": "m^2", "s": "MEASURED", "n": "Silhouette from above, from the STL. This is the area available for the ENERGY_REQ_185 monitoring bay and any solar." },
-    "cockpit_surface_area_m2":{ "v": 4.580,  "u": "m^2", "s": "MEASURED", "n": "Total wetted-by-air surface, from the STL. Sets the convective area for anything mounted against the shell, and the laminate area for the mass estimate." },
-    "cockpit_volume_L":       { "v": 320.6,  "u": "L", "s": "MEASURED", "n": "Enclosed volume of the cockpit shell, from the STL. The pack envelope is 42.5 L of it." },
-    "cockpit_stl":            { "v": "04_data/geometry/Cockpit V1.3.stl", "u": "-", "s": "MEASURED", "n": "22082 triangles. The source of every MEASURED cockpit dimension in this section. Re-measure with python/volare/boat.py Cockpit.from_stl if the CAD changes." },
-    "beam_Cd":            { "v": 1.20,  "u": "-", "s": "PUBLISHED_TEST", "n": "Circular cylinder in cross-flow. NOT 2.05, which is the square-section figure." },
-    "beams_faired":       { "v": false, "u": "-", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_3 forbids modifying the organiser beams. A non-structural clip-on fairing is a separate question for the Technical Committee." },
-    "planing_transition_Fn": { "v": 1.20, "u": "-", "s": "ASSUMPTION", "n": "Volumetric Froude number at which the hull unsticks." },
-    "planing_LD":         { "v": 5.60,  "u": "-", "s": "ASSUMPTION", "n": "Lift/drag of the planing surface once up." },
-    "reverse_thrust_frac":{ "v": 0.72,  "u": "-", "s": "ASSUMPTION", "n": "Astern thrust as a fraction of ahead thrust at equal shaft power, for a propeller not designed for reverse. Drives the ENERGY_REQ_32 manoeuvrability check." },
-    "wind_speed_ms":      { "v": 0.0,   "u": "m/s", "s": "DESIGN_CHOICE", "n": "Head-wind in the nominal performance case. Monaco sees an afternoon sea breeze; rerun the sweep at 5 m/s for the sensitivity." },
-    "n_hulls":            { "v": 2, "u": "-", "s": "DATASHEET", "n": "Catamaran." },
-    "hull_mass_kg":       { "v": 65.0,  "u": "kg", "s": "DATASHEET", "n": "With beams. Monaco ENERGY_REQ_2." },
-    "block_coefficient":  { "v": 0.55,  "u": "-", "s": "ASSUMPTION" },
-    "prismatic_coefficient": { "v": 0.62, "u": "-", "s": "ASSUMPTION" },
-    "beam_diameter_m":    { "v": 0.104, "u": "m", "s": "DATASHEET", "n": "Organiser round crossbeams." },
-    "beam_span_m":        { "v": 2.035, "u": "m", "s": "DATASHEET" },
-    "n_beams":            { "v": 2, "u": "-", "s": "DATASHEET" },
-
-    "displacement_kg":    { "v": 315.0, "u": "kg", "s": "CALCULATED", "n": "FLOATING mass - what buoyancy, planing lift and inertia respond to. ENERGY_REQ_48 caps everything EXCLUDING hulls at 250 kg; the hulls and beams are a further 65 kg (Annex I) and float too. The previous value of 250 kg silently omitted the hulls. Planing drag is directly proportional to weight, so that understated drag and overstated top speed. Built up in the mass section." },
-    "added_mass_frac":    { "v": 0.10,  "u": "-", "s": "ASSUMPTION" },
-    "driveline_eff":      { "v": 0.99,  "u": "-", "s": "ASSUMPTION", "n": "Shaft, bearings and seals between the GEARBOX OUTPUT and the propeller. It was 0.97, which is a whole gearbox's worth of loss -- and the gearbox is already modelled explicitly in P50B_DrivetrainModel, whose reported shaft power is the gearbox OUTPUT. Applying 0.97 again on top of motor.gearbox_efficiency = 0.97 counted the same loss twice and cost about 3% of shaft power that nothing was actually consuming. Python's boat.py still applies the old value because it takes the 25 kW electrical cap as shaft power directly and never models a gearbox stage; the two are consistent about the boat even though they are not consistent about this number, which is exactly the sort of thing tools/crosscheck.py exists to keep visible." },
-
-    "correlation_allowance": { "v": 4.0e-4, "u": "-", "s": "PUBLISHED_TEST", "n": "ITTC Ca, roughness." },
-    "appendage_factor":   { "v": 1.08, "u": "-", "s": "ASSUMPTION", "n": "Shaft, strut, rudder." },
-    "form_factor_k":      { "v": 0.18, "u": "-", "s": "ASSUMPTION", "n": "(1+k)." },
-    "spray_factor":       { "v": 1.06, "u": "-", "s": "ASSUMPTION" },
-    "aero_enabled":       { "v": true, "u": "-", "s": "DESIGN_CHOICE" },
-    "planing_wetted_frac":{ "v": 0.30, "u": "-", "s": "ASSUMPTION" },
-
-    "prop_diameter_m":    { "v": 0.240, "u": "m", "s": "ASSUMPTION" },
-    "prop_pitch_ratio":   { "v": 1.05,  "u": "-", "s": "ASSUMPTION", "n": "P/D." },
-    "prop_blade_area_ratio": { "v": 0.62, "u": "-", "s": "ASSUMPTION" },
-    "prop_n_blades":      { "v": 3, "u": "-", "s": "ASSUMPTION" },
-    "wake_fraction":      { "v": 0.06, "u": "-", "s": "ASSUMPTION" },
-    "thrust_deduction":   { "v": 0.08, "u": "-", "s": "ASSUMPTION" },
-    "rel_rotative_eff":   { "v": 1.0,  "u": "-", "s": "ASSUMPTION" },
-
-    "pilot_mass_kg":      { "v": 80.0, "u": "kg", "s": "ASSUMPTION", "n": "The boat is weighed with the pilot." },
-    "target_speed_kmh":   { "v": 55.0, "u": "km/hr", "s": "DESIGN_CHOICE" },
-    "lateral_g_limit":    { "v": 0.55, "u": "-", "s": "ASSUMPTION" },
-    "min_speed_knots":    { "v": 3.0,  "u": "knot", "s": "DATASHEET", "n": "Monaco ENERGY_REQ_37 minimum." }
+    "Lwl_m": {
+      "v": 4.99,
+      "u": "m",
+      "s": "ASSUMPTION",
+      "n": "Demihull waterline length. Annex I gives 5.0 m overall; the waterline is marginally shorter. Measure off the Annex II drawings to replace this."
+    },
+    "Bwl_m": {
+      "v": 0.45,
+      "u": "m",
+      "s": "ASSUMPTION",
+      "n": "Demihull waterline beam. Overall boat width is 2.5 m across both hulls plus the gap."
+    },
+    "loa_m": {
+      "v": 5.0,
+      "u": "m",
+      "s": "DATASHEET",
+      "n": "Annex I overall length."
+    },
+    "boa_m": {
+      "v": 2.5,
+      "u": "m",
+      "s": "DATASHEET",
+      "n": "Annex I overall width."
+    },
+    "freeboard_m": {
+      "v": 0.45,
+      "u": "m",
+      "s": "DATASHEET",
+      "n": "Annex I freeboard height."
+    },
+    "beam_pitch_m": {
+      "v": 3.0,
+      "u": "m",
+      "s": "DATASHEET",
+      "n": "Annex I longitudinal distance between the two crossbeams. ENERGY_REQ_38 requires the cockpit clamps to straddle these."
+    },
+    "buoyancy_L": {
+      "v": 200.0,
+      "u": "L",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_2 requires 200 litres of buoyancy in the hulls."
+    },
+    "cockpit_frontal_area_m2": {
+      "v": 0.2755,
+      "u": "m^2",
+      "s": "MEASURED",
+      "n": "Rasterised silhouette of 04_data/geometry/Cockpit V1.3.stl along the direction of travel. Was assumed at 0.42 m2, which was 52% high. Measured by projecting the mesh and counting the shadow, not by summing |n.a| over triangles - that double-counts every surface hidden behind another and overstates a closed body by roughly 2x."
+    },
+    "cockpit_Cd": {
+      "v": 0.55,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Streamlined pod. A blunt box is nearer 0.9."
+    },
+    "cockpit_side_area_m2": {
+      "v": 0.7765,
+      "u": "m^2",
+      "s": "MEASURED",
+      "n": "Silhouette from abeam, from the STL. Sets the cross-wind heeling force, which nothing models yet."
+    },
+    "cockpit_plan_area_m2": {
+      "v": 1.5164,
+      "u": "m^2",
+      "s": "MEASURED",
+      "n": "Silhouette from above, from the STL. This is the area available for the ENERGY_REQ_185 monitoring bay and any solar."
+    },
+    "cockpit_surface_area_m2": {
+      "v": 4.58,
+      "u": "m^2",
+      "s": "MEASURED",
+      "n": "Total wetted-by-air surface, from the STL. Sets the convective area for anything mounted against the shell, and the laminate area for the mass estimate."
+    },
+    "cockpit_volume_L": {
+      "v": 320.6,
+      "u": "L",
+      "s": "MEASURED",
+      "n": "Enclosed volume of the cockpit shell, from the STL. The pack envelope is 42.5 L of it."
+    },
+    "cockpit_stl": {
+      "v": "04_data/geometry/Cockpit V1.3.stl",
+      "u": "-",
+      "s": "MEASURED",
+      "n": "22082 triangles. The source of every MEASURED cockpit dimension in this section. Re-measure with python/volare/boat.py Cockpit.from_stl if the CAD changes."
+    },
+    "beam_Cd": {
+      "v": 1.2,
+      "u": "-",
+      "s": "PUBLISHED_TEST",
+      "n": "Circular cylinder in cross-flow. NOT 2.05, which is the square-section figure."
+    },
+    "beams_faired": {
+      "v": false,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_3 forbids modifying the organiser beams. A non-structural clip-on fairing is a separate question for the Technical Committee."
+    },
+    "planing_transition_Fn": {
+      "v": 1.2,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Volumetric Froude number at which the hull unsticks."
+    },
+    "planing_LD": {
+      "v": 5.6,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Lift/drag of the planing surface once up."
+    },
+    "reverse_thrust_frac": {
+      "v": 0.72,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Astern thrust as a fraction of ahead thrust at equal shaft power, for a propeller not designed for reverse. Drives the ENERGY_REQ_32 manoeuvrability check."
+    },
+    "wind_speed_ms": {
+      "v": 0.0,
+      "u": "m/s",
+      "s": "DESIGN_CHOICE",
+      "n": "Head-wind in the nominal performance case. Monaco sees an afternoon sea breeze; rerun the sweep at 5 m/s for the sensitivity."
+    },
+    "n_hulls": {
+      "v": 2,
+      "u": "-",
+      "s": "DATASHEET",
+      "n": "Catamaran."
+    },
+    "hull_mass_kg": {
+      "v": 65.0,
+      "u": "kg",
+      "s": "DATASHEET",
+      "n": "With beams. Monaco ENERGY_REQ_2."
+    },
+    "block_coefficient": {
+      "v": 0.55,
+      "u": "-",
+      "s": "ASSUMPTION"
+    },
+    "prismatic_coefficient": {
+      "v": 0.62,
+      "u": "-",
+      "s": "ASSUMPTION"
+    },
+    "beam_diameter_m": {
+      "v": 0.104,
+      "u": "m",
+      "s": "DATASHEET",
+      "n": "Organiser round crossbeams."
+    },
+    "beam_span_m": {
+      "v": 2.035,
+      "u": "m",
+      "s": "DATASHEET"
+    },
+    "n_beams": {
+      "v": 2,
+      "u": "-",
+      "s": "DATASHEET"
+    },
+    "displacement_kg": {
+      "v": 315.0,
+      "u": "kg",
+      "s": "CALCULATED",
+      "n": "FLOATING mass - what buoyancy, planing lift and inertia respond to. ENERGY_REQ_48 caps everything EXCLUDING hulls at 250 kg; the hulls and beams are a further 65 kg (Annex I) and float too. The previous value of 250 kg silently omitted the hulls. Planing drag is directly proportional to weight, so that understated drag and overstated top speed. Built up in the mass section."
+    },
+    "added_mass_frac": {
+      "v": 0.1,
+      "u": "-",
+      "s": "ASSUMPTION"
+    },
+    "driveline_eff": {
+      "v": 0.99,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Shaft, bearings and seals between the GEARBOX OUTPUT and the propeller. It was 0.97, which is a whole gearbox's worth of loss -- and the gearbox is already modelled explicitly in P50B_DrivetrainModel, whose reported shaft power is the gearbox OUTPUT. Applying 0.97 again on top of motor.gearbox_efficiency = 0.97 counted the same loss twice and cost about 3% of shaft power that nothing was actually consuming. Python's boat.py still applies the old value because it takes the 25 kW electrical cap as shaft power directly and never models a gearbox stage; the two are consistent about the boat even though they are not consistent about this number, which is exactly the sort of thing tools/crosscheck.py exists to keep visible."
+    },
+    "correlation_allowance": {
+      "v": 0.0004,
+      "u": "-",
+      "s": "PUBLISHED_TEST",
+      "n": "ITTC Ca, roughness."
+    },
+    "appendage_factor": {
+      "v": 1.08,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Shaft, strut, rudder."
+    },
+    "form_factor_k": {
+      "v": 0.18,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "(1+k)."
+    },
+    "spray_factor": {
+      "v": 1.06,
+      "u": "-",
+      "s": "ASSUMPTION"
+    },
+    "aero_enabled": {
+      "v": true,
+      "u": "-",
+      "s": "DESIGN_CHOICE"
+    },
+    "planing_wetted_frac": {
+      "v": 0.3,
+      "u": "-",
+      "s": "ASSUMPTION"
+    },
+    "prop_diameter_m": {
+      "v": 0.24,
+      "u": "m",
+      "s": "ASSUMPTION"
+    },
+    "prop_pitch_ratio": {
+      "v": 1.05,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "P/D."
+    },
+    "prop_blade_area_ratio": {
+      "v": 0.62,
+      "u": "-",
+      "s": "ASSUMPTION"
+    },
+    "prop_n_blades": {
+      "v": 3,
+      "u": "-",
+      "s": "ASSUMPTION"
+    },
+    "wake_fraction": {
+      "v": 0.06,
+      "u": "-",
+      "s": "ASSUMPTION"
+    },
+    "thrust_deduction": {
+      "v": 0.08,
+      "u": "-",
+      "s": "ASSUMPTION"
+    },
+    "rel_rotative_eff": {
+      "v": 1.0,
+      "u": "-",
+      "s": "ASSUMPTION"
+    },
+    "pilot_mass_kg": {
+      "v": 70.0,
+      "u": "kg",
+      "s": "DESIGN_CHOICE",
+      "n": "Stated design value, 2026-09-11. The boat is weighed with the pilot (ENERGY_REQ_48), so this lands directly against the 250 kg cap. ENERGY_REQ_135 sets a 60 kg minimum ready to sail. Change this one value to re-plan the budget; cad/scripts/volare.py PILOT_DESIGN_KG must match and powertrain.py checks that it does."
+    },
+    "target_speed_kmh": {
+      "v": 55.0,
+      "u": "km/hr",
+      "s": "DESIGN_CHOICE"
+    },
+    "lateral_g_limit": {
+      "v": 0.55,
+      "u": "-",
+      "s": "ASSUMPTION"
+    },
+    "min_speed_knots": {
+      "v": 3.0,
+      "u": "knot",
+      "s": "DATASHEET",
+      "n": "Monaco ENERGY_REQ_37 minimum."
+    }
   },
-
-
   "mass": {
     "_note": [
       "Weight budget for ENERGY_REQ_48 and ENERGY_REQ_135.",
@@ -549,23 +1677,91 @@
       "closes with very little to spare, which makes it the second tightest",
       "constraint in the project after stored energy. Weigh things early."
     ],
-
-    "cockpit_structure_kg":   { "v": 32.0, "u": "kg", "s": "ASSUMPTION", "n": "Deck, pod shell, bulkhead, longerons, motor mount. Composite build." },
-    "seat_kg":                { "v": 4.5,  "u": "kg", "s": "ASSUMPTION", "n": "Seat with the headrest ENERGY_REQ_42 requires." },
-    "steering_control_kg":    { "v": 6.0,  "u": "kg", "s": "ASSUMPTION", "n": "Wheel or bar, cables or hydraulics, throttle, trim switch." },
-    "hv_harness_kg":          { "v": 4.0,  "u": "kg", "s": "ASSUMPTION", "n": "CABLE ONLY: 2.4 m of 150 mm2 plus the three-phase run, terminals and conduit. It used to be asked to cover the switchgear too, which is why the two lines below now exist." },
-    "energy_container_kg":    { "v": 6.0,  "u": "kg", "s": "ASSUMPTION", "n": "The container AROUND the pack: shell, lid, seals, the ENERGY_REQ_155 overpressure valve, the 56 fire port and the 189 charge interface. It was missing from the budget entirely -- cad/scripts/powertrain.py builds it as a real box and the mass reconciliation caught the gap." },
-    "hv_switchgear_kg":       { "v": 5.6,  "u": "kg", "s": "ASSUMPTION", "n": "Terminal box (1.4) and PDU with its contactors, fuse and shunt (4.2), from the CAD decomposition. Previously folded into the 4.0 kg harness allowance, which could not have covered it." },
-    "inverter_kg":            { "v": 6.5,  "u": "kg", "s": "ASSUMPTION", "n": "Not selected - Competr lists the inverter on request. Representative device." },
-    "lv_system_kg":           { "v": 3.5,  "u": "kg", "s": "ASSUMPTION", "n": "DC-DC, 12 V service battery, LV loom, breakers." },
-    "cooling_system_kg":      { "v": 7.0,  "u": "kg", "s": "ASSUMPTION", "n": "Pump, seawater heat exchanger, hoses and about 2 L of coolant." },
-    "safety_equipment_kg":    { "v": 6.0,  "u": "kg", "s": "ASSUMPTION", "n": "ENERGY_REQ_96 to 111: extinguisher and bracket, paddle, boat hook, flag, 10 m towline, bridle, horn." },
-    "organiser_equipment_kg": { "v": 2.5,  "u": "kg", "s": "ASSUMPTION", "n": "ENERGY_REQ_185 monitoring device, the organiser camera and their cabling. It is carried on race day whether or not the team fitted it." },
-    "fasteners_clamps_kg":    { "v": 3.0,  "u": "kg", "s": "ASSUMPTION", "n": "ENERGY_REQ_38 beam clamps with gaskets, plus general fastening." },
-    "ballast_kg":             { "v": 0.0,  "u": "kg", "s": "CALCULATED", "n": "ENERGY_REQ_135 ballast, only if the lightest pilot is under 60 kg ready to sail. Computed by P50B_MassBudget, not set by hand." },
-    "contingency_kg":         { "v": 6.0,  "u": "kg", "s": "DESIGN_CHOICE", "n": "Reserve against every line above being an estimate. Spend it deliberately, not by accident." }
+    "cockpit_structure_kg": {
+      "v": 32.0,
+      "u": "kg",
+      "s": "ASSUMPTION",
+      "n": "Deck, pod shell, bulkhead, longerons, motor mount. Composite build."
+    },
+    "seat_kg": {
+      "v": 4.5,
+      "u": "kg",
+      "s": "ASSUMPTION",
+      "n": "Seat with the headrest ENERGY_REQ_42 requires."
+    },
+    "steering_control_kg": {
+      "v": 6.0,
+      "u": "kg",
+      "s": "ASSUMPTION",
+      "n": "Wheel or bar, cables or hydraulics, throttle, trim switch."
+    },
+    "hv_harness_kg": {
+      "v": 4.0,
+      "u": "kg",
+      "s": "ASSUMPTION",
+      "n": "CABLE ONLY: 2.4 m of 150 mm2 plus the three-phase run, terminals and conduit. It used to be asked to cover the switchgear too, which is why the two lines below now exist."
+    },
+    "energy_container_kg": {
+      "v": 6.0,
+      "u": "kg",
+      "s": "ASSUMPTION",
+      "n": "The container AROUND the pack: shell, lid, seals, the ENERGY_REQ_155 overpressure valve, the 56 fire port and the 189 charge interface. It was missing from the budget entirely -- cad/scripts/powertrain.py builds it as a real box and the mass reconciliation caught the gap."
+    },
+    "hv_switchgear_kg": {
+      "v": 5.6,
+      "u": "kg",
+      "s": "ASSUMPTION",
+      "n": "Terminal box (1.4) and PDU with its contactors, fuse and shunt (4.2), from the CAD decomposition. Previously folded into the 4.0 kg harness allowance, which could not have covered it."
+    },
+    "inverter_kg": {
+      "v": 6.5,
+      "u": "kg",
+      "s": "ASSUMPTION",
+      "n": "Not selected - Competr lists the inverter on request. Representative device."
+    },
+    "lv_system_kg": {
+      "v": 3.5,
+      "u": "kg",
+      "s": "ASSUMPTION",
+      "n": "DC-DC, 12 V service battery, LV loom, breakers."
+    },
+    "cooling_system_kg": {
+      "v": 7.0,
+      "u": "kg",
+      "s": "ASSUMPTION",
+      "n": "Pump, seawater heat exchanger, hoses and about 2 L of coolant."
+    },
+    "safety_equipment_kg": {
+      "v": 6.0,
+      "u": "kg",
+      "s": "ASSUMPTION",
+      "n": "ENERGY_REQ_96 to 111: extinguisher and bracket, paddle, boat hook, flag, 10 m towline, bridle, horn."
+    },
+    "organiser_equipment_kg": {
+      "v": 2.5,
+      "u": "kg",
+      "s": "ASSUMPTION",
+      "n": "ENERGY_REQ_185 monitoring device, the organiser camera and their cabling. It is carried on race day whether or not the team fitted it."
+    },
+    "fasteners_clamps_kg": {
+      "v": 3.0,
+      "u": "kg",
+      "s": "ASSUMPTION",
+      "n": "ENERGY_REQ_38 beam clamps with gaskets, plus general fastening."
+    },
+    "ballast_kg": {
+      "v": 0.0,
+      "u": "kg",
+      "s": "CALCULATED",
+      "n": "ENERGY_REQ_135 ballast, only if the lightest pilot is under 60 kg ready to sail. Computed by P50B_MassBudget, not set by hand."
+    },
+    "contingency_kg": {
+      "v": 6.0,
+      "u": "kg",
+      "s": "DESIGN_CHOICE",
+      "n": "Reserve against every line above being an estimate. Spend it deliberately, not by accident."
+    }
   },
-
   "cockpit": {
     "_note": [
       "Physical dimensions the Monaco rules put a number on.",
@@ -581,81 +1777,373 @@
       "DESIGN_CHOICE until it is measured on the boat, at which point it",
       "becomes MEASURED and the check becomes evidence."
     ],
-
-    "bulkhead_fire_class":        { "v": "A1", "u": "-", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_51, Euroclass. Changed from the French classification for 2026." },
-    "bulkhead_hole_diameter_mm":  { "v": 40.0, "u": "mm", "s": "DESIGN_CHOICE", "n": "WITHDRAWN 2027: ENERGY_REQ_174/175 no longer exist. Retained as a design choice; 40 mm still satisfies the withdrawn 30-50 mm band. See docs/reference/RULES_CHANGES_2026_to_2027.md." },
-    "bulkhead_hole_capped":       { "v": true, "u": "-", "s": "DESIGN_CHOICE", "n": "WITHDRAWN 2027: ENERGY_REQ_175 no longer exists. Retained as a design choice." },
-    "bulkhead_hole_offset_deg":   { "v": 35.0, "u": "deg", "s": "DESIGN_CHOICE", "n": "WITHDRAWN 2027: ENERGY_REQ_176 no longer exists. Retained as sound practice; the hole still points to the pilot's side." },
-    "grommets_fitted":            { "v": true, "u": "-", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_55." },
-
-    "energy_container_to_pilot_mm": { "v": 620.0, "u": "mm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_25 requires at least 500 mm. Relaxed from 1 m for 2026." },
-    "container_vent_away_from_pilot": { "v": true, "u": "-", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_27." },
-    "overpressure_valve_aft":     { "v": true, "u": "-", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_155, certified and adequately sized, facing aft." },
-    "fire_port_on_port_side":     { "v": true, "u": "-", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_56." },
-    "external_charge_interface":  { "v": true, "u": "-", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_189 - recharge without opening the container. New for 2026." },
-    "sensor_pass_through_mm":     { "v": 4.0, "u": "mm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_182 requires at least 3.2 mm reaching cells at the core. Routed through one of the three free slots in the 4x4 grid." },
-
-    "estop_button_diameter_mm":   { "v": 40.0, "u": "mm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_77 requires at least 30 mm." },
-    "estop_yellow_circle_mm":     { "v": 90.0, "u": "mm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_76: red button over a 90 mm yellow circle." },
-    "estop_symbol_height_mm":     { "v": 100.0, "u": "mm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_78 red spark on a white-edged blue triangle, at least 100 mm." },
-    "estop_from_starboard_m":     { "v": 0.35, "u": "m", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_85 requires within 1 m of starboard; 81 starboard and in front of the pilot; 86 facing outboard." },
-    "estop_isolates_telemetry":   { "v": true, "u": "-", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_79 - all power sources, telemetry included, by relay and not in software." },
-
-    "contactor_dropout_ms":       { "v": 35.0, "u": "ms", "s": "ASSUMPTION", "n": "Main contactor mechanical opening time. From the contactor datasheet once one is chosen." },
-    "inverter_disable_ms":        { "v": 15.0, "u": "ms", "s": "ASSUMPTION", "n": "Gate-drive inhibit to zero torque." },
-    "killcord_detect_ms":         { "v": 20.0, "u": "ms", "s": "ASSUMPTION", "n": "Switch debounce and detection. ENERGY_REQ_71 gives the whole chain under 1 s." },
-
-    "hivis_starboard_cm2":        { "v": 520.0, "u": "cm^2", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_49 requires at least 500." },
-    "hivis_port_cm2":             { "v": 520.0, "u": "cm^2", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_49 requires at least 500." },
-    "hivis_front_cm2":            { "v": 260.0, "u": "cm^2", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_49 requires at least 250." },
-    "hivis_back_cm2":             { "v": 260.0, "u": "cm^2", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_49 requires at least 250." },
-
-    "clamps_per_beam":            { "v": 2, "u": "-", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_38 requires at least two per beam, enveloping the full circumference." },
-    "clamp_width_mm":             { "v": 60.0, "u": "mm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_38 requires at least 50 mm per clamp." },
-    "clamp_spacing_mm":           { "v": 800.0, "u": "mm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_38 requires at least 750 mm, symmetric about the centreline. Tightened for 2026." },
-    "clamp_gasket_mm":            { "v": 1.5, "u": "mm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_38 requires at least 1 mm of rubber between beam and clamp." },
-
-    "monitor_bay_L_mm":           { "v": 200.0, "u": "mm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_185 needs 190 mm." },
-    "monitor_bay_W_mm":           { "v": 160.0, "u": "mm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_185 needs 150 mm." },
-    "monitor_bay_H_mm":           { "v": 130.0, "u": "mm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_185 needs 122 mm." },
-    "monitor_bay_open_to_sky":    { "v": true, "u": "-", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_185: open to sky, outside every closed compartment, need not be waterproof." },
-    "monitor_bay_cable_clear_mm": { "v": 150.0, "u": "mm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_185 requires at least 100 mm from any power cable; crossings only at right angles." },
-
-    "electronics_ip_rating":      { "v": "IP56", "u": "-", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_62 - watertight and cooled." },
-    "hv_circuit_ip_rating":       { "v": "IP2X", "u": "-", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_63 applies above 15 V DC. Busbars included." },
-    "hv_cable_colour":            { "v": "orange", "u": "-", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_61 - every run outside the enclosure." },
-    "w026_symbol_cm":             { "v": 12.0, "u": "cm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_171 requires at least 10 cm." },
-    "label_letter_cm":            { "v": 3.0, "u": "cm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_172 and 173 require at least 2 cm for capacity and composition." },
-
-    "evacuation_time_s":          { "v": 3.5, "u": "s", "s": "ASSUMPTION", "n": "ENERGY_REQ_44 allows 5 s unaided. Demonstrated by an evacuation test - rehearse it." },
-    "pilot_enclosed":             { "v": false, "u": "-", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_45 - no hatch may stand between the pilot and the water." },
-    "pilot_restrained":           { "v": false, "u": "-", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_46 - no belts." },
-    "self_draining":              { "v": true, "u": "-", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_47." },
-    "appendices_touch_water":     { "v": false, "u": "-", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_186 - only the motor and the water pump may touch the water. New for 2026." },
-
-    "extinguisher_kg":            { "v": 1.0, "u": "kg", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_106 at least 1 kg, ENERGY_REQ_107 ABC type, approved and in date." },
-    "paddle_length_cm":           { "v": 110.0, "u": "cm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_101 requires at least 100 cm." },
-    "paddle_blade_length_cm":     { "v": 32.0, "u": "cm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_101 requires at least 30 cm." },
-    "paddle_blade_width_cm":      { "v": 14.0, "u": "cm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_101 requires at least 13 cm." },
-    "boathook_length_cm":         { "v": 110.0, "u": "cm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_102 requires at least 100 cm and it must actually catch." },
-    "warning_flag_cm":            { "v": 35.0, "u": "cm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_103 requires at least 30 x 30 cm, orange or red; ENERGY_REQ_104 says not on the paddle or hook." },
-    "warning_flag_handle_cm":     { "v": 110.0, "u": "cm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_103 requires a handle of at least 100 cm." },
-    "towline_length_m":           { "v": 12.0, "u": "m", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_99 requires at least 10 m, floating." },
-    "towline_diameter_mm":        { "v": 12.0, "u": "mm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_99 requires at least 10 mm." },
-    "bridle_diameter_mm":         { "v": 12.0, "u": "mm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_96 requires at least 10 mm, floating, fitted to the boat." },
-    "lifejacket_buoyancy_N":      { "v": 150.0, "u": "N", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_137 requires at least 100 N." },
-    "nationality_flag_height_m":  { "v": 2.20, "u": "m", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_150 requires at least 2 m above the water." },
-    "nationality_flag_width_cm":  { "v": 35.0, "u": "cm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_151 requires at least 30 cm." },
-
-    "comms_range_nmi":            { "v": 5.0, "u": "nmi", "s": "ASSUMPTION", "n": "ENERGY_REQ_142 requires at least 2 nautical miles." },
-    "comms_type":                 { "v": "4G/LTE helmet intercom", "u": "-", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_141 FORBIDS VHF for 2026 - this changed. 143 requires it integrated into the helmet, 144 waterproof, 145 one race on a charge." },
-
-    "solar_area_m2":              { "v": 0.0, "u": "m^2", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_28 caps solar at 4 m2 including the frame. None fitted." },
-    "sail_area_m2":               { "v": 0.0, "u": "m^2", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_29 caps sail at 20 m2. None fitted." },
-    "hydrogen_onboard":           { "v": false, "u": "-", "s": "DESIGN_CHOICE", "n": "Battery electric. The whole hydrogen safety chapter is out of scope, and the compliance report says so rather than staying silent." },
-    "human_power_used":           { "v": false, "u": "-", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_31." }
+    "bulkhead_fire_class": {
+      "v": "A1",
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_51, Euroclass. Changed from the French classification for 2026."
+    },
+    "bulkhead_hole_diameter_mm": {
+      "v": 40.0,
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "WITHDRAWN 2027: ENERGY_REQ_174/175 no longer exist. Retained as a design choice; 40 mm still satisfies the withdrawn 30-50 mm band. See docs/reference/RULES_CHANGES_2026_to_2027.md."
+    },
+    "bulkhead_hole_capped": {
+      "v": true,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "WITHDRAWN 2027: ENERGY_REQ_175 no longer exists. Retained as a design choice."
+    },
+    "bulkhead_hole_offset_deg": {
+      "v": 35.0,
+      "u": "deg",
+      "s": "DESIGN_CHOICE",
+      "n": "WITHDRAWN 2027: ENERGY_REQ_176 no longer exists. Retained as sound practice; the hole still points to the pilot's side."
+    },
+    "grommets_fitted": {
+      "v": true,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_55."
+    },
+    "energy_container_to_pilot_mm": {
+      "v": 620.0,
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_25 requires at least 500 mm. Relaxed from 1 m for 2026."
+    },
+    "container_vent_away_from_pilot": {
+      "v": true,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_27."
+    },
+    "overpressure_valve_aft": {
+      "v": true,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_155, certified and adequately sized, facing aft."
+    },
+    "fire_port_on_port_side": {
+      "v": true,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_56."
+    },
+    "external_charge_interface": {
+      "v": true,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_189 - recharge without opening the container. New for 2026."
+    },
+    "sensor_pass_through_mm": {
+      "v": 4.0,
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_182 requires at least 3.2 mm reaching cells at the core. Routed through one of the three free slots in the 4x4 grid."
+    },
+    "estop_button_diameter_mm": {
+      "v": 40.0,
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_77 requires at least 30 mm."
+    },
+    "estop_yellow_circle_mm": {
+      "v": 90.0,
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_76: red button over a 90 mm yellow circle."
+    },
+    "estop_symbol_height_mm": {
+      "v": 100.0,
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_78 red spark on a white-edged blue triangle, at least 100 mm."
+    },
+    "estop_from_starboard_m": {
+      "v": 0.35,
+      "u": "m",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_85 requires within 1 m of starboard; 81 starboard and in front of the pilot; 86 facing outboard."
+    },
+    "estop_isolates_telemetry": {
+      "v": true,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_79 - all power sources, telemetry included, by relay and not in software."
+    },
+    "contactor_dropout_ms": {
+      "v": 35.0,
+      "u": "ms",
+      "s": "ASSUMPTION",
+      "n": "Main contactor mechanical opening time. From the contactor datasheet once one is chosen."
+    },
+    "inverter_disable_ms": {
+      "v": 15.0,
+      "u": "ms",
+      "s": "ASSUMPTION",
+      "n": "Gate-drive inhibit to zero torque."
+    },
+    "killcord_detect_ms": {
+      "v": 20.0,
+      "u": "ms",
+      "s": "ASSUMPTION",
+      "n": "Switch debounce and detection. ENERGY_REQ_71 gives the whole chain under 1 s."
+    },
+    "hivis_starboard_cm2": {
+      "v": 520.0,
+      "u": "cm^2",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_49 requires at least 500."
+    },
+    "hivis_port_cm2": {
+      "v": 520.0,
+      "u": "cm^2",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_49 requires at least 500."
+    },
+    "hivis_front_cm2": {
+      "v": 260.0,
+      "u": "cm^2",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_49 requires at least 250."
+    },
+    "hivis_back_cm2": {
+      "v": 260.0,
+      "u": "cm^2",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_49 requires at least 250."
+    },
+    "clamps_per_beam": {
+      "v": 2,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_38 requires at least two per beam, enveloping the full circumference."
+    },
+    "clamp_width_mm": {
+      "v": 60.0,
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_38 requires at least 50 mm per clamp."
+    },
+    "clamp_spacing_mm": {
+      "v": 800.0,
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_38 requires at least 750 mm, symmetric about the centreline. Tightened for 2026."
+    },
+    "clamp_gasket_mm": {
+      "v": 1.5,
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_38 requires at least 1 mm of rubber between beam and clamp."
+    },
+    "monitor_bay_L_mm": {
+      "v": 200.0,
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_185 needs 190 mm."
+    },
+    "monitor_bay_W_mm": {
+      "v": 160.0,
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_185 needs 150 mm."
+    },
+    "monitor_bay_H_mm": {
+      "v": 130.0,
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_185 needs 122 mm."
+    },
+    "monitor_bay_open_to_sky": {
+      "v": true,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_185: open to sky, outside every closed compartment, need not be waterproof."
+    },
+    "monitor_bay_cable_clear_mm": {
+      "v": 150.0,
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_185 requires at least 100 mm from any power cable; crossings only at right angles."
+    },
+    "electronics_ip_rating": {
+      "v": "IP56",
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_62 - watertight and cooled."
+    },
+    "hv_circuit_ip_rating": {
+      "v": "IP2X",
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_63 applies above 15 V DC. Busbars included."
+    },
+    "hv_cable_colour": {
+      "v": "orange",
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_61 - every run outside the enclosure."
+    },
+    "w026_symbol_cm": {
+      "v": 12.0,
+      "u": "cm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_171 requires at least 10 cm."
+    },
+    "label_letter_cm": {
+      "v": 3.0,
+      "u": "cm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_172 and 173 require at least 2 cm for capacity and composition."
+    },
+    "evacuation_time_s": {
+      "v": 3.5,
+      "u": "s",
+      "s": "ASSUMPTION",
+      "n": "ENERGY_REQ_44 allows 5 s unaided. Demonstrated by an evacuation test - rehearse it."
+    },
+    "pilot_enclosed": {
+      "v": false,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_45 - no hatch may stand between the pilot and the water."
+    },
+    "pilot_restrained": {
+      "v": false,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_46 - no belts."
+    },
+    "self_draining": {
+      "v": true,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_47."
+    },
+    "appendices_touch_water": {
+      "v": false,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_186 - only the motor and the water pump may touch the water. New for 2026."
+    },
+    "extinguisher_kg": {
+      "v": 1.0,
+      "u": "kg",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_106 at least 1 kg, ENERGY_REQ_107 ABC type, approved and in date."
+    },
+    "paddle_length_cm": {
+      "v": 110.0,
+      "u": "cm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_101 requires at least 100 cm."
+    },
+    "paddle_blade_length_cm": {
+      "v": 32.0,
+      "u": "cm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_101 requires at least 30 cm."
+    },
+    "paddle_blade_width_cm": {
+      "v": 14.0,
+      "u": "cm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_101 requires at least 13 cm."
+    },
+    "boathook_length_cm": {
+      "v": 110.0,
+      "u": "cm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_102 requires at least 100 cm and it must actually catch."
+    },
+    "warning_flag_cm": {
+      "v": 35.0,
+      "u": "cm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_103 requires at least 30 x 30 cm, orange or red; ENERGY_REQ_104 says not on the paddle or hook."
+    },
+    "warning_flag_handle_cm": {
+      "v": 110.0,
+      "u": "cm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_103 requires a handle of at least 100 cm."
+    },
+    "towline_length_m": {
+      "v": 12.0,
+      "u": "m",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_99 requires at least 10 m, floating."
+    },
+    "towline_diameter_mm": {
+      "v": 12.0,
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_99 requires at least 10 mm."
+    },
+    "bridle_diameter_mm": {
+      "v": 12.0,
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_96 requires at least 10 mm, floating, fitted to the boat."
+    },
+    "lifejacket_buoyancy_N": {
+      "v": 150.0,
+      "u": "N",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_137 requires at least 100 N."
+    },
+    "nationality_flag_height_m": {
+      "v": 2.2,
+      "u": "m",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_150 requires at least 2 m above the water."
+    },
+    "nationality_flag_width_cm": {
+      "v": 35.0,
+      "u": "cm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_151 requires at least 30 cm."
+    },
+    "comms_range_nmi": {
+      "v": 5.0,
+      "u": "nmi",
+      "s": "ASSUMPTION",
+      "n": "ENERGY_REQ_142 requires at least 2 nautical miles."
+    },
+    "comms_type": {
+      "v": "4G/LTE helmet intercom",
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_141 FORBIDS VHF for 2026 - this changed. 143 requires it integrated into the helmet, 144 waterproof, 145 one race on a charge."
+    },
+    "solar_area_m2": {
+      "v": 0.0,
+      "u": "m^2",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_28 caps solar at 4 m2 including the frame. None fitted."
+    },
+    "sail_area_m2": {
+      "v": 0.0,
+      "u": "m^2",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_29 caps sail at 20 m2. None fitted."
+    },
+    "hydrogen_onboard": {
+      "v": false,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "Battery electric. The whole hydrogen safety chapter is out of scope, and the compliance report says so rather than staying silent."
+    },
+    "human_power_used": {
+      "v": false,
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_31."
+    }
   },
-
   "telemetry": {
     "_note": [
       "Annex III temperature monitoring API and Annex IV power interface.",
@@ -670,22 +2158,79 @@
       "be checked against the organiser endpoint before the event rather than",
       "in the paddock."
     ],
-
-    "api_protocol":       { "v": "REST/JSON over HTTP", "u": "-", "s": "DATASHEET", "n": "Annex III." },
-    "api_path":           { "v": "/monitoringdata/", "u": "-", "s": "DATASHEET", "n": "Annex III example." },
-    "api_method":         { "v": "POST", "u": "-", "s": "DATASHEET", "n": "The Annex III example uses curl --data, so POST." },
-    "api_content_type":   { "v": "application/json", "u": "-", "s": "DATASHEET", "n": "Annex III." },
-    "post_period_s":      { "v": 1.0, "u": "s", "s": "DESIGN_CHOICE", "n": "Rate not specified by the organiser. 1 Hz is ample for temperature and cheap on a 4G link." },
-    "n_temperature_channels": { "v": 3, "u": "-", "s": "DATASHEET", "n": "The Annex III example carries temp1, temp2, temp3." },
-    "team_token":         { "v": "SET_AT_EVENT", "u": "-", "s": "DESIGN_CHOICE", "n": "Issued per boat by the organiser. Never committed to the repository." },
-
-    "supply_nominal_V":   { "v": 12.0, "u": "V", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_184 requires 10-28 V. Taken from the DC-DC 12 V rail." },
-    "supply_budget_W":    { "v": 30.0, "u": "W", "s": "DATASHEET", "n": "ENERGY_REQ_184 maximum. The organiser will confirm the nominal draw." },
-    "connector_pn":       { "v": "BD-02BFFA-LL7001", "u": "-", "s": "DATASHEET", "n": "ENERGY_REQ_184, Amphenol LTW. Alternative ABD-02AFFM-LL7A03. Part number changed for 2026." },
-    "connector_pin1":     { "v": "positive", "u": "-", "s": "DATASHEET", "n": "Annex IV." },
-    "connector_pin2":     { "v": "ground", "u": "-", "s": "DATASHEET", "n": "Annex IV." }
+    "api_protocol": {
+      "v": "REST/JSON over HTTP",
+      "u": "-",
+      "s": "DATASHEET",
+      "n": "Annex III."
+    },
+    "api_path": {
+      "v": "/monitoringdata/",
+      "u": "-",
+      "s": "DATASHEET",
+      "n": "Annex III example."
+    },
+    "api_method": {
+      "v": "POST",
+      "u": "-",
+      "s": "DATASHEET",
+      "n": "The Annex III example uses curl --data, so POST."
+    },
+    "api_content_type": {
+      "v": "application/json",
+      "u": "-",
+      "s": "DATASHEET",
+      "n": "Annex III."
+    },
+    "post_period_s": {
+      "v": 1.0,
+      "u": "s",
+      "s": "DESIGN_CHOICE",
+      "n": "Rate not specified by the organiser. 1 Hz is ample for temperature and cheap on a 4G link."
+    },
+    "n_temperature_channels": {
+      "v": 3,
+      "u": "-",
+      "s": "DATASHEET",
+      "n": "The Annex III example carries temp1, temp2, temp3."
+    },
+    "team_token": {
+      "v": "SET_AT_EVENT",
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "Issued per boat by the organiser. Never committed to the repository."
+    },
+    "supply_nominal_V": {
+      "v": 12.0,
+      "u": "V",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_184 requires 10-28 V. Taken from the DC-DC 12 V rail."
+    },
+    "supply_budget_W": {
+      "v": 30.0,
+      "u": "W",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_184 maximum. The organiser will confirm the nominal draw."
+    },
+    "connector_pn": {
+      "v": "BD-02BFFA-LL7001",
+      "u": "-",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_184, Amphenol LTW. Alternative ABD-02AFFM-LL7A03. Part number changed for 2026."
+    },
+    "connector_pin1": {
+      "v": "positive",
+      "u": "-",
+      "s": "DATASHEET",
+      "n": "Annex IV."
+    },
+    "connector_pin2": {
+      "v": "ground",
+      "u": "-",
+      "s": "DATASHEET",
+      "n": "Annex IV."
+    }
   },
-
   "hydro": {
     "_note": [
       "Hull resistance and contra-rotating propulsor, from the hydrodynamics",
@@ -732,15 +2277,60 @@
       "real displacement, P50B_HullModel says out loud that it is",
       "extrapolating."
     ],
-
-    "resistance_source":       { "v": "MEBC Energy Class supplied resistance curve", "u": "-", "s": "DATASHEET", "n": "Bare hull, 250 kg, LCG 1.80 m. Reproduced by the hydrodynamics team's tool as a hard assertion in its main.m stage 1." },
-    "resistance_displacement_kg": { "v": 250.0, "u": "kg", "s": "DATASHEET", "n": "The condition the curve was measured at. NOT our floating mass." },
-    "resistance_LCG_m":        { "v": 1.80, "u": "m", "s": "DATASHEET", "n": "Longitudinal centre of gravity for the supplied condition." },
-    "resistance_speed_kn":     { "v": [0, 5, 10, 15, 20], "u": "knot", "s": "DATASHEET", "n": "The five supplied points. There are no more." },
-    "resistance_bare_hull_N":  { "v": [0, 89, 212, 381, 624], "u": "N", "s": "DATASHEET", "n": "Bare hull. Drive-leg and appendage drag are added separately." },
-    "resistance_max_valid_kn": { "v": 20.0, "u": "knot", "s": "DATASHEET", "n": "The curve is not extrapolated silently. Above this the hull model reports that it is estimating." },
-    "drive_leg_drag_N_at_20kn":{ "v": 81.56, "u": "N", "s": "CALCULATED", "n": "Submerged drive leg, from the hydrodynamics team's appendage model (0.15 m strut chord, flat-plate friction plus form factor). Their report flags it as NOT validated and notes it is unknown whether the supplied 624 N already includes it -- they add it, so we add it." },
-
+    "resistance_source": {
+      "v": "MEBC Energy Class supplied resistance curve",
+      "u": "-",
+      "s": "DATASHEET",
+      "n": "Bare hull, 250 kg, LCG 1.80 m. Reproduced by the hydrodynamics team's tool as a hard assertion in its main.m stage 1."
+    },
+    "resistance_displacement_kg": {
+      "v": 250.0,
+      "u": "kg",
+      "s": "DATASHEET",
+      "n": "The condition the curve was measured at. NOT our floating mass."
+    },
+    "resistance_LCG_m": {
+      "v": 1.8,
+      "u": "m",
+      "s": "DATASHEET",
+      "n": "Longitudinal centre of gravity for the supplied condition."
+    },
+    "resistance_speed_kn": {
+      "v": [
+        0,
+        5,
+        10,
+        15,
+        20
+      ],
+      "u": "knot",
+      "s": "DATASHEET",
+      "n": "The five supplied points. There are no more."
+    },
+    "resistance_bare_hull_N": {
+      "v": [
+        0,
+        89,
+        212,
+        381,
+        624
+      ],
+      "u": "N",
+      "s": "DATASHEET",
+      "n": "Bare hull. Drive-leg and appendage drag are added separately."
+    },
+    "resistance_max_valid_kn": {
+      "v": 20.0,
+      "u": "knot",
+      "s": "DATASHEET",
+      "n": "The curve is not extrapolated silently. Above this the hull model reports that it is estimating."
+    },
+    "drive_leg_drag_N_at_20kn": {
+      "v": 81.56,
+      "u": "N",
+      "s": "CALCULATED",
+      "n": "Submerged drive leg, from the hydrodynamics team's appendage model (0.15 m strut chord, flat-plate friction plus form factor). Their report flags it as NOT validated and notes it is unknown whether the supplied 624 N already includes it -- they add it, so we add it."
+    },
     "_propulsor_note": [
       "The Competr outboard datasheet says counter-rotating, so the single",
       "Wageningen-style propeller in P50B_Propeller was always a stand-in.",
@@ -754,54 +2344,235 @@
       "their report is explicit that the section polars are the largest",
       "single source of uncertainty in the absolute efficiency."
     ],
-
-    "propulsor_type":          { "v": "Coaxial contra-rotating, fully submerged", "u": "-", "s": "DESIGN_CHOICE", "n": "Their trade study puts submerged ahead of surface-piercing by 58% at 20 kn, but says the verdict is dominated by the ventilated-section and drive-leg assumptions and is not settled without CFD." },
-    "propulsor_design_speed_kn": { "v": 20.0, "u": "knot", "s": "DESIGN_CHOICE", "n": "The point the propulsor was optimised at. 37.0 km/h." },
-    "crp_efficiency":          { "v": 0.7737, "u": "-", "s": "CALCULATED", "n": "CRP SYSTEM efficiency at the design point, not the isolated-rotor figure. The isolated rotors are 0.7942 each; quoting that as the system number would overstate it." },
-    "crp_thrust_N":            { "v": 784.1, "u": "N", "s": "CALCULATED", "n": "Total, both rotors, at 20 kn. Required was 784.0 N." },
-    "crp_shaft_power_W":       { "v": 9900.0, "u": "W", "s": "CALCULATED", "n": "Total shaft power at the design point." },
-    "crp_energy_Wh_per_nm":    { "v": 559.6, "u": "W*hr/nmi", "s": "CALCULATED", "n": "302.2 Wh/km. The objective the whole tool minimises." },
-
-    "front_diameter_m":        { "v": 0.3803, "u": "m", "s": "CALCULATED", "n": "14.97 in. Well below the 21 in limit - the propulsor is profile-drag dominated, so it wants low blade area and low speed." },
-    "front_blades":            { "v": 3, "u": "-", "s": "CALCULATED", "n": "3/3 beat 4/4 by 18% on Wh/nm." },
-    "front_pitch_ratio":       { "v": 1.995, "u": "-", "s": "CALCULATED", "n": "P/D at 0.7R. THEIR REPORT FLAGS THIS AS SITTING ON ITS SEARCH BOUND - the bound is setting the answer, not the physics. Widen and rerun before ordering." },
-    "front_EAR":               { "v": 0.489, "u": "-", "s": "CALCULATED", "n": "Expanded area ratio." },
-    "front_rpm":               { "v": 808.5, "u": "rpm", "s": "CALCULATED", "n": "At the design point." },
-    "front_thrust_N":          { "v": 513.7, "u": "N", "s": "CALCULATED", "n": "65.5% of total thrust." },
-    "front_torque_Nm":         { "v": 75.90, "u": "N*m", "s": "CALCULATED", "n": "" },
-    "front_gear_ratio":        { "v": 1.6079, "u": "-", "s": "CALCULATED", "n": "Motor rev per front-rotor rev." },
-
-    "rear_diameter_m":         { "v": 0.3609, "u": "m", "s": "CALCULATED", "n": "14.21 in." },
-    "rear_blades":             { "v": 3, "u": "-", "s": "CALCULATED", "n": "" },
-    "rear_pitch_ratio":        { "v": 2.126, "u": "-", "s": "CALCULATED", "n": "P/D at 0.7R." },
-    "rear_EAR":                { "v": 0.573, "u": "-", "s": "CALCULATED", "n": "" },
-    "rear_rpm":                { "v": 718.7, "u": "rpm", "s": "CALCULATED", "n": "" },
-    "rear_thrust_N":           { "v": 270.4, "u": "N", "s": "CALCULATED", "n": "34.5% of total thrust." },
-    "rear_torque_Nm":          { "v": 46.16, "u": "N*m", "s": "CALCULATED", "n": "" },
-    "rear_gear_ratio":         { "v": 1.8088, "u": "-", "s": "CALCULATED", "n": "Motor rev per rear-rotor rev. Different from the front - the gearbox has to deliver two ratios on a coaxial shaft." },
-
-    "hub_diameter_m":          { "v": 0.0968, "u": "m", "s": "CALCULATED", "n": "Common to both rotors." },
-    "axial_gap_m":             { "v": 0.050, "u": "m", "s": "DESIGN_CHOICE", "n": "Front-to-rear disk spacing. Sets the interference development factors g_dn = 1.254 and g_up = 0.733." },
-    "swirl_recovery_frac":     { "v": 0.493, "u": "-", "s": "CALCULATED", "n": "Fraction of the front rotor's swirl recovered by the rear. This is what a contra-rotating pair is for, and the baseline equal-diameter equal-speed configuration got it badly wrong (-954%)." },
-    "net_roll_torque_Nm":      { "v": 29.74, "u": "N*m", "s": "CALCULATED", "n": "Front minus rear. A contra-rotating pair does not cancel roll reaction unless the torques match, and here they do not." },
-
-    "gearbox_input_rpm":       { "v": 1300.0, "u": "rpm", "s": "CALCULATED", "n": "Motor speed at the design point." },
-    "gearbox_input_torque_Nm": { "v": 75.8, "u": "N*m", "s": "CALCULATED", "n": "Against a 100 N*m motor rating." },
-    "gearbox_torque_capacity_Nm": { "v": 94.7, "u": "N*m", "s": "CALCULATED", "n": "Input, at a 1.25 service factor." },
-    "gearbox_power_capacity_W":{ "v": 12890.0, "u": "W", "s": "CALCULATED", "n": "" },
-    "gearbox_efficiency":      { "v": 0.96, "u": "-", "s": "ASSUMPTION", "n": "The hydrodynamics team's assumption. Ours in motor.gearbox_efficiency is 0.97; the difference is 1% on the whole chain and neither is measured. Their sensitivity ranks gearbox efficiency third out of ten inputs." },
-
-    "wake_fraction":           { "v": 0.05, "u": "-", "s": "ASSUMPTION", "n": "Theirs. Ours in boat.wake_fraction is 0.06. Their sensitivity ranks wake fraction FIRST, at 14.7% spread on Wh/nm - it is the highest-value hydrodynamic measurement available." },
-    "thrust_deduction":        { "v": 0.10, "u": "-", "s": "ASSUMPTION", "n": "Theirs. Ours in boat.thrust_deduction is 0.08. Ranked second at 14.4% spread." },
-
-    "controller_efficiency":   { "v": 0.97, "u": "-", "s": "ASSUMPTION", "n": "Their lumped inverter figure. Our P50B_InverterData models the losses rather than assuming an efficiency, which is why the two chains do not agree exactly." },
-    "overall_efficiency":      { "v": 0.6487, "u": "-", "s": "CALCULATED", "n": "Effective hull power over electrical power, their whole chain at the design point." },
-
-    "cavitation_sigma_front":  { "v": 0.88, "u": "-", "s": "CALCULATED", "n": "At 0.7R. No cavitation predicted by the analytical screen; margin 1.67." },
-    "cavitation_sigma_rear":   { "v": 1.06, "u": "-", "s": "CALCULATED", "n": "Margin 1.66." },
-    "blade_stress_front_MPa":  { "v": 9.9, "u": "MPa", "s": "CALCULATED", "n": "Centrifugal plus bending, against an 83.3 MPa allowable. Safety factor 25. Preliminary analytical screening; FEA required." }
+    "propulsor_type": {
+      "v": "Coaxial contra-rotating, fully submerged",
+      "u": "-",
+      "s": "DESIGN_CHOICE",
+      "n": "Their trade study puts submerged ahead of surface-piercing by 58% at 20 kn, but says the verdict is dominated by the ventilated-section and drive-leg assumptions and is not settled without CFD."
+    },
+    "propulsor_design_speed_kn": {
+      "v": 20.0,
+      "u": "knot",
+      "s": "DESIGN_CHOICE",
+      "n": "The point the propulsor was optimised at. 37.0 km/h."
+    },
+    "crp_efficiency": {
+      "v": 0.7737,
+      "u": "-",
+      "s": "CALCULATED",
+      "n": "CRP SYSTEM efficiency at the design point, not the isolated-rotor figure. The isolated rotors are 0.7942 each; quoting that as the system number would overstate it."
+    },
+    "crp_thrust_N": {
+      "v": 784.1,
+      "u": "N",
+      "s": "CALCULATED",
+      "n": "Total, both rotors, at 20 kn. Required was 784.0 N."
+    },
+    "crp_shaft_power_W": {
+      "v": 9900.0,
+      "u": "W",
+      "s": "CALCULATED",
+      "n": "Total shaft power at the design point."
+    },
+    "crp_energy_Wh_per_nm": {
+      "v": 559.6,
+      "u": "W*hr/nmi",
+      "s": "CALCULATED",
+      "n": "302.2 Wh/km. The objective the whole tool minimises."
+    },
+    "front_diameter_m": {
+      "v": 0.3803,
+      "u": "m",
+      "s": "CALCULATED",
+      "n": "14.97 in. Well below the 21 in limit - the propulsor is profile-drag dominated, so it wants low blade area and low speed."
+    },
+    "front_blades": {
+      "v": 3,
+      "u": "-",
+      "s": "CALCULATED",
+      "n": "3/3 beat 4/4 by 18% on Wh/nm."
+    },
+    "front_pitch_ratio": {
+      "v": 1.995,
+      "u": "-",
+      "s": "CALCULATED",
+      "n": "P/D at 0.7R. THEIR REPORT FLAGS THIS AS SITTING ON ITS SEARCH BOUND - the bound is setting the answer, not the physics. Widen and rerun before ordering."
+    },
+    "front_EAR": {
+      "v": 0.489,
+      "u": "-",
+      "s": "CALCULATED",
+      "n": "Expanded area ratio."
+    },
+    "front_rpm": {
+      "v": 808.5,
+      "u": "rpm",
+      "s": "CALCULATED",
+      "n": "At the design point."
+    },
+    "front_thrust_N": {
+      "v": 513.7,
+      "u": "N",
+      "s": "CALCULATED",
+      "n": "65.5% of total thrust."
+    },
+    "front_torque_Nm": {
+      "v": 75.9,
+      "u": "N*m",
+      "s": "CALCULATED",
+      "n": ""
+    },
+    "front_gear_ratio": {
+      "v": 1.6079,
+      "u": "-",
+      "s": "CALCULATED",
+      "n": "Motor rev per front-rotor rev."
+    },
+    "rear_diameter_m": {
+      "v": 0.3609,
+      "u": "m",
+      "s": "CALCULATED",
+      "n": "14.21 in."
+    },
+    "rear_blades": {
+      "v": 3,
+      "u": "-",
+      "s": "CALCULATED",
+      "n": ""
+    },
+    "rear_pitch_ratio": {
+      "v": 2.126,
+      "u": "-",
+      "s": "CALCULATED",
+      "n": "P/D at 0.7R."
+    },
+    "rear_EAR": {
+      "v": 0.573,
+      "u": "-",
+      "s": "CALCULATED",
+      "n": ""
+    },
+    "rear_rpm": {
+      "v": 718.7,
+      "u": "rpm",
+      "s": "CALCULATED",
+      "n": ""
+    },
+    "rear_thrust_N": {
+      "v": 270.4,
+      "u": "N",
+      "s": "CALCULATED",
+      "n": "34.5% of total thrust."
+    },
+    "rear_torque_Nm": {
+      "v": 46.16,
+      "u": "N*m",
+      "s": "CALCULATED",
+      "n": ""
+    },
+    "rear_gear_ratio": {
+      "v": 1.8088,
+      "u": "-",
+      "s": "CALCULATED",
+      "n": "Motor rev per rear-rotor rev. Different from the front - the gearbox has to deliver two ratios on a coaxial shaft."
+    },
+    "hub_diameter_m": {
+      "v": 0.0968,
+      "u": "m",
+      "s": "CALCULATED",
+      "n": "Common to both rotors."
+    },
+    "axial_gap_m": {
+      "v": 0.05,
+      "u": "m",
+      "s": "DESIGN_CHOICE",
+      "n": "Front-to-rear disk spacing. Sets the interference development factors g_dn = 1.254 and g_up = 0.733."
+    },
+    "swirl_recovery_frac": {
+      "v": 0.493,
+      "u": "-",
+      "s": "CALCULATED",
+      "n": "Fraction of the front rotor's swirl recovered by the rear. This is what a contra-rotating pair is for, and the baseline equal-diameter equal-speed configuration got it badly wrong (-954%)."
+    },
+    "net_roll_torque_Nm": {
+      "v": 29.74,
+      "u": "N*m",
+      "s": "CALCULATED",
+      "n": "Front minus rear. A contra-rotating pair does not cancel roll reaction unless the torques match, and here they do not."
+    },
+    "gearbox_input_rpm": {
+      "v": 1300.0,
+      "u": "rpm",
+      "s": "CALCULATED",
+      "n": "Motor speed at the design point."
+    },
+    "gearbox_input_torque_Nm": {
+      "v": 75.8,
+      "u": "N*m",
+      "s": "CALCULATED",
+      "n": "Against a 100 N*m motor rating."
+    },
+    "gearbox_torque_capacity_Nm": {
+      "v": 94.7,
+      "u": "N*m",
+      "s": "CALCULATED",
+      "n": "Input, at a 1.25 service factor."
+    },
+    "gearbox_power_capacity_W": {
+      "v": 12890.0,
+      "u": "W",
+      "s": "CALCULATED",
+      "n": ""
+    },
+    "gearbox_efficiency": {
+      "v": 0.96,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "The hydrodynamics team's assumption. Ours in motor.gearbox_efficiency is 0.97; the difference is 1% on the whole chain and neither is measured. Their sensitivity ranks gearbox efficiency third out of ten inputs."
+    },
+    "wake_fraction": {
+      "v": 0.05,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Theirs. Ours in boat.wake_fraction is 0.06. Their sensitivity ranks wake fraction FIRST, at 14.7% spread on Wh/nm - it is the highest-value hydrodynamic measurement available."
+    },
+    "thrust_deduction": {
+      "v": 0.1,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Theirs. Ours in boat.thrust_deduction is 0.08. Ranked second at 14.4% spread."
+    },
+    "controller_efficiency": {
+      "v": 0.97,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Their lumped inverter figure. Our P50B_InverterData models the losses rather than assuming an efficiency, which is why the two chains do not agree exactly."
+    },
+    "overall_efficiency": {
+      "v": 0.6487,
+      "u": "-",
+      "s": "CALCULATED",
+      "n": "Effective hull power over electrical power, their whole chain at the design point."
+    },
+    "cavitation_sigma_front": {
+      "v": 0.88,
+      "u": "-",
+      "s": "CALCULATED",
+      "n": "At 0.7R. No cavitation predicted by the analytical screen; margin 1.67."
+    },
+    "cavitation_sigma_rear": {
+      "v": 1.06,
+      "u": "-",
+      "s": "CALCULATED",
+      "n": "Margin 1.66."
+    },
+    "blade_stress_front_MPa": {
+      "v": 9.9,
+      "u": "MPa",
+      "s": "CALCULATED",
+      "n": "Centrifugal plus bending, against an 83.3 MPa allowable. Safety factor 25. Preliminary analytical screening; FEA required."
+    }
   },
-
   "powertrain": {
     "_note": [
       "Physical envelopes and mounting positions for every powertrain",
@@ -837,151 +2608,736 @@
       "the things that decide whether the boat is legal and whether the parts",
       "fit. Anything needing internals belongs in the supplier's model."
     ],
-
     "_pack_note": [
       "The pack envelope is CALCULATED by P50B_Geometry from the cell",
       "dimensions, clearances and enclosure wall thicknesses. It is not",
       "repeated here -- the CAD calls the geometry model for it, so a change",
       "to cell_clearance_m moves the box in Blender too."
     ],
-    "pack_centre_mm":              { "v": [-200.0, 0.0, 745.0], "u": "mm", "s": "DESIGN_CHOICE", "n": "Sitting on the pod floor with the container lid 17 mm under the crown at its aft end. Moved forward and up from [-280,0,700]: the real pod floor aft is at 624 mm, not the 577.7 mm bounding-box figure, and the container was 30 mm into it." },
-    "pack_container_wall_mm":    { "v": 4.0, "u": "mm", "s": "DESIGN_CHOICE", "n": "Container shell around the pack enclosure. Carries the ENERGY_REQ_155 overpressure valve, the 56 fire port and the 189 charge interface." },
-    "pack_container_pad_mm":     { "v": [40.0, 24.0, 20.0], "u": "mm", "s": "DESIGN_CHOICE", "n": "Clear space inside the container beyond the pack: length for the terminal studs and the charge interface, width for the harness, height for the lid and the sensor route. Every one of the three was trimmed to make the container fit the pod -- it is the tightest thing in the boat after the mass budget." },
-
-    "inverter_size_mm":          { "v": [260.0, 200.0, 110.0], "u": "mm", "s": "ASSUMPTION", "n": "Representative liquid-cooled SiC drive for 400 A. NOT SELECTED -- Competr lists the inverter on request, so this is an envelope reservation, not a part." },
-    "inverter_centre_mm":          { "v": [-730.0, 140.0, 715.0], "u": "mm", "s": "DESIGN_CHOICE", "n": "Aft of the container, port, mirroring the PDU. Short three-phase run to the outboard, which is the point." },
-
-    "pdu_size_mm":               { "v": [300.0, 200.0, 115.0], "u": "mm", "s": "DESIGN_CHOICE", "n": "Power distribution unit: main contactor, precharge resistor and contactor, HV interlock. One sealed box rather than parts scattered along the run, so ENERGY_REQ_60 and 63 are satisfied by one lid. 115 mm tall, not 130: the tallest thing inside is a 92 mm contactor, and the pod aft of the container gives 128 mm." },
-    "pdu_centre_mm":               { "v": [-730.0, -140.0, 715.0], "u": "mm", "s": "DESIGN_CHOICE", "n": "AFT of the container, low, starboard. It cannot go above the container: at that station the crown is 871 mm and the lid is at 854, leaving 17 mm. The aft compartment is 304 mm long and 160 mm tall at the transom, which is what actually sizes this box." },
-    "terminal_box_size_mm":      { "v": [200.0, 150.0, 100.0], "u": "mm", "s": "DESIGN_CHOICE", "n": "HV terminal box on the container lid: main fuse (62 mm), shunt, and the pack terminal studs. 100 mm tall, not 120: the pod crown leaves 141 mm above the container lid at its forward end and the taller box could not be placed there, which pushed it into the aft bay the PDU needs." },
-    "terminal_box_centre_mm":      { "v": [-120.0, 0.0, 925.0], "u": "mm", "s": "DESIGN_CHOICE", "n": "On the container lid, forward, where the crown is 1012 mm and there is room for a 120 mm box. Directly over the pack terminals, which P50B_GroupLayout puts on the TOP face." },
-
-    "fuse_size_mm":              { "v": [82.0, 42.0, 62.0], "u": "mm", "s": "ASSUMPTION", "n": "400 A class-aR HV fuse, bolt-down. Inside the PDU. Envelope typical of a 500 V DC traction fuse in this rating." },
-    "contactor_size_mm":         { "v": [86.0, 72.0, 92.0], "u": "mm", "s": "ASSUMPTION", "n": "Main DC contactor, gas-filled, 500 A continuous. Inside the PDU. ENERGY_REQ_79 requires the E-stop to open it by relay, not in software." },
-    "precharge_contactor_size_mm": { "v": [52.0, 42.0, 62.0], "u": "mm", "s": "ASSUMPTION", "n": "Precharge path. Without it, closing the main contactor onto the inverter's DC-link capacitance welds the contacts." },
-    "shunt_size_mm":             { "v": [90.0, 40.0, 40.0], "u": "mm", "s": "ASSUMPTION", "n": "Current shunt. Feeds both the BMS and the Annex III telemetry current channel." },
-
-    "dcdc_size_mm":              { "v": [200.0, 150.0, 70.0], "u": "mm", "s": "ASSUMPTION", "n": "1 kW HV to 12 V, from the Competr datasheet's auxiliary rating. Also supplies the ENERGY_REQ_184 organiser interface." },
-    "dcdc_centre_mm":              { "v": [-60.0, -170.0, 920.0], "u": "mm", "s": "DESIGN_CHOICE", "n": "On the container lid, starboard of the terminal box." },
-
-    "lv_battery_size_mm":        { "v": [151.0, 65.0, 95.0], "u": "mm", "s": "ASSUMPTION", "n": "12 V 7 Ah LiFePO4 service battery. ENERGY_REQ_7 note 3 exempts it from the energy calculation; ENERGY_REQ_58 still requires it fused and ENERGY_REQ_67 still requires its temperature monitored." },
-    "lv_battery_centre_mm":        { "v": [420.0, -240.0, 690.0], "u": "mm", "s": "DESIGN_CHOICE", "n": "Forward of the bulkhead with the LV electronics, clear of the HV container." },
-
-    "vcu_size_mm":               { "v": [260.0, 160.0, 90.0], "u": "mm", "s": "DATASHEET", "n": "Competr control unit, IP67. Datasheet section 2: 260x160x90 mm, 1x 35-way and 1x 23-way sealed connectors." },
-    "vcu_centre_mm":               { "v": [420.0, 240.0, 700.0], "u": "mm", "s": "DESIGN_CHOICE", "n": "Forward of the bulkhead, in the ENERGY_REQ_62 IP56 compartment." },
-
-    "motor_centre_mm":           { "v": [-990.0, 0.0, 500.0], "u": "mm", "s": "DESIGN_CHOICE", "n": "Transom-mounted, just aft of the pod tail at X = -886 mm. The powerhead spans Z 100 to 900 mm and the leg hangs below it." },
-    "motor_shaft_angle_deg":     { "v": 0.0, "u": "deg", "s": "DESIGN_CHOICE", "n": "Trim angle in the modelled pose. The datasheet allows -5 to +30 deg." },
-
-    "coolant_pump_size_mm":      { "v": [120.0, 80.0, 80.0], "u": "mm", "s": "ASSUMPTION", "n": "12 V circulation pump, 8 L/min against the loop pressure drop." },
-    "coolant_pump_centre_mm":      { "v": [-500.0, 200.0, 700.0], "u": "mm", "s": "DESIGN_CHOICE", "n": "Beside the container, port, low so it stays primed. Half-width at this station is 286 mm." },
-    "heat_exchanger_size_mm":    { "v": [300.0, 120.0, 60.0], "u": "mm", "s": "ASSUMPTION", "n": "Seawater plate exchanger. The sea is the ultimate heat sink for both the pack loop and the motor." },
-    "heat_exchanger_centre_mm":    { "v": [-400.0, -220.0, 690.0], "u": "mm", "s": "DESIGN_CHOICE", "n": "Beside the container, starboard, low and near the through-hull pickup. Half-width here is 295 mm, so this is 15 mm off the skin." },
-    "coolant_hose_od_mm":        { "v": 19.0, "u": "mm", "s": "DESIGN_CHOICE", "n": "13 mm bore hose. Distinct from cooling.tube_id_m, which is the 6 mm passage inside the cold plates." },
-
-    "hv_cable_od_mm":            { "v": 25.4, "u": "mm", "s": "ASSUMPTION", "n": "150 mm2 flexible tinned copper with silicone insulation, orange per ENERGY_REQ_61. Conductor alone is about 14 mm; the jacket dominates the bend radius." },
-    "hv_cable_bend_radius_mm":   { "v": 152.0, "u": "mm", "s": "ASSUMPTION", "n": "Six times outside diameter, the usual minimum for flexible HV cable. Sets whether a route is buildable, which is the whole reason the cables are modelled as swept curves rather than straight lines." },
-    "three_phase_cable_od_mm":   { "v": 22.0, "u": "mm", "s": "ASSUMPTION", "n": "Per phase, inverter to motor. Screened." },
-
-    "bulkhead_x_mm":             { "v": 300.0, "u": "mm", "s": "DESIGN_CHOICE", "n": "Station of the ENERGY_REQ_50 bulkhead, moved aft from 120 mm with the seat. The pod is 350 mm half-width and 484 mm tall here, so the bulkhead spans a full section rather than a tapered one." },
-    "bulkhead_thickness_mm":     { "v": 12.0, "u": "mm", "s": "DESIGN_CHOICE", "n": "Aluminium sheet on a non-combustible core." },
-    "bulkhead_width_mm":         { "v": 630.0, "u": "mm", "s": "CALCULATED", "n": "The pod's usable internal width at X = 120 mm: the shell half-width is 336 mm and 15 mm each side is reserved for the skin and fixings, leaving 642 mm. It was drawn 1400 mm wide -- twice the pod -- and then 660, which was still 10 mm over." },
-    "bulkhead_height_mm":        { "v": 380.0, "u": "mm", "s": "CALCULATED", "n": "Pod floor 633 mm to crown 1026 mm at X = 120 mm, inside the 15 mm skin allowance, is 393 mm. 380 leaves a fitting margin. It was 420, which put the bulkhead 9 mm into the floor." },
-    "bulkhead_z_mm":             { "v": 823.0, "u": "mm", "s": "CALCULATED", "n": "Centred in the 633 to 1026 mm opening at that station." },
-
-    "pilot_seat_x_mm":           { "v": 820.0, "u": "mm", "s": "DESIGN_CHOICE", "n": "Seat back station. Moved forward from 700 mm. ENERGY_REQ_25 measures 500 mm from here to the container, and with the seat at 700 the container had to end by X = 200, which forced it into the tapering aft section where the pod is only 187 mm tall against the container's 218. Moving the pilot forward is also the right direction for trim." },
-    "pilot_seat_z_mm":           { "v": 640.0, "u": "mm", "s": "DESIGN_CHOICE", "n": "Seat pan, just above the pod floor at 577.7 mm." },
-
-    "estop_centre_mm":             { "v": [560.0, -230.0, 880.0], "u": "mm", "s": "DESIGN_CHOICE", "n": "ENERGY_REQ_81 starboard and forward of the pilot, 85 within a metre of starboard, 86 facing outboard. Y is limited by the pod, which is 285 mm half-width at this station -- not by the rule." },
-    "monitor_bay_centre_mm":     { "v": [300.0, 0.0, 1140.0], "u": "mm", "s": "DESIGN_CHOICE", "n": "ON the crown over the cockpit, where ENERGY_REQ_185's open-to-sky and outside-every-closed-compartment conditions are both met and it is 400 mm clear of the nearest HV run. It was at X = -60, where the terminal-box cable came within 72 mm of the 100 mm the rule requires." }
+    "pack_centre_mm": {
+      "v": [
+        -200.0,
+        0.0,
+        745.0
+      ],
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "Sitting on the pod floor with the container lid 17 mm under the crown at its aft end. Moved forward and up from [-280,0,700]: the real pod floor aft is at 624 mm, not the 577.7 mm bounding-box figure, and the container was 30 mm into it."
+    },
+    "pack_container_wall_mm": {
+      "v": 4.0,
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "Container shell around the pack enclosure. Carries the ENERGY_REQ_155 overpressure valve, the 56 fire port and the 189 charge interface."
+    },
+    "pack_container_pad_mm": {
+      "v": [
+        40.0,
+        24.0,
+        20.0
+      ],
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "Clear space inside the container beyond the pack: length for the terminal studs and the charge interface, width for the harness, height for the lid and the sensor route. Every one of the three was trimmed to make the container fit the pod -- it is the tightest thing in the boat after the mass budget."
+    },
+    "inverter_size_mm": {
+      "v": [
+        260.0,
+        200.0,
+        110.0
+      ],
+      "u": "mm",
+      "s": "ASSUMPTION",
+      "n": "Representative liquid-cooled SiC drive for 400 A. NOT SELECTED -- Competr lists the inverter on request, so this is an envelope reservation, not a part."
+    },
+    "inverter_centre_mm": {
+      "v": [
+        -730.0,
+        140.0,
+        715.0
+      ],
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "Aft of the container, port, mirroring the PDU. Short three-phase run to the outboard, which is the point."
+    },
+    "pdu_size_mm": {
+      "v": [
+        300.0,
+        200.0,
+        115.0
+      ],
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "Power distribution unit: main contactor, precharge resistor and contactor, HV interlock. One sealed box rather than parts scattered along the run, so ENERGY_REQ_60 and 63 are satisfied by one lid. 115 mm tall, not 130: the tallest thing inside is a 92 mm contactor, and the pod aft of the container gives 128 mm."
+    },
+    "pdu_centre_mm": {
+      "v": [
+        -730.0,
+        -140.0,
+        715.0
+      ],
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "AFT of the container, low, starboard. It cannot go above the container: at that station the crown is 871 mm and the lid is at 854, leaving 17 mm. The aft compartment is 304 mm long and 160 mm tall at the transom, which is what actually sizes this box."
+    },
+    "terminal_box_size_mm": {
+      "v": [
+        200.0,
+        150.0,
+        100.0
+      ],
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "HV terminal box on the container lid: main fuse (62 mm), shunt, and the pack terminal studs. 100 mm tall, not 120: the pod crown leaves 141 mm above the container lid at its forward end and the taller box could not be placed there, which pushed it into the aft bay the PDU needs."
+    },
+    "terminal_box_centre_mm": {
+      "v": [
+        -120.0,
+        0.0,
+        925.0
+      ],
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "On the container lid, forward, where the crown is 1012 mm and there is room for a 120 mm box. Directly over the pack terminals, which P50B_GroupLayout puts on the TOP face."
+    },
+    "fuse_size_mm": {
+      "v": [
+        82.0,
+        42.0,
+        62.0
+      ],
+      "u": "mm",
+      "s": "ASSUMPTION",
+      "n": "400 A class-aR HV fuse, bolt-down. Inside the PDU. Envelope typical of a 500 V DC traction fuse in this rating."
+    },
+    "contactor_size_mm": {
+      "v": [
+        86.0,
+        72.0,
+        92.0
+      ],
+      "u": "mm",
+      "s": "ASSUMPTION",
+      "n": "Main DC contactor, gas-filled, 500 A continuous. Inside the PDU. ENERGY_REQ_79 requires the E-stop to open it by relay, not in software."
+    },
+    "precharge_contactor_size_mm": {
+      "v": [
+        52.0,
+        42.0,
+        62.0
+      ],
+      "u": "mm",
+      "s": "ASSUMPTION",
+      "n": "Precharge path. Without it, closing the main contactor onto the inverter's DC-link capacitance welds the contacts."
+    },
+    "shunt_size_mm": {
+      "v": [
+        90.0,
+        40.0,
+        40.0
+      ],
+      "u": "mm",
+      "s": "ASSUMPTION",
+      "n": "Current shunt. Feeds both the BMS and the Annex III telemetry current channel."
+    },
+    "dcdc_size_mm": {
+      "v": [
+        200.0,
+        150.0,
+        70.0
+      ],
+      "u": "mm",
+      "s": "ASSUMPTION",
+      "n": "1 kW HV to 12 V, from the Competr datasheet's auxiliary rating. Also supplies the ENERGY_REQ_184 organiser interface."
+    },
+    "dcdc_centre_mm": {
+      "v": [
+        -60.0,
+        -170.0,
+        920.0
+      ],
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "On the container lid, starboard of the terminal box."
+    },
+    "lv_battery_size_mm": {
+      "v": [
+        151.0,
+        65.0,
+        95.0
+      ],
+      "u": "mm",
+      "s": "ASSUMPTION",
+      "n": "12 V 7 Ah LiFePO4 service battery. ENERGY_REQ_7 note 3 exempts it from the energy calculation; ENERGY_REQ_58 still requires it fused and ENERGY_REQ_67 still requires its temperature monitored."
+    },
+    "lv_battery_centre_mm": {
+      "v": [
+        420.0,
+        -240.0,
+        690.0
+      ],
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "Forward of the bulkhead with the LV electronics, clear of the HV container."
+    },
+    "vcu_size_mm": {
+      "v": [
+        260.0,
+        160.0,
+        90.0
+      ],
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "Competr control unit, IP67. Datasheet section 2: 260x160x90 mm, 1x 35-way and 1x 23-way sealed connectors."
+    },
+    "vcu_centre_mm": {
+      "v": [
+        420.0,
+        240.0,
+        700.0
+      ],
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "Forward of the bulkhead, in the ENERGY_REQ_62 IP56 compartment."
+    },
+    "motor_centre_mm": {
+      "v": [
+        -990.0,
+        0.0,
+        500.0
+      ],
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "Transom-mounted, just aft of the pod tail at X = -886 mm. The powerhead spans Z 100 to 900 mm and the leg hangs below it."
+    },
+    "motor_shaft_angle_deg": {
+      "v": 0.0,
+      "u": "deg",
+      "s": "DESIGN_CHOICE",
+      "n": "Trim angle in the modelled pose. The datasheet allows -5 to +30 deg."
+    },
+    "coolant_pump_size_mm": {
+      "v": [
+        120.0,
+        80.0,
+        80.0
+      ],
+      "u": "mm",
+      "s": "ASSUMPTION",
+      "n": "12 V circulation pump, 8 L/min against the loop pressure drop."
+    },
+    "coolant_pump_centre_mm": {
+      "v": [
+        -500.0,
+        200.0,
+        700.0
+      ],
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "Beside the container, port, low so it stays primed. Half-width at this station is 286 mm."
+    },
+    "heat_exchanger_size_mm": {
+      "v": [
+        300.0,
+        120.0,
+        60.0
+      ],
+      "u": "mm",
+      "s": "ASSUMPTION",
+      "n": "Seawater plate exchanger. The sea is the ultimate heat sink for both the pack loop and the motor."
+    },
+    "heat_exchanger_centre_mm": {
+      "v": [
+        -400.0,
+        -220.0,
+        690.0
+      ],
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "Beside the container, starboard, low and near the through-hull pickup. Half-width here is 295 mm, so this is 15 mm off the skin."
+    },
+    "coolant_hose_od_mm": {
+      "v": 19.0,
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "13 mm bore hose. Distinct from cooling.tube_id_m, which is the 6 mm passage inside the cold plates."
+    },
+    "hv_cable_od_mm": {
+      "v": 25.4,
+      "u": "mm",
+      "s": "ASSUMPTION",
+      "n": "150 mm2 flexible tinned copper with silicone insulation, orange per ENERGY_REQ_61. Conductor alone is about 14 mm; the jacket dominates the bend radius."
+    },
+    "hv_cable_bend_radius_mm": {
+      "v": 152.0,
+      "u": "mm",
+      "s": "ASSUMPTION",
+      "n": "Six times outside diameter, the usual minimum for flexible HV cable. Sets whether a route is buildable, which is the whole reason the cables are modelled as swept curves rather than straight lines."
+    },
+    "three_phase_cable_od_mm": {
+      "v": 22.0,
+      "u": "mm",
+      "s": "ASSUMPTION",
+      "n": "Per phase, inverter to motor. Screened."
+    },
+    "bulkhead_x_mm": {
+      "v": 300.0,
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "Station of the ENERGY_REQ_50 bulkhead, moved aft from 120 mm with the seat. The pod is 350 mm half-width and 484 mm tall here, so the bulkhead spans a full section rather than a tapered one."
+    },
+    "bulkhead_thickness_mm": {
+      "v": 12.0,
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "Aluminium sheet on a non-combustible core."
+    },
+    "bulkhead_width_mm": {
+      "v": 630.0,
+      "u": "mm",
+      "s": "CALCULATED",
+      "n": "The pod's usable internal width at X = 120 mm: the shell half-width is 336 mm and 15 mm each side is reserved for the skin and fixings, leaving 642 mm. It was drawn 1400 mm wide -- twice the pod -- and then 660, which was still 10 mm over."
+    },
+    "bulkhead_height_mm": {
+      "v": 380.0,
+      "u": "mm",
+      "s": "CALCULATED",
+      "n": "Pod floor 633 mm to crown 1026 mm at X = 120 mm, inside the 15 mm skin allowance, is 393 mm. 380 leaves a fitting margin. It was 420, which put the bulkhead 9 mm into the floor."
+    },
+    "bulkhead_z_mm": {
+      "v": 823.0,
+      "u": "mm",
+      "s": "CALCULATED",
+      "n": "Centred in the 633 to 1026 mm opening at that station."
+    },
+    "pilot_seat_x_mm": {
+      "v": 820.0,
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "Seat back station. Moved forward from 700 mm. ENERGY_REQ_25 measures 500 mm from here to the container, and with the seat at 700 the container had to end by X = 200, which forced it into the tapering aft section where the pod is only 187 mm tall against the container's 218. Moving the pilot forward is also the right direction for trim."
+    },
+    "pilot_seat_z_mm": {
+      "v": 640.0,
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "Seat pan, just above the pod floor at 577.7 mm."
+    },
+    "estop_centre_mm": {
+      "v": [
+        560.0,
+        -230.0,
+        880.0
+      ],
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "ENERGY_REQ_81 starboard and forward of the pilot, 85 within a metre of starboard, 86 facing outboard. Y is limited by the pod, which is 285 mm half-width at this station -- not by the rule."
+    },
+    "monitor_bay_centre_mm": {
+      "v": [
+        300.0,
+        0.0,
+        1140.0
+      ],
+      "u": "mm",
+      "s": "DESIGN_CHOICE",
+      "n": "ON the crown over the cockpit, where ENERGY_REQ_185's open-to-sky and outside-every-closed-compartment conditions are both met and it is 400 mm clear of the nearest HV run. It was at X = -60, where the terminal-box cable came within 72 mm of the 100 mm the rule requires."
+    }
   },
-
   "rules": {
     "_note": "Monaco Energy Class Technical Rules 2026.1. Numeric limits only; the full check including procedural items is in 08_compliance/.",
-
-    "document":                 { "v": "Monaco Energy Class Technical Rules 2026.1", "u": "-", "s": "DATASHEET" },
-    "issued":                   { "v": "2025-09-08", "u": "-", "s": "DATASHEET" },
-
-    "energy_limit_Wh":          { "v": 10000, "u": "W*hr", "s": "DATASHEET", "n": "ENERGY_REQ_7. Battery energy factor 1.0." },
-    "battery_energy_factor":    { "v": 1.0,   "u": "-", "s": "DATASHEET", "n": "ENERGY_REQ_7 table." },
-    "motor_power_limit_W":      { "v": 25000, "u": "W", "s": "DATASHEET", "n": "ENERGY_REQ_188. New for 2026." },
-    "mass_limit_excl_hulls_kg": { "v": 250,   "u": "kg", "s": "DATASHEET", "n": "ENERGY_REQ_48. Weighed with the pilot." },
-    "hv_approval_threshold_V":  { "v": 100,   "u": "V", "s": "DATASHEET", "n": "ENERGY_REQ_187 approval and ENERGY_REQ_191 training." },
-    "exposed_part_max_C":       { "v": 60,    "u": "degC", "s": "DATASHEET", "n": "ENERGY_REQ_93." },
-    "temp_warn_fraction":       { "v": 0.90,  "u": "-", "s": "DATASHEET", "n": "ENERGY_REQ_68: warn at 90% of the maximum monitored temperature." },
-    "steering_min_angle_deg":   { "v": 40,    "u": "deg", "s": "DATASHEET", "n": "ENERGY_REQ_154." },
-    "sensor_hole_min_mm":       { "v": 3.2,   "u": "mm", "s": "DATASHEET", "n": "ENERGY_REQ_182 organiser temperature sensor." },
-    "monitor_volume_mm":        { "v": [190, 150, 122], "u": "mm", "s": "DATASHEET", "n": "ENERGY_REQ_185 free volume for the organiser device, open to sky." },
-    "monitor_supply_V":         { "v": [10, 28], "u": "V", "s": "DATASHEET", "n": "ENERGY_REQ_184." },
-    "monitor_supply_max_W":     { "v": 30,    "u": "W", "s": "DATASHEET", "n": "ENERGY_REQ_184." },
-
+    "document": {
+      "v": "Monaco Energy Class Technical Rules 2026.1",
+      "u": "-",
+      "s": "DATASHEET"
+    },
+    "issued": {
+      "v": "2025-09-08",
+      "u": "-",
+      "s": "DATASHEET"
+    },
+    "energy_limit_Wh": {
+      "v": 10000,
+      "u": "W*hr",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_7. Battery energy factor 1.0."
+    },
+    "battery_energy_factor": {
+      "v": 1.0,
+      "u": "-",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_7 table."
+    },
+    "motor_power_limit_W": {
+      "v": 25000,
+      "u": "W",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_188. New for 2026."
+    },
+    "mass_limit_excl_hulls_kg": {
+      "v": 250,
+      "u": "kg",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_48. Weighed with the pilot."
+    },
+    "hv_approval_threshold_V": {
+      "v": 100,
+      "u": "V",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_187 approval and ENERGY_REQ_191 training."
+    },
+    "exposed_part_max_C": {
+      "v": 60,
+      "u": "degC",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_93."
+    },
+    "temp_warn_fraction": {
+      "v": 0.9,
+      "u": "-",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_68: warn at 90% of the maximum monitored temperature."
+    },
+    "steering_min_angle_deg": {
+      "v": 40,
+      "u": "deg",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_154."
+    },
+    "sensor_hole_min_mm": {
+      "v": 3.2,
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_182 organiser temperature sensor."
+    },
+    "monitor_volume_mm": {
+      "v": [
+        190,
+        150,
+        122
+      ],
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_185 free volume for the organiser device, open to sky."
+    },
+    "monitor_supply_V": {
+      "v": [
+        10,
+        28
+      ],
+      "u": "V",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_184."
+    },
+    "monitor_supply_max_W": {
+      "v": 30,
+      "u": "W",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_184."
+    },
     "_limits_note": [
       "Every numeric limit the 2026 rules impose, so no threshold is ever a",
       "bare literal in MATLAB, Python or the browser engine. The requirement",
       "number is in the note of each one; 08_compliance/P50B_MonacoCompliance",
       "checks the design against these and nothing else."
     ],
-
-    "min_speed_knots":             { "v": 3.0,  "u": "knot", "s": "DATASHEET", "n": "ENERGY_REQ_37." },
-    "hull_mass_kg":                { "v": 65.0, "u": "kg", "s": "DATASHEET", "n": "ENERGY_REQ_2 and Annex I: hulls with beams. Deducted from the weigh-in figure." },
-    "hull_mass_tol_kg":            { "v": 1.0,  "u": "kg", "s": "DATASHEET", "n": "ENERGY_REQ_48 note: the hulls are supposed to be 65 +/- 1 kg." },
-    "pilot_min_mass_kg":           { "v": 60.0, "u": "kg", "s": "DATASHEET", "n": "ENERGY_REQ_135, ready to sail with overalls, helmet, lifejacket, shoes and comms. Below this the boat is ballasted." },
-
-    "bulkhead_hole_min_mm":        { "v": 30.0, "u": "mm", "s": "DATASHEET", "n": "WITHDRAWN 2027: ENERGY_REQ_174 no longer exists. Kept so the historical check still has a limit to report against." },
-    "bulkhead_hole_max_mm":        { "v": 50.0, "u": "mm", "s": "DATASHEET", "n": "WITHDRAWN 2027: ENERGY_REQ_175 no longer exists. Kept so the historical check still has a limit to report against." },
-    "container_min_from_pilot_mm": { "v": 500.0, "u": "mm", "s": "DATASHEET", "n": "ENERGY_REQ_25. Relaxed from 1 m for 2026." },
-
-    "estop_min_diameter_mm":       { "v": 30.0, "u": "mm", "s": "DATASHEET", "n": "ENERGY_REQ_77." },
-    "estop_yellow_circle_mm":      { "v": 90.0, "u": "mm", "s": "DATASHEET", "n": "ENERGY_REQ_76." },
-    "estop_symbol_min_mm":         { "v": 100.0, "u": "mm", "s": "DATASHEET", "n": "ENERGY_REQ_78." },
-    "estop_max_from_starboard_m":  { "v": 1.0,  "u": "m", "s": "DATASHEET", "n": "ENERGY_REQ_85." },
-    "killcord_max_cutoff_s":       { "v": 1.0,  "u": "s", "s": "DATASHEET", "n": "ENERGY_REQ_71 - instantly, less than one second." },
-
-    "hivis_side_min_cm2":          { "v": 500.0, "u": "cm^2", "s": "DATASHEET", "n": "ENERGY_REQ_49, port and starboard each." },
-    "hivis_end_min_cm2":           { "v": 250.0, "u": "cm^2", "s": "DATASHEET", "n": "ENERGY_REQ_49, forward and aft each." },
-
-    "clamp_min_per_beam":          { "v": 2,     "u": "-", "s": "DATASHEET", "n": "ENERGY_REQ_38." },
-    "clamp_min_width_mm":          { "v": 50.0,  "u": "mm", "s": "DATASHEET", "n": "ENERGY_REQ_38." },
-    "clamp_min_spacing_mm":        { "v": 750.0, "u": "mm", "s": "DATASHEET", "n": "ENERGY_REQ_38. Added for 2026." },
-    "clamp_min_gasket_mm":         { "v": 1.0,   "u": "mm", "s": "DATASHEET", "n": "ENERGY_REQ_38." },
-
-    "monitor_min_cable_clear_mm":  { "v": 100.0, "u": "mm", "s": "DATASHEET", "n": "ENERGY_REQ_185 - at least 10 cm from every power cable." },
-    "ip2x_threshold_dc_V":         { "v": 15.0, "u": "V", "s": "DATASHEET", "n": "ENERGY_REQ_63 - circuits above 15 V DC or 6 V AC." },
-    "ip2x_threshold_ac_V":         { "v": 6.0,  "u": "V", "s": "DATASHEET", "n": "ENERGY_REQ_63." },
-    "touch_probe_diameter_mm":     { "v": 6.0,  "u": "mm", "s": "DATASHEET", "n": "ENERGY_REQ_60 - 100 mm long, 6 mm diameter insulated probe." },
-
-    "extinguisher_min_kg":         { "v": 1.0,  "u": "kg", "s": "DATASHEET", "n": "ENERGY_REQ_106, ABC type per ENERGY_REQ_107." },
-    "paddle_min_length_cm":        { "v": 100.0, "u": "cm", "s": "DATASHEET", "n": "ENERGY_REQ_101." },
-    "paddle_min_blade_length_cm":  { "v": 30.0, "u": "cm", "s": "DATASHEET", "n": "ENERGY_REQ_101." },
-    "paddle_min_blade_width_cm":   { "v": 13.0, "u": "cm", "s": "DATASHEET", "n": "ENERGY_REQ_101." },
-    "boathook_min_length_cm":      { "v": 100.0, "u": "cm", "s": "DATASHEET", "n": "ENERGY_REQ_102." },
-    "warning_flag_min_cm":         { "v": 30.0, "u": "cm", "s": "DATASHEET", "n": "ENERGY_REQ_103." },
-    "flag_min_handle_cm":          { "v": 100.0, "u": "cm", "s": "DATASHEET", "n": "ENERGY_REQ_103." },
-    "towline_min_length_m":        { "v": 10.0, "u": "m", "s": "DATASHEET", "n": "ENERGY_REQ_99." },
-    "towline_min_diameter_mm":     { "v": 10.0, "u": "mm", "s": "DATASHEET", "n": "ENERGY_REQ_99." },
-    "bridle_min_diameter_mm":      { "v": 10.0, "u": "mm", "s": "DATASHEET", "n": "ENERGY_REQ_96." },
-    "lifejacket_min_N":            { "v": 100.0, "u": "N", "s": "DATASHEET", "n": "ENERGY_REQ_137." },
-    "nationality_flag_min_height_m": { "v": 2.0, "u": "m", "s": "DATASHEET", "n": "ENERGY_REQ_150." },
-    "nationality_flag_min_width_cm": { "v": 30.0, "u": "cm", "s": "DATASHEET", "n": "ENERGY_REQ_151." },
-    "comms_min_range_nmi":         { "v": 2.0,  "u": "nmi", "s": "DATASHEET", "n": "ENERGY_REQ_142. VHF is forbidden for 2026 - ENERGY_REQ_141." },
-    "w026_symbol_min_cm":          { "v": 10.0, "u": "cm", "s": "DATASHEET", "n": "ENERGY_REQ_171, ISO 7010:2019." },
-    "label_letter_min_cm":         { "v": 2.0,  "u": "cm", "s": "DATASHEET", "n": "ENERGY_REQ_172 and 173." },
-    "evacuation_max_s":            { "v": 5.0,  "u": "s", "s": "DATASHEET", "n": "ENERGY_REQ_44, unaided." },
-    "solar_max_area_m2":           { "v": 4.0,  "u": "m^2", "s": "DATASHEET", "n": "ENERGY_REQ_28, including the mounting frame." },
-    "sail_max_area_m2":            { "v": 20.0, "u": "m^2", "s": "DATASHEET", "n": "ENERGY_REQ_29." },
-    "label_energy_threshold_Wh":   { "v": 100.0, "u": "W*hr", "s": "DATASHEET", "n": "ENERGY_REQ_171 to 173 apply to any battery above 100 Wh." }
-
+    "min_speed_knots": {
+      "v": 3.0,
+      "u": "knot",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_37."
+    },
+    "hull_mass_kg": {
+      "v": 65.0,
+      "u": "kg",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_2 and Annex I: hulls with beams. Deducted from the weigh-in figure."
+    },
+    "hull_mass_tol_kg": {
+      "v": 1.0,
+      "u": "kg",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_48 note: the hulls are supposed to be 65 +/- 1 kg."
+    },
+    "pilot_min_mass_kg": {
+      "v": 60.0,
+      "u": "kg",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_135, ready to sail with overalls, helmet, lifejacket, shoes and comms. Below this the boat is ballasted."
+    },
+    "bulkhead_hole_min_mm": {
+      "v": 30.0,
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "WITHDRAWN 2027: ENERGY_REQ_174 no longer exists. Kept so the historical check still has a limit to report against."
+    },
+    "bulkhead_hole_max_mm": {
+      "v": 50.0,
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "WITHDRAWN 2027: ENERGY_REQ_175 no longer exists. Kept so the historical check still has a limit to report against."
+    },
+    "container_min_from_pilot_mm": {
+      "v": 500.0,
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_25. Relaxed from 1 m for 2026."
+    },
+    "estop_min_diameter_mm": {
+      "v": 30.0,
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_77."
+    },
+    "estop_yellow_circle_mm": {
+      "v": 90.0,
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_76."
+    },
+    "estop_symbol_min_mm": {
+      "v": 100.0,
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_78."
+    },
+    "estop_max_from_starboard_m": {
+      "v": 1.0,
+      "u": "m",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_85."
+    },
+    "killcord_max_cutoff_s": {
+      "v": 1.0,
+      "u": "s",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_71 - instantly, less than one second."
+    },
+    "hivis_side_min_cm2": {
+      "v": 500.0,
+      "u": "cm^2",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_49, port and starboard each."
+    },
+    "hivis_end_min_cm2": {
+      "v": 250.0,
+      "u": "cm^2",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_49, forward and aft each."
+    },
+    "clamp_min_per_beam": {
+      "v": 2,
+      "u": "-",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_38."
+    },
+    "clamp_min_width_mm": {
+      "v": 50.0,
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_38."
+    },
+    "clamp_min_spacing_mm": {
+      "v": 750.0,
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_38. Added for 2026."
+    },
+    "clamp_min_gasket_mm": {
+      "v": 1.0,
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_38."
+    },
+    "monitor_min_cable_clear_mm": {
+      "v": 100.0,
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_185 - at least 10 cm from every power cable."
+    },
+    "ip2x_threshold_dc_V": {
+      "v": 15.0,
+      "u": "V",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_63 - circuits above 15 V DC or 6 V AC."
+    },
+    "ip2x_threshold_ac_V": {
+      "v": 6.0,
+      "u": "V",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_63."
+    },
+    "touch_probe_diameter_mm": {
+      "v": 6.0,
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_60 - 100 mm long, 6 mm diameter insulated probe."
+    },
+    "extinguisher_min_kg": {
+      "v": 1.0,
+      "u": "kg",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_106, ABC type per ENERGY_REQ_107."
+    },
+    "paddle_min_length_cm": {
+      "v": 100.0,
+      "u": "cm",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_101."
+    },
+    "paddle_min_blade_length_cm": {
+      "v": 30.0,
+      "u": "cm",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_101."
+    },
+    "paddle_min_blade_width_cm": {
+      "v": 13.0,
+      "u": "cm",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_101."
+    },
+    "boathook_min_length_cm": {
+      "v": 100.0,
+      "u": "cm",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_102."
+    },
+    "warning_flag_min_cm": {
+      "v": 30.0,
+      "u": "cm",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_103."
+    },
+    "flag_min_handle_cm": {
+      "v": 100.0,
+      "u": "cm",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_103."
+    },
+    "towline_min_length_m": {
+      "v": 10.0,
+      "u": "m",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_99."
+    },
+    "towline_min_diameter_mm": {
+      "v": 10.0,
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_99."
+    },
+    "bridle_min_diameter_mm": {
+      "v": 10.0,
+      "u": "mm",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_96."
+    },
+    "lifejacket_min_N": {
+      "v": 100.0,
+      "u": "N",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_137."
+    },
+    "nationality_flag_min_height_m": {
+      "v": 2.0,
+      "u": "m",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_150."
+    },
+    "nationality_flag_min_width_cm": {
+      "v": 30.0,
+      "u": "cm",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_151."
+    },
+    "comms_min_range_nmi": {
+      "v": 2.0,
+      "u": "nmi",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_142. VHF is forbidden for 2026 - ENERGY_REQ_141."
+    },
+    "w026_symbol_min_cm": {
+      "v": 10.0,
+      "u": "cm",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_171, ISO 7010:2019."
+    },
+    "label_letter_min_cm": {
+      "v": 2.0,
+      "u": "cm",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_172 and 173."
+    },
+    "evacuation_max_s": {
+      "v": 5.0,
+      "u": "s",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_44, unaided."
+    },
+    "solar_max_area_m2": {
+      "v": 4.0,
+      "u": "m^2",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_28, including the mounting frame."
+    },
+    "sail_max_area_m2": {
+      "v": 20.0,
+      "u": "m^2",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_29."
+    },
+    "label_energy_threshold_Wh": {
+      "v": 100.0,
+      "u": "W*hr",
+      "s": "DATASHEET",
+      "n": "ENERGY_REQ_171 to 173 apply to any battery above 100 Wh."
+    }
   },
-
   "simulation": {
-    "dt_s":               { "v": 1.0,  "u": "s", "s": "DESIGN_CHOICE", "n": "Stepper timestep. Stable to ~8.5 s for the explicit browser scheme." },
-    "ambient_C":          { "v": 30.0, "u": "degC", "s": "ASSUMPTION", "n": "Monaco in July." },
-    "sea_C":              { "v": 28.0, "u": "degC", "s": "ASSUMPTION" },
-    "initial_soc":        { "v": 0.95, "u": "-", "s": "DESIGN_CHOICE" },
-    "initial_temp_C":     { "v": 25.0, "u": "degC", "s": "DESIGN_CHOICE" },
-
-    "sigma_capacity":     { "v": 0.015, "u": "-", "s": "ASSUMPTION", "n": "Ungraded batch spread. Grading to +/-1% gives 0.004." },
-    "sigma_resistance":   { "v": 0.060, "u": "-", "s": "ASSUMPTION", "n": "Ungraded. This, not thermal feedback, is what drives current hogging." },
-    "population_correlation": { "v": -0.4, "u": "-", "s": "ASSUMPTION", "n": "High capacity tends to pair with low resistance." }
+    "dt_s": {
+      "v": 1.0,
+      "u": "s",
+      "s": "DESIGN_CHOICE",
+      "n": "Stepper timestep. Stable to ~8.5 s for the explicit browser scheme."
+    },
+    "ambient_C": {
+      "v": 30.0,
+      "u": "degC",
+      "s": "ASSUMPTION",
+      "n": "Monaco in July."
+    },
+    "sea_C": {
+      "v": 28.0,
+      "u": "degC",
+      "s": "ASSUMPTION"
+    },
+    "initial_soc": {
+      "v": 0.95,
+      "u": "-",
+      "s": "DESIGN_CHOICE"
+    },
+    "initial_temp_C": {
+      "v": 25.0,
+      "u": "degC",
+      "s": "DESIGN_CHOICE"
+    },
+    "sigma_capacity": {
+      "v": 0.015,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Ungraded batch spread. Grading to +/-1% gives 0.004."
+    },
+    "sigma_resistance": {
+      "v": 0.06,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "Ungraded. This, not thermal feedback, is what drives current hogging."
+    },
+    "population_correlation": {
+      "v": -0.4,
+      "u": "-",
+      "s": "ASSUMPTION",
+      "n": "High capacity tends to pair with low resistance."
+    }
   }
 }

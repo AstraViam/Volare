@@ -136,14 +136,86 @@ def load_geometry() -> dict:
         return json.load(f)
 
 
+# Every value the MATLAB geometry export is derived from, mapped to the field
+# it lands in. Keyed by the export path; each entry is the source parameter,
+# the scale from parameter units to export units, and a tolerance.
+#
+# Adding a parameter that P50B_ExportGeometry consumes? Add it here too, or the
+# freshness check will not notice when it changes.
+_GEOMETRY_INPUTS = [
+    # (export path,            parameter path,           scale, tol)
+    ("pack.nSeries",           "pack.n_series",            1.0, 0),
+    ("pack.nParallel",         "pack.n_parallel",          1.0, 0),
+    ("pack.nLayers",           "pack.n_layers",            1.0, 0),
+    ("pack.groupsPerLayer",    "pack.groups_per_layer",    1.0, 0),
+    ("grid.rows",              "pack.grid_rows",           1.0, 0),
+    ("grid.cols",              "pack.grid_cols",           1.0, 0),
+    ("group.rows",             "pack.group_rows",          1.0, 0),
+    ("group.cols",             "pack.group_cols",          1.0, 0),
+    ("cell.diameter_mm",       "cell.diameter_m",        1000.0, 1e-6),
+    ("cell.height_mm",         "cell.height_m",          1000.0, 1e-6),
+    ("cell.mass_kg",           "cell.mass_kg",             1.0, 1e-9),
+    ("cell.clearance_mm",      "pack.cell_clearance_m",  1000.0, 1e-6),
+]
+
+
+def _dig(obj, dotted):
+    """Fetch a dotted path, unwrapping the {v,u,s,n} parameter leaves."""
+    cur = obj
+    for part in dotted.split("."):
+        if not isinstance(cur, dict) or part not in cur:
+            return None
+        cur = cur[part]
+    if isinstance(cur, dict) and "v" in cur:
+        return cur["v"]
+    return cur
+
+
 def check_export_freshness() -> str | None:
-    """Warn if the geometry export predates the parameter file."""
+    """Report whether the geometry export still matches the parameters.
+
+    Compares the VALUES the export was built from against the parameter file,
+    not the two files' modification times.
+
+    Modification time is the wrong test and produced a false alarm: editing a
+    comment in volare_params.json, which changes nothing the export depends
+    on, made the file newer and the check reported the export stale. Worse, it
+    is silent in the opposite direction -- touching the export file would make
+    a genuinely stale export look current.
+
+    Comparing values also says WHICH parameter moved, which is what you need in
+    order to decide whether rerunning P50B_ExportGeometry is necessary.
+    """
     if not (os.path.isfile(GEOMETRY_PATH) and os.path.isfile(PARAMS_PATH)):
         return None
-    if os.path.getmtime(GEOMETRY_PATH) < os.path.getmtime(PARAMS_PATH):
-        return ("output/P50B_Geometry.json is older than "
-                "params/volare_params.json -- rerun P50B_ExportGeometry")
-    return None
+
+    try:
+        with open(GEOMETRY_PATH, "r", encoding="utf-8") as f:
+            geom = json.load(f)
+        with open(PARAMS_PATH, "r", encoding="utf-8") as f:
+            prm = json.load(f)
+    except (OSError, json.JSONDecodeError) as exc:
+        return f"could not compare export against parameters: {exc}"
+
+    drifted = []
+    unchecked = []
+    for export_path, param_path, scale, tol in _GEOMETRY_INPUTS:
+        have = _dig(geom, export_path)
+        want = _dig(prm, param_path)
+        if have is None or want is None:
+            unchecked.append(export_path)
+            continue
+        want = want * scale
+        if abs(float(have) - float(want)) > tol:
+            drifted.append(f"{param_path} is {want:g} but the export has {have:g}")
+
+    if drifted:
+        return ("geometry export no longer matches the parameters -- rerun "
+                "P50B_ExportGeometry. " + "; ".join(drifted))
+    if unchecked:
+        return ("could not verify " + ", ".join(unchecked) +
+                " against the parameter file; the export format may have changed")
+    return None          # fresh; the caller treats None as a pass
 
 
 # ---------------------------------------------------------------------------
@@ -562,18 +634,43 @@ def build(P: dict | None = None, solve: bool = True) -> dict:
         ]), hv_od, hv_bend, "HV",
         "PDU to the inverter DC input"))
 
+    # Three-phase, inverter to outboard.
+    #
+    # Two rules govern this route and the old one broke both.
+    #
+    # First, a corner needs at least one bend radius of STRAIGHT cable either
+    # side of it to be formed. The old route stepped outboard to a station
+    # only 37 mm short of the outboard centre and turned twice inside that
+    # 37 mm, asking for a 37 mm radius in a cable rated for 132. That is not
+    # a tight fit, it is an impossible one.
+    #
+    # Second, and less obvious: DO NOT climb over the outboard. The inverter
+    # sits only about 90 mm above the outboard top, so routing up to an apex
+    # and back down puts a hairpin in the cable. Lengthening the legs then
+    # makes the bend radius WORSE, not better, because raising the apex makes
+    # the reversal sharper faster than the legs grow. Measured: 105 mm at a
+    # 152 mm leg, falling to 82 mm at a 232 mm leg.
+    #
+    # So the route descends monotonically. One straight leg off the inverter
+    # face, then a single diagonal carrying the outboard offset, the lateral
+    # shift and the 91 mm of descent together. One corner, opened out to about
+    # 115 degrees, which a 132 mm radius fits inside comfortably.
+    #
+    # These cables stay deliberately short: they are the loudest EMC source on
+    # the boat and length is the cheapest fix for that.
+    ph_bend = 6 * ph_od
+    ph_leg = ph_bend + 20.0          # straight off the inverter face
+
     for i, dy in enumerate((-40.0, 0.0, 40.0)):
         cables.append(CableRun(
             f"phase_{'UVW'[i]}", np.array([
                 [inv.lo[0], inv.centre[1] + dy, inv.centre[2]],
-                [inv.lo[0] - 6 * ph_od - 60.0, inv.centre[1] + dy,
-                 inv.centre[2]],
-                [inv.lo[0] - 6 * ph_od - 60.0, dy, motor.hi[2] + 160.0],
-                [motor.centre[0], dy, motor.hi[2] + 160.0],
+                [inv.lo[0] - ph_leg, inv.centre[1] + dy, inv.centre[2]],
                 [motor.centre[0], dy, motor.hi[2]],
-            ]), ph_od, 6 * ph_od, "HV",
-            "screened three-phase. Short on purpose: this is the loudest "
-            "EMC source on the boat and length is the cheapest fix"))
+            ]), ph_od, ph_bend, "HV",
+            "screened three-phase. Descends monotonically: no climb over the "
+            "outboard, because a hairpin there cannot meet the bend radius"))
+
 
     return dict(parts=parts, cables=cables, params=P,
                 pack_envelope_mm=pack_env, geometry=GEO,
@@ -623,7 +720,8 @@ def check(asm: dict) -> list[tuple[str, bool, str]]:
 
     stale = check_export_freshness()
     add("geometry export is current", stale is None,
-        stale or "newer than the parameter file")
+        stale or f"all {len(_GEOMETRY_INPUTS)} geometry inputs match "
+                 "params/volare_params.json")
 
     # --- nothing intersects ----------------------------------------------
     worst, worst_pair = np.inf, ("", "")
@@ -767,6 +865,37 @@ def check(asm: dict) -> list[tuple[str, bool, str]]:
     asm["mass_kg"] = total
     asm["cg_mm"] = cg
 
+    # --- cross-language constants must not drift -------------------------
+    #
+    # CLAUDE.md: never duplicate a constant across the two languages, read it
+    # from the shared parameter file. volare.py is pure constants with no file
+    # I/O by design, so it cannot read the file; the next best thing is to
+    # fail loudly when the two disagree. They did: volare.py had a 70 kg pilot
+    # and the parameter file had 80 kg, a 10 kg error sitting directly against
+    # a 250 kg cap with negative margin.
+    pilot_param = float(P["boat"]["pilot_mass_kg"])
+    add("pilot mass agrees between volare.py and the parameter file",
+        abs(volare.PILOT_DESIGN_KG - pilot_param) < 1e-9,
+        f"volare.py has {volare.PILOT_DESIGN_KG:.1f} kg, "
+        f"boat.pilot_mass_kg has {pilot_param:.1f} kg"
+        + ("" if abs(volare.PILOT_DESIGN_KG - pilot_param) < 1e-9
+           else " -- the boat is weighed with the pilot, so this lands "
+                "straight on the ENERGY_REQ_48 margin"))
+
+    # --- the motor power limit that makes the outboard legal -------------
+    #
+    # ENERGY_REQ_188 v1.1 caps INSTANTANEOUS power summed over all motors at
+    # 25 kW and permits no peak. The outboard hardware is rated above that, so
+    # compliance rests entirely on the controller limit being set and being
+    # demonstrable. This asserts the limit exists and is at or below the cap.
+    limit_w = float(P["motor"].get("power_limit_W", float("inf")))
+    rule_w = 25000.0
+    add("the motor controller limit meets ENERGY_REQ_188",
+        limit_w <= rule_w + 1e-6,
+        f"enforced limit {limit_w/1000:.1f} kW against a {rule_w/1000:.0f} kW "
+        f"cap; hardware peak is {float(P['motor']['power_max_W'])/1000:.1f} kW and is "
+        "not a permitted operating point")
+
     # --- against the MATLAB weight budget ---------------------------------
     #
     # The budget in P50B_MassBudget books these items as allowances -- a
@@ -783,33 +912,140 @@ def check(asm: dict) -> list[tuple[str, bool, str]]:
             C = json.load(f)
 
         if "mass" in C:
-            # The lines the CAD actually models as physical parts. The rest
-            # of the budget -- cockpit structure, seat, controls, pilot --
-            # is outside the powertrain and is not compared.
-            modelled = {"Battery pack", "Outboard", "Trim assembly",
-                        "Inverter / ESC", "HV harness and switchgear",
-                        "Cooling system", "LV system",
-                        "Organiser equipment"}
+            # EXPLICIT mapping, CAD part -> MATLAB budget line.
+            #
+            # This used to be a set of budget-item names summed with a
+            # membership test, and it was silently wrong. It looked for a line
+            # called "HV harness and switchgear"; the budget has two lines,
+            # "HV switchgear" and "HV harness (cable)". Nothing matched, so
+            # 9.6 kg simply vanished from the budget side and the CAD appeared
+            # 7 kg heavy when it is in fact slightly light.
+            #
+            # A membership test cannot fail loudly. A mapping can: anything
+            # unmapped on either side is reported below, so the next rename
+            # produces a complaint instead of a wrong number.
+            CAD_TO_BUDGET = {
+                "battery_pack":        "Battery pack",
+                "outboard":            "Outboard",
+                "drive_leg":           "Trim assembly",
+                "inverter":            "Inverter / ESC",
+                "energy_container":    "Energy container",
+                # switchgear is one budget line and six CAD parts
+                "pdu":                 "HV switchgear",
+                "main_contactor":      "HV switchgear",
+                "precharge_contactor": "HV switchgear",
+                "terminal_box":        "HV switchgear",
+                "main_fuse":           "HV switchgear",
+                "current_shunt":       "HV switchgear",
+                "heat_exchanger":      "Cooling system",
+                "coolant_pump":        "Cooling system",
+                "dcdc":                "LV system",
+                "vcu":                 "LV system",
+                "lv_battery":          "LV system",
+            }
 
-            budget = sum(i["kg"] for i in C["mass"]["items"]
-                         if i["item"] in modelled)
+            # Parts the CAD draws that the budget books elsewhere, outside the
+            # powertrain. Excluded from BOTH sides so the comparison is like
+            # for like.
+            CAD_ELSEWHERE = {
+                "bulkhead":    "Cockpit structure",
+                "estop":       "Safety equipment",
+                "monitor_bay": "Organiser equipment",
+            }
 
-            # Structure and safety items the CAD draws but the budget books
-            # under cockpit structure and safety equipment instead.
-            elsewhere = sum(p.mass_kg for p in parts
-                            if p.name in ("bulkhead", "estop", "monitor_bay"))
+            # Budget lines with no CAD counterpart, and why.
+            BUDGET_UNMODELLED = {
+                "HV harness (cable)": "the CAD routes cables but gives them no mass",
+                "Cockpit structure": "outside the powertrain",
+                "Steering and controls": "outside the powertrain",
+                "Seat": "outside the powertrain",
+                "Safety equipment": "outside the powertrain",
+                "Beam clamps and fasteners": "outside the powertrain",
+                "Pilot, ready to sail": "not hardware",
+                "Contingency": "an allowance, not a part",
+                "Ballast": "an allowance, not a part",
+                "Organiser equipment": "drawn as monitor_bay, excluded both sides",
+            }
 
-            comparable = total - elsewhere
+            budget_by_item = {i["item"]: i["kg"] for i in C["mass"]["items"]}
+
+            # --- integrity: nothing may be silently dropped ----------------
+            problems = []
+            for cad_name, item in CAD_TO_BUDGET.items():
+                if item not in budget_by_item:
+                    problems.append(f"CAD part '{cad_name}' maps to budget line "
+                                    f"'{item}', which does not exist")
+            cad_names = {p.name for p in parts}
+            for cad_name in list(CAD_TO_BUDGET) + list(CAD_ELSEWHERE):
+                if cad_name not in cad_names:
+                    problems.append(f"mapping names CAD part '{cad_name}', "
+                                    "which the CAD does not build")
+            for p_ in parts:
+                if p_.mass_kg > 0 and p_.name not in CAD_TO_BUDGET \
+                        and p_.name not in CAD_ELSEWHERE:
+                    problems.append(f"CAD part '{p_.name}' ({p_.mass_kg:.2f} kg) "
+                                    "is in no mapping")
+            for item in budget_by_item:
+                if item not in CAD_TO_BUDGET.values() \
+                        and item not in BUDGET_UNMODELLED:
+                    problems.append(f"budget line '{item}' is in no mapping")
+
+            add("the CAD-to-budget mass mapping is complete",
+                not problems,
+                "; ".join(problems) if problems
+                else f"{len(CAD_TO_BUDGET)} CAD parts mapped onto "
+                     f"{len(set(CAD_TO_BUDGET.values()))} budget lines, "
+                     f"{len(BUDGET_UNMODELLED)} lines deliberately unmodelled")
+
+            # --- like-for-like comparison ----------------------------------
+            comparable = sum(p_.mass_kg for p_ in parts
+                             if p_.name in CAD_TO_BUDGET)
+            budget = sum(budget_by_item[i]
+                         for i in set(CAD_TO_BUDGET.values())
+                         if i in budget_by_item)
             delta = comparable - budget
+
+            # Per-line audit, so a disagreement says WHERE.
+            asm["mass_audit"] = []
+            for item in sorted(set(CAD_TO_BUDGET.values())):
+                cad_kg = sum(p_.mass_kg for p_ in parts
+                             if CAD_TO_BUDGET.get(p_.name) == item)
+                bud_kg = budget_by_item.get(item, 0.0)
+                asm["mass_audit"].append(dict(item=item, cad_kg=cad_kg,
+                                              budget_kg=bud_kg,
+                                              delta_kg=cad_kg - bud_kg))
 
             asm["mass_vs_budget_kg"] = delta
             asm["budget_margin_kg"] = C["mass"]["margin_kg"]
 
+            # Two DIFFERENT questions, and they used to be one check.
+            #
+            # The tolerance was the budget margin. The margin is currently
+            # -9.2 kg, because the budget does not close, so the test read
+            # abs(delta) <= -9.2 and could never be true however well the two
+            # sides agreed. A modelling-consistency check must not be gated on
+            # an engineering result.
+            #
+            # Question one: do the two accountings of the SAME hardware agree?
+            # That is about modelling quality and wants a fixed tolerance.
+            MASS_AGREEMENT_TOL_KG = 3.0
             add("CAD mass agrees with the MATLAB budget",
-                abs(delta) <= C["mass"]["margin_kg"],
+                abs(delta) <= MASS_AGREEMENT_TOL_KG,
                 f"CAD {comparable:.1f} kg against {budget:.1f} kg budgeted, "
-                f"{delta:+.1f} kg, and the budget has "
-                f"{C['mass']['margin_kg']:.1f} kg of margin")
+                f"{delta:+.1f} kg, tolerance {MASS_AGREEMENT_TOL_KG:.1f} kg. "
+                + ("the CAD is the better estimate where they differ, because "
+                   "an allowance does not know it forgot the container shell"
+                   if abs(delta) > MASS_AGREEMENT_TOL_KG else "within tolerance"))
+
+            # Question two: does the budget close against the 250 kg limit?
+            # That is the engineering result, and it is reported separately so
+            # a failure here cannot be mistaken for a modelling error.
+            margin = C["mass"]["margin_kg"]
+            add("the MATLAB mass budget closes under the 250 kg cap",
+                margin >= 0.0,
+                f"margin {margin:+.1f} kg against ENERGY_REQ_48. "
+                + ("over the cap; see cad/scripts/mass.py for closure options"
+                   if margin < 0 else "closes"))
 
     return out
 
@@ -883,6 +1119,25 @@ def main() -> int:
         rs = "straight" if np.isinf(r) else f"{r:.0f}"
         print(f"  {c.name:<22}{c.od_mm:>6.1f}{c.length_mm:>11.0f}"
               f"{rs:>10}{c.min_bend_mm:>7.0f}")
+
+    # Per-line mass audit. Printed because a one-line total hides where the
+    # two accountings actually disagree, and that is the number an engineer
+    # needs in order to act.
+    if asm.get("mass_audit"):
+        print("\nMASS AUDIT, CAD against the MATLAB budget\n")
+        print(f"  {'budget line':<26}{'CAD kg':>9}{'budget kg':>11}{'delta':>9}")
+        tc = tb = 0.0
+        for row in asm["mass_audit"]:
+            tc += row["cad_kg"]
+            tb += row["budget_kg"]
+            flag = "  <--" if abs(row["delta_kg"]) > 0.5 else ""
+            print(f"  {row['item']:<26}{row['cad_kg']:>9.2f}"
+                  f"{row['budget_kg']:>11.2f}{row['delta_kg']:>+9.2f}{flag}")
+        print(f"  {'':<26}{'-'*9}{'-'*11}{'-'*9}")
+        print(f"  {'TOTAL':<26}{tc:>9.2f}{tb:>11.2f}{tc - tb:>+9.2f}")
+        print("\n  Lines marked <-- differ by more than 0.5 kg. Where the two")
+        print("  disagree the CAD is usually the better estimate: an allowance")
+        print("  does not know it forgot the container shell.")
 
     print(f"\nCHECKS\n")
     nfail = 0

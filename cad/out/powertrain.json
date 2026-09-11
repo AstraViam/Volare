@@ -452,19 +452,9 @@
      696.1108126220703
     ],
     [
-     -953.275,
+     -913.275,
      100.0,
      696.1108126220703
-    ],
-    [
-     -953.275,
-     -40.0,
-     765.0
-    ],
-    [
-     -990.0,
-     -40.0,
-     765.0
     ],
     [
      -990.0,
@@ -474,10 +464,10 @@
    ],
    "od_mm": 22.0,
    "min_bend_mm": 132.0,
-   "length_mm": 544.7561511769093,
-   "tightest_bend_mm": 36.725000000000016,
+   "length_mm": 335.81486828234,
+   "tightest_bend_mm": 237.08631709566825,
    "zone": "HV",
-   "note": "screened three-phase. Short on purpose: this is the loudest EMC source on the boat and length is the cheapest fix"
+   "note": "screened three-phase. Descends monotonically: no climb over the outboard, because a hairpin there cannot meet the bend radius"
   },
   {
    "name": "phase_V",
@@ -488,19 +478,9 @@
      696.1108126220703
     ],
     [
-     -953.275,
+     -913.275,
      140.0,
      696.1108126220703
-    ],
-    [
-     -953.275,
-     0.0,
-     765.0
-    ],
-    [
-     -990.0,
-     0.0,
-     765.0
     ],
     [
      -990.0,
@@ -510,10 +490,10 @@
    ],
    "od_mm": 22.0,
    "min_bend_mm": 132.0,
-   "length_mm": 544.7561511769093,
-   "tightest_bend_mm": 36.725000000000016,
+   "length_mm": 335.81486828234,
+   "tightest_bend_mm": 237.08631709566825,
    "zone": "HV",
-   "note": "screened three-phase. Short on purpose: this is the loudest EMC source on the boat and length is the cheapest fix"
+   "note": "screened three-phase. Descends monotonically: no climb over the outboard, because a hairpin there cannot meet the bend radius"
   },
   {
    "name": "phase_W",
@@ -524,19 +504,9 @@
      696.1108126220703
     ],
     [
-     -953.275,
+     -913.275,
      180.0,
      696.1108126220703
-    ],
-    [
-     -953.275,
-     40.0,
-     765.0
-    ],
-    [
-     -990.0,
-     40.0,
-     765.0
     ],
     [
      -990.0,
@@ -546,10 +516,10 @@
    ],
    "od_mm": 22.0,
    "min_bend_mm": 132.0,
-   "length_mm": 544.7561511769093,
-   "tightest_bend_mm": 36.725000000000016,
+   "length_mm": 335.81486828234,
+   "tightest_bend_mm": 237.08631709566825,
    "zone": "HV",
-   "note": "screened three-phase. Short on purpose: this is the loudest EMC source on the boat and length is the cheapest fix"
+   "note": "screened three-phase. Descends monotonically: no climb over the outboard, because a hairpin there cannot meet the bend radius"
   }
  ]
 }

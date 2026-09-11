@@ -106,9 +106,17 @@ blender -b -P cad/blender/<name>.py                   # scenes
 SMOKE_TEST ; RUN_EVERYTHING ; TEST_ALL
 ```
 
-`cad/scripts/powertrain.py` exits non-zero because 3 of its 15 **design** checks
-fail — those are real open issues, not a broken script. Do not "fix" it by
-loosening a check.
+`cad/scripts/powertrain.py` exits non-zero because 1 of its 19 **design**
+checks fails: the MATLAB mass budget is 9.2 kg over the 250 kg cap
+(ENERGY_REQ_48). That is a real open engineering issue, not a broken script.
+Do not "fix" it by loosening a check; close the budget.
+
+The other two failures that used to appear here were modelling bugs and are
+gone. The geometry-freshness check compared file modification times, so a
+comment-only edit tripped it; it now compares the values the export was built
+from and names the parameter that moved. The phase-U cable asked for a 37 mm
+bend radius in a cable rated 132 mm, because the route climbed over the
+outboard and hairpinned; it now descends monotonically.
 
 ---
 

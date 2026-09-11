@@ -21,9 +21,10 @@ SCRIPTS = ROOT / "cad" / "scripts"
 # Known non-zero exits that are not regressions. Remove an entry the moment its
 # cause is fixed, so the failure starts being reported again.
 EXPECTED_FAILURES = {
-    "powertrain.py": "3 of 15 design checks fail. These are real open "
-                     "engineering issues, documented in CLAUDE.md. Do not "
-                     "loosen a check to make this pass",
+    "powertrain.py": "1 of 19 design checks fails: the MATLAB mass budget is "
+                     "9.2 kg over the 250 kg cap (ENERGY_REQ_48). A real open "
+                     "engineering issue, not a modelling error. Do not loosen "
+                     "the check; close the budget",
 }
 
 TIMEOUT_S = 300
