@@ -4,7 +4,7 @@
 stands. Anyone, human or AI, should be able to read this page and start work
 without reading the rest of the repository.
 
-Last updated: 2026-09-10 (fifth session) · Branch: `claude/epic-lovelace-36k14r`
+Last updated: 2026-09-11 (sixth session) · Branch: `claude/epic-lovelace-36k14r`
 
 ---
 
@@ -21,7 +21,7 @@ through one file and are otherwise separate.
 |---|---|---|
 | `powertrain/` — 26S21P battery pack, drivetrain, mission, compliance | MATLAB | Structured; blocked on 2 measured data files |
 | `cad/` — geometry, frame, aero, optimisation, Blender scenes | Python | 14 of 16 modules self-test green |
-| `propulsor/` — contra-rotating propulsor optimiser | MATLAB | **Stages 0-2 built and gated, 69 checks green.** Stages 3-12 remain; see `propulsor/DESIGN.md` |
+| `propulsor/` — contra-rotating propulsor optimiser | MATLAB | **Stages 0-4 built and gated, 147 checks green.** The BEM solver runs end to end. Stages 5-12 remain; see `propulsor/DESIGN.md` |
 | `notes/`, `docs/` — design record and competition rules | Markdown | Complete |
 
 ---
@@ -248,12 +248,15 @@ code on first run.
    the revised ENERGY_REQ_184 list, and decide the post-August-2028 cell
    chemistry (ENERGY_REQ_193). All listed in
    `docs/reference/RULES_CHANGES_2026_to_2027.md` section 7.
-2. **Stage 3 of `propulsor/DESIGN.md`: `hydrofoil_polar.m` and
-   `propeller_geometry.m`.** Stages 0 to 2 are done and gated. These two are
-   the hard ones and everything downstream depends on their quality.
-   Stage 4 is the honesty checkpoint: if the single-rotor BEM does not give
-   sane K_T and K_Q against published open-water data, nothing after it means
-   anything.
+2. **Widen the pitch search bounds before the first optimisation run.**
+   Efficiency has not turned over by P/D = 2.2 and the configured bounds stop
+   at 1.52, so the optimiser would pin against the upper bound and report it
+   as converged. `DESIGN.md` section 9c has the numbers.
+3. **Stage 5: couple the rotors through `crp_interaction.m`.** Both wrappers
+   and the single-rotor solver are in place; what remains is verifying the
+   coupled loop converges and that the rear rotor genuinely recovers swirl.
+   The gate is that rear-rotor inflow strictly exceeds the free-stream
+   advance speed and that swirl recovery is positive.
 2. **Resolve the cockpit STL path.** Pick one canonical location and make
    `volare_params.json` agree, then remove the fallback in `boat.py`.
 3. **Run `TEST_ALL.m` and `RUN_EVERYTHING.m` in MATLAB** and record the result
@@ -269,6 +272,51 @@ code on first run.
 
 Append one entry per working session. Newest first. Keep entries short: what
 changed, what broke, what is next.
+
+### 2026-09-11 (sixth session) — propulsor stages 3 and 4, solver running
+Built `hydrofoil_polar.m`, `propeller_geometry.m`, `prandtl_loss.m`,
+`bem_front_rotor.m` and `bem_rear_rotor.m`. **The blade element momentum
+solver now runs end to end and converges at every advance ratio tested.**
+
+Interface catch: `bem_rotor.m` calls
+`hydrofoil_polar(alpha, Re, toc, foc, vent, params)` returning two plain
+arrays, not the struct-returning signature written first. Rewritten to match
+the existing caller, which also added the ventilated-section branch the
+config already parameterises: linearised supercavitating theory gives a lift
+slope of pi/2 per radian, a quarter of the wetted 2*pi, and the test confirms
+the ratio at 4.25 against the thickness-corrected slope.
+
+`crp_interaction.m` calls `bem_front_rotor` and `bem_rear_rotor` by name.
+Rather than duplicate the solver, both are thin wrappers on `bem_rotor` that
+add rotor-specific warnings: the front one warns if given pre-swirl, since an
+actuator disc induces no tangential velocity upstream of itself; the rear one
+warns if given none, since that would be two independent propellers rather
+than a contra-rotating pair.
+
+A real modelling error was caught by a symmetry test: the drag bucket was
+centred on a single global `Cl_design`, which put minimum drag at a positive
+angle of attack even for an uncambered section. It is now centred on the
+section's own camber-derived design lift, so an uncambered section has its
+drag minimum at zero incidence, as symmetry requires.
+
+Three of my own tests were wrong rather than the code, and each taught
+something: an absolute curvature threshold cannot distinguish a kink from
+designed blend curvature (convergence under refinement can); 25 kW is
+unreachable at 2000 rpm because the torque limit binds first; and increasing
+rotation rate means decreasing advance ratio, so a trend assertion over the
+sweep reads backwards unless sorted.
+
+`round(x, n)` is MATLAB-only and Octave rejects it. Added it to
+`tools/octave_check.m` along with `contains`, `strlength` and `isstring`.
+
+First real result from the running model: at 20 knots the thrust loading is
+only C_T = 0.072, and efficiency rises monotonically with pitch across the
+whole searchable range without turning over. The supplied 26.5 inch reference
+pitch is P/D = 1.35 and sits near the bottom. **The configured pitch search
+bounds of 22 to 30 inches are probably too narrow.** See `DESIGN.md`
+section 9c.
+
+147 checks green.
 
 ### 2026-09-10 (fifth session) — 2027 rules adopted
 Replaced the 2026 Technical Rules and Notice of Challenge with the 2027

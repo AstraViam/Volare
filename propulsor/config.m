@@ -175,6 +175,51 @@ params.propeller.rear.P07_min_m    = 24 * U.in2m;
 params.propeller.rear.P07_max_m    = 32 * U.in2m;
 params.propeller.front.D_min_m     = 0.30;
 params.propeller.rear.D_min_m      = 0.30;
+% -------------------------------------------------------------------------
+% BLADE SHAPE PARAMETERISATION
+%
+% The blade is described by a handful of smooth shape numbers, not by a free
+% value at every radial station. That is deliberate. Letting the optimiser
+% move 24 chord values independently produces a saw-toothed blade that scores
+% well and cannot be made, and it multiplies the search dimension for no
+% physical gain. Distributions are interpolated through these control points
+% with pchip, which is shape preserving, so a chord distribution can never
+% overshoot into a negative value between knots.
+%
+% All values are normalised. Chord is a SHAPE only; its scale is set by the
+% expanded area ratio, so changing EAR does not change the shape and changing
+% the shape does not change the blade area.
+% -------------------------------------------------------------------------
+params.propeller.common.shape.chord_x   = [0.20 0.40 0.60 0.75 0.90 1.00];
+params.propeller.common.shape.chord_val = [0.72 0.94 1.00 0.96 0.72 0.18];
+%   Peaks near 0.6R and falls to a small but non-zero tip, which is what a
+%   rounded tip is. Zero chord at the tip would put the Prandtl tip factor and
+%   the local solidity both at zero and make the BEM residual degenerate.
+
+params.propeller.common.shape.pitch_x     = [0.20 0.70 1.00];
+params.propeller.common.shape.pitch_ratio = [0.85 1.00 0.95];
+%   Pitch relative to its value at 0.7R, the station pitch is quoted at.
+%   Reduced at the root to keep the inner sections off stall, and slightly
+%   reduced at the tip to unload it. ASSUMED; a real design comes from the
+%   optimiser or from the supplier's drawing.
+
+params.propeller.common.shape.toc_x   = [0.20 0.60 1.00];
+params.propeller.common.shape.toc_val = [0.16 0.075 0.030];
+%   Thickness/chord. Thick at the root where the bending moment is carried,
+%   thin at the tip for efficiency. The tip value is floored by
+%   tTE_over_c and by the structural check.
+
+params.propeller.common.shape.foc_x   = [0.20 0.60 1.00];
+params.propeller.common.shape.foc_val = [0.020 0.025 0.015];
+%   Camber/chord. ASSUMED distribution; the optimiser may vary it.
+
+params.propeller.common.shape.skew_exp = 2.0;   % skew grows as x^2 to the tip
+params.propeller.common.shape.rake_exp = 1.0;   % rake grows linearly to the tip
+
+params.propeller.common.EAR_ref     = 0.75;   % baseline expanded area ratio
+params.propeller.common.toc_min     = 0.020;  % manufacturable minimum t/c
+params.propeller.common.dcdx_max    = 4.0;    % smoothness: max |d(c/D)/d(r/R)|
+
 params.propeller.common.EAR_min    = 0.45;
 params.propeller.common.EAR_max    = 1.05;
 params.propeller.common.n_prop_min_rps = 5;     % ASSUMED propeller speed bounds (gearbox plausibility)

@@ -281,8 +281,8 @@ Each stage ends with a runnable check. Nothing proceeds on an unverified stage.
 | 0 | `units.m`, then `config()` runs | **DONE.** 11 checks green |
 | 1 | `resistance_model.m` | **DONE.** 16 checks green, including a discriminator that fails if pchip is swapped for linear |
 | 2 | `motor_model.m` | **DONE.** 18 checks green, including the 25 kW cap held across 5001 speeds |
-| 3 | `hydrofoil_polar.m`, `propeller_geometry.m` | Smooth geometry, no negative chord, monotonic radius |
-| 4 | `bem_rotor.m` on a single submerged rotor | Converges; `eta_0` in (0,1); `K_T`, `K_Q` physically ordered |
+| 3 | `hydrofoil_polar.m`, `propeller_geometry.m` | **DONE.** 32 + 29 checks green |
+| 4 | `bem_rotor.m` on a single submerged rotor | **DONE.** 17 checks green, including that efficiency never beats the actuator-disc ideal |
 | 5 | `crp_interaction.m` coupled | Rear-rotor inflow strictly exceeds `V_A`; swirl recovery positive |
 | 6 | `surface_piercing_model.m` | Immersion in [0,1]; cyclic torque amplitude reported |
 | 7 | `gearbox_model.m` | Ratios reproduce the rotor speeds from the motor speed |
@@ -402,6 +402,48 @@ speeds and fails if any point exceeds the cap.
 | ENERGY_REQ_195 v1.0 **(new)** | Waterproof 220 × 111 × 80 mm per traction chain for the Organiser's power sensor | Cockpit layout, not this subsystem |
 
 Full change record: `docs/reference/RULES_CHANGES_2026_to_2027.md`.
+
+---
+
+## 9c. First real result from the running model
+
+With the solver working end to end, the first engineering finding is about
+pitch. At the 20 knot design point the required thrust is
+
+    T = R_T / (1 - t) = 624 / 0.90 = 693 N
+
+on a 0.5 m disc at 9.77 m/s advance, which is a thrust loading coefficient of
+only **C_T = 0.072**. That is very lightly loaded, and the actuator-disc ideal
+efficiency at that loading is **0.983**.
+
+Matching the required thrust at a range of pitches gives:
+
+| P/D | n, rev/s | J | eta_o |
+|---:|---:|---:|---:|
+| 1.0 | 18.7 | 1.05 | 0.503 |
+| 1.4 | 15.0 | 1.30 | 0.617 |
+| 1.8 | 11.4 | 1.72 | 0.712 |
+| 2.2 | 9.1 | 2.14 | 0.752 |
+
+**Efficiency rises monotonically with pitch across the whole searchable range,
+and has not turned over by P/D = 2.2.** The supplied reference pitch of 26.5
+inches is P/D = 1.35 on a 0.5 m propeller, which sits near the bottom of that
+table at about 0.63.
+
+Two consequences:
+
+1. **The configured pitch search bounds are probably too narrow.**
+   `params.propeller.front.P07_min_m` and `_max_m` span 22 to 30 inches, which
+   is P/D 1.12 to 1.52 at this diameter. The optimum appears to lie well
+   outside. Widen them before the first optimisation run, or the optimiser
+   will simply pin against the upper bound and report it as converged.
+2. **The boat is propeller-limited, not motor-limited, at 20 knots.** The
+   earlier chain estimate already showed the motor at 45 percent of its
+   ceiling. This says where the recoverable loss actually is.
+
+Both statements come from the provisional polar. They will move when real
+section data arrives, but the direction is robust: at C_T = 0.072 a lightly
+loaded, slow-turning, high-pitch rotor is the right answer.
 
 ---
 

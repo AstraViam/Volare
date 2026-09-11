@@ -20,6 +20,10 @@ banned = {
   '\<string\s*\(',          'string() type; use char arrays or cellstr'
   '\<dictionary\s*\(',      'dictionary() (MATLAB R2022b+); use struct or containers.Map'
   '^\s*classdef\>',         'classdef; prefer functions and structs here'
+  '\<round\s*\([^)]*,',    'round(x,n) is MATLAB-only; Octave round takes one argument. Use sprintf to format instead'
+  '\<contains\s*\(',       'contains() is MATLAB-only; use strfind or regexp'
+  '\<strlength\s*\(',      'strlength() is MATLAB-only; use numel on a char array'
+  '\<isstring\s*\(',       'isstring() implies the string type; use ischar or iscellstr'
 };
 
 files = {};
